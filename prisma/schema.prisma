@@ -1,0 +1,222 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../node_modules/.prisma/client"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model projects {
+  id        String      @id @default(uuid()) @db.Uuid
+  title     String      @default("New Project")
+  documents documents[]
+  maps      maps[]
+  boards    boards[]
+  image     String?
+  tags      tags[]
+}
+
+model documents {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String   @default("New Document")
+  content     Json?    @db.JsonB
+  icon        String?  @default("mdi:file")
+  expanded    Boolean  @default(false)
+  folder      Boolean  @default(false)
+  isPublic    Boolean  @default(false)
+  sort        Int      @default(0)
+  template    Boolean  @default(false)
+  properties  Json?
+  alter_names String[] @default([])
+  image       String?
+
+  // Relations
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  project_id String   @db.Uuid
+  nodes      nodes[]
+
+  parentId String?     @db.Uuid
+  parent   documents?  @relation("parentChildDocuments", fields: [parentId], references: [id], onDelete: Cascade)
+  children documents[] @relation("parentChildDocuments")
+
+  tags   tags[]
+  tagsId String? @db.Uuid
+}
+
+model maps {
+  id       String  @id @default(uuid()) @db.Uuid
+  title    String  @default("New Map")
+  folder   Boolean @default(false)
+  isPublic Boolean @default(false)
+  expanded Boolean @default(false)
+  sort     Int     @default(0)
+
+  image String?
+  icon  String? @default("mdi:map")
+
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  project_id String   @db.Uuid
+
+  map_pins   map_pins[]
+  map_layers map_layers[]
+
+  parentId String? @db.Uuid
+  parent   maps?   @relation("parentChildMaps", fields: [parentId], references: [id], onDelete: Cascade)
+  children maps[]  @relation("parentChildMaps")
+  tags     tags[]
+}
+
+model map_pins {
+  id              String  @id @default(uuid()) @db.Uuid
+  parent          String  @db.Uuid
+  lat             Float
+  lng             Float
+  color           String  @default("#ffffff")
+  backgroundColor String  @default("#000000")
+  icon            String
+  isPublic        Boolean @default(true)
+  text            String?
+  map_link        String? @db.Uuid
+  doc_id          String? @db.Uuid
+  maps            maps?   @relation(fields: [parent], references: [id], onDelete: Cascade)
+  tags            tags[]
+}
+
+model map_layers {
+  id       String  @id @default(uuid()) @db.Uuid
+  title    String  @default("New Layer")
+  image    String?
+  parent   String  @db.Uuid
+  isPublic Boolean @default(false)
+  maps     maps?   @relation(fields: [parent], references: [id], onDelete: Cascade)
+}
+
+model boards {
+  id       String  @id @default(uuid()) @db.Uuid
+  title    String  @default("New Board")
+  folder   Boolean @default(false)
+  isPublic Boolean @default(false)
+  expanded Boolean @default(false)
+  sort     Int     @default(0)
+
+  icon String? @default("mdi:draw")
+
+  defaultNodeShape String  @default("rectangle")
+  defaultNodeColor String  @default("#595959")
+  defaultEdgeColor String  @default("#595959")
+  defaultGrid      Boolean @default(false)
+
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  project_id String   @db.Uuid
+  parentId   String?  @db.Uuid
+  parent     boards?  @relation("parentChildBoards", fields: [parentId], references: [id], onDelete: Cascade)
+  children   boards[] @relation("parentChildBoards")
+  nodes      nodes[]
+  edges      edges[]
+  tags       tags[]
+}
+
+model nodes {
+  id    String  @id @default(uuid()) @db.Uuid
+  label String?
+
+  type   String @default("rectangle")
+  width  Int    @default(50)
+  height Int    @default(50)
+  x      Float  @default(0)
+  y      Float  @default(0)
+
+  fontSize   Int    @default(16)
+  fontColor  String @default("#ffffff")
+  fontFamily String @default("Lato")
+  textVAlign String @default("center")
+  textHAlign String @default("center")
+
+  backgroundColor   String @default("#595959")
+  backgroundOpacity Float  @default(1)
+
+  locked   Boolean @default(false)
+  template Boolean @default(false)
+  zIndex   Int     @default(1)
+
+  board        boards     @relation(fields: [parent], references: [id], onDelete: Cascade)
+  document     documents? @relation(fields: [doc_id], references: [id])
+  doc_id       String?    @db.Uuid
+  image        String?
+  parent       String     @db.Uuid
+  edges_source edges[]    @relation("edges_source")
+  edges_target edges[]    @relation("edges_target")
+  tags         tags[]
+}
+
+model edges {
+  id    String  @id @default(uuid()) @db.Uuid
+  label String?
+
+  curveStyle  String @default("straight")
+  lineStyle   String @default("solid")
+  lineColor   String @default("#595959")
+  lineCap     String @default("butt")
+  lineFill    String @default("solid")
+  lineOpacity Int    @default(1)
+  width       Int    @default(1)
+
+  controlPointDistances Int   @default(-100)
+  controlPointWeights   Float @default(0.5)
+
+  taxiDirection String @default("auto")
+  taxiTurn      Int    @default(50)
+
+  arrowScale Int @default(1)
+
+  targetArrowShape String @default("triangle")
+  targetArrowFill  String @default("filled")
+  targetArrowColor String @default("#595959")
+
+  sourceArrowShape String @default("none")
+  sourceArrowFill  String @default("filled")
+  sourceArrowColor String @default("#595959")
+
+  midTargetArrowShape String @default("none")
+  midTargetArrowFill  String @default("filled")
+  midTargetArrowColor String @default("#595959")
+
+  midSourceArrowShape String @default("none")
+  midSourceArrowFill  String @default("filled")
+  midSourceArrowColor String @default("#595959")
+
+  fontSize   Int    @default(16)
+  fontColor  String @default("#ffffff")
+  fontFamily String @default("Lato")
+
+  zIndex Int @default(1)
+
+  board     boards @relation(fields: [parent], references: [id], onDelete: Cascade)
+  source    nodes  @relation("edges_source", fields: [source_id], references: [id], onDelete: Cascade)
+  target    nodes  @relation("edges_target", fields: [target_id], references: [id], onDelete: Cascade)
+  source_id String @db.Uuid
+  target_id String @db.Uuid
+  parent    String @db.Uuid
+  tags      tags[]
+}
+
+model tags {
+  id    String @id @default(uuid()) @db.Uuid
+  title String
+
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  project_id String   @db.Uuid
+
+  documents documents[]
+  maps      maps[]
+  map_pins  map_pins[]
+  boards    boards[]
+  nodes     nodes[]
+  edges     edges[]
+
+  @@unique([title, project_id])
+}
