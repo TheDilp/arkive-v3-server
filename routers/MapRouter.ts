@@ -248,7 +248,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       await prisma.map_pins.deleteMany({
         where: {
-          parent: req.params.id,
+          parentId: req.params.id,
         },
       });
       await prisma.map_pins.delete({

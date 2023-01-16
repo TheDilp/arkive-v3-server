@@ -7,7 +7,12 @@ import { hasValueDeep } from "../utils/transform";
 export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
   server.post(
     "/fullsearch/:project_id/:type",
-    async (req: FastifyRequest<{ Params: { project_id: string; type: "tags" | "namecontent" }; Body: string }>) => {
+    async (
+      req: FastifyRequest<{
+        Params: { project_id: string; type: "tags" | "namecontent" };
+        Body: string;
+      }>
+    ) => {
       const { project_id, type } = req.params;
       const { query } = JSON.parse(req.body) as { query: string | string[] };
 
@@ -37,15 +42,14 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
                 contains: query as string,
                 mode: "insensitive",
               },
-              maps: {
+              parent: {
                 project_id,
               },
             },
             select: {
               id: true,
               text: true,
-              parent: true,
-              maps: {
+              parent: {
                 select: {
                   title: true,
                 },
@@ -110,10 +114,14 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           }),
         ];
-        const [titleDocuments, maps, pins, boards, nodes, edges] = await prisma.$transaction(searches);
-        const contentSearchedDocuments = [...(titleDocuments as documents[])].filter(
+        const [titleDocuments, maps, pins, boards, nodes, edges] =
+          await prisma.$transaction(searches);
+        const contentSearchedDocuments = [
+          ...(titleDocuments as documents[]),
+        ].filter(
           (doc: documents) =>
-            doc.title.toLowerCase().includes((query as string).toLowerCase()) || hasValueDeep(doc.content, query as string),
+            doc.title.toLowerCase().includes((query as string).toLowerCase()) ||
+            hasValueDeep(doc.content, query as string)
         );
 
         // Remove and do not return content
@@ -239,11 +247,19 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           }),
         ];
-        const [titleDocuments, maps, map_pins, boards, nodes, edges] = await prisma.$transaction(searches);
-        return { documents: titleDocuments, maps, map_pins, boards, nodes, edges };
+        const [titleDocuments, maps, map_pins, boards, nodes, edges] =
+          await prisma.$transaction(searches);
+        return {
+          documents: titleDocuments,
+          maps,
+          map_pins,
+          boards,
+          nodes,
+          edges,
+        };
       }
       return {};
-    },
+    }
   );
 
   done();

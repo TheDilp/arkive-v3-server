@@ -72,18 +72,19 @@ model maps {
 
 model map_pins {
   id              String  @id @default(uuid()) @db.Uuid
-  parent          String  @db.Uuid
+  text            String?
+  parent          maps?   @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  parentId        String  @db.Uuid
   lat             Float
   lng             Float
   color           String  @default("#ffffff")
   backgroundColor String  @default("#000000")
   icon            String
   isPublic        Boolean @default(true)
-  text            String?
-  map_link        String? @db.Uuid
-  doc_id          String? @db.Uuid
-  maps            maps?   @relation(fields: [parent], references: [id], onDelete: Cascade)
   tags            tags[]
+
+  map_link String? @db.Uuid
+  doc_id   String? @db.Uuid
 }
 
 model map_layers {
