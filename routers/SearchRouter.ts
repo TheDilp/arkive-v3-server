@@ -1,4 +1,3 @@
-import { documents } from "@prisma/client";
 import { FastifyInstance, FastifyRequest } from "fastify";
 
 import { prisma } from "..";
@@ -116,10 +115,8 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         ];
         const [titleDocuments, maps, pins, boards, nodes, edges] =
           await prisma.$transaction(searches);
-        const contentSearchedDocuments = [
-          ...(titleDocuments as documents[]),
-        ].filter(
-          (doc: documents) =>
+        const contentSearchedDocuments = [...(titleDocuments as any[])].filter(
+          (doc: any) =>
             doc.title.toLowerCase().includes((query as string).toLowerCase()) ||
             hasValueDeep(doc.content, query as string)
         );
