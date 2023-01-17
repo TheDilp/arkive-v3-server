@@ -91,9 +91,9 @@ model map_layers {
   id       String  @id @default(uuid()) @db.Uuid
   title    String  @default("New Layer")
   image    String?
-  parent   String  @db.Uuid
+  parentId String  @db.Uuid
   isPublic Boolean @default(false)
-  maps     maps?   @relation(fields: [parent], references: [id], onDelete: Cascade)
+  maps     maps?   @relation(fields: [parentId], references: [id], onDelete: Cascade)
 }
 
 model boards {
@@ -144,11 +144,11 @@ model nodes {
   template Boolean @default(false)
   zIndex   Int     @default(1)
 
-  board        boards     @relation(fields: [parent], references: [id], onDelete: Cascade)
+  board        boards     @relation(fields: [parentId], references: [id], onDelete: Cascade)
   document     documents? @relation(fields: [doc_id], references: [id])
   doc_id       String?    @db.Uuid
   image        String?
-  parent       String     @db.Uuid
+  parentId     String     @db.Uuid
   edges_source edges[]    @relation("edges_source")
   edges_target edges[]    @relation("edges_target")
   tags         tags[]
@@ -196,12 +196,12 @@ model edges {
 
   zIndex Int @default(1)
 
-  board     boards @relation(fields: [parent], references: [id], onDelete: Cascade)
+  board     boards @relation(fields: [parentId], references: [id], onDelete: Cascade)
   source    nodes  @relation("edges_source", fields: [source_id], references: [id], onDelete: Cascade)
   target    nodes  @relation("edges_target", fields: [target_id], references: [id], onDelete: Cascade)
   source_id String @db.Uuid
   target_id String @db.Uuid
-  parent    String @db.Uuid
+  parentId  String @db.Uuid
   tags      tags[]
 }
 
