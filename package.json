@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm prisma generate && node ./dist/index.js",
+    "start": "prisma generate && node ./dist/index.js",
     "build": "tsc"
   },
   "keywords": [],
