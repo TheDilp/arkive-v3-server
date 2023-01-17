@@ -32,14 +32,11 @@ server.register(documentRouter);
 server.register(mapRouter);
 server.register(boardRouter);
 server.register(imageRouter);
-if (process.env.VITE_BE_PORT) {
-  server.listen({ port: parseInt(process.env.VITE_BE_PORT, 10) as number }, (err, address) => {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-    console.log(`Server listening at ${address}`);
-  });
-} else {
-  console.log("NO VITE_BE_PORT");
-}
+
+server.listen({ port: 5175 }, (err, address) => {
+  if (err) {
+    console.error(err);
+    process.exit(1);
+  }
+  console.log(`Server listening at ${address}`);
+});
