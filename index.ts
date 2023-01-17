@@ -32,6 +32,7 @@ server.register(documentRouter);
 server.register(mapRouter);
 server.register(boardRouter);
 server.register(imageRouter);
+// PLS WORK
 if (process.env.VITE_BE_PORT) {
   server.listen(
     { port: parseInt(process.env.VITE_BE_PORT, 10) as number, host: "0.0.0.0" },
