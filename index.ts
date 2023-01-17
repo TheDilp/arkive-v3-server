@@ -23,7 +23,7 @@ server.register(fastifystatic, {
 server.register(fileupload);
 
 server.register(cors, {
-  origin: "https://illustrious-lamington-d3b43c.netlify.app/",
+  origin: "illustrious-lamington-d3b43c.netlify.app",
 });
 server.register(projectRouter);
 server.register(searchRouter);
