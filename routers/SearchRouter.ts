@@ -83,7 +83,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             select: {
               id: true,
               label: true,
-              parent: true,
+              parentId: true,
               board: {
                 select: {
                   title: true,
@@ -104,7 +104,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             select: {
               id: true,
               label: true,
-              parent: true,
+              parentId: true,
               board: {
                 select: {
                   title: true,
@@ -222,7 +222,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             select: {
               id: true,
               label: true,
-              parent: true,
+              parentId: true,
             },
           }),
           prisma.edges.findMany({
@@ -240,7 +240,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             select: {
               id: true,
               label: true,
-              parent: true,
+              parentId: true,
             },
           }),
         ];
