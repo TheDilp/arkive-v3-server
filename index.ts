@@ -21,7 +21,6 @@ server.register(fastifystatic, {
 });
 
 server.register(fileupload);
-
 server.register(cors, {
   origin: "*",
 });
@@ -41,6 +40,7 @@ if (process.env.VITE_BE_PORT) {
         console.error(err);
         process.exit(1);
       }
+
       console.log(`Server listening at ${address}`);
     }
   );
