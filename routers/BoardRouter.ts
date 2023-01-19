@@ -185,6 +185,7 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
         return newNode;
       } catch (error) {
         console.log(error);
+        return new Error("Cannot create node.");
       }
       return null;
     }
