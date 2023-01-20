@@ -7,10 +7,11 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
     "/getallprojects",
     async (req: FastifyRequest<{ Body: string }>) => {
       try {
-        const body = JSON.parse(req.body) as { ownerId: string };
         const data = await prisma.projects.findMany({
           where: {
-            ownerId: body.ownerId,
+            owner: {
+              auth_id: req.user_id,
+            },
           },
           select: {
             id: true,
@@ -38,13 +39,19 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
 
   server.post(
     "/createproject",
-    async (req: FastifyRequest<{ Params: { ownerId: string } }>) => {
-      const newProject = await prisma.projects.create({
-        data: {
-          ownerId: req.params.ownerId,
-        },
-      });
-      return newProject;
+    async (req: FastifyRequest<{ Body: string }>) => {
+      if (req.user_id) {
+        try {
+          const newProject = await prisma.projects.create({
+            data: {
+              ownerId: req.user_id,
+            },
+          });
+          return newProject;
+        } catch (error) {
+          console.log(error);
+        }
+      }
     }
   );
   server.post(
@@ -54,6 +61,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       const updatedProject = await prisma.projects.update({
         where: {
           id: req.params.id,
+          ownerId: req.user_id,
         },
         data,
       });

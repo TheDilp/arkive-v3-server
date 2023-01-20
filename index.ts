@@ -1,9 +1,9 @@
 import cors from "@fastify/cors";
-import fastifystatic from "@fastify/static";
 import { PrismaClient } from "@prisma/client";
-import fastify from "fastify";
+import fastify, { FastifyRequest } from "fastify";
 import fileupload from "fastify-file-upload";
-import path from "path";
+
+import * as admin from "firebase-admin";
 
 import { boardRouter } from "./routers/BoardRouter";
 import { documentRouter } from "./routers/DocumentRouter";
@@ -14,11 +14,30 @@ import { searchRouter } from "./routers/SearchRouter";
 import { tagRouter } from "./routers/TagRouter";
 import { userRouter } from "./routers/UserRouter";
 
+declare module "fastify" {
+  interface FastifyRequest {
+    user_id: string;
+  }
+}
+
 export const prisma = new PrismaClient();
 
+const firebase = admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    privateKey: process.env.FIREBASE_PKEY?.replace(/\\n/g, "\n"),
+    clientEmail: process.env.FIREBASE_CLIENTEMAIL,
+  }),
+});
+
 const server = fastify();
-server.register(fastifystatic, {
-  root: path.join(__dirname, "assets"),
+server.decorateRequest("user_id", null);
+server.addHook("preParsing", async (request) => {
+  const token = await firebase
+    .auth()
+    .verifyIdToken(request.headers.authorization?.split(" ")[1] as string);
+
+  request.user_id = token.uid;
 });
 
 server.register(fileupload);
@@ -33,7 +52,6 @@ server.register(documentRouter);
 server.register(mapRouter);
 server.register(boardRouter);
 server.register(imageRouter);
-// PLS WORK
 if (process.env.VITE_BE_PORT) {
   server.listen(
     { port: parseInt(process.env.VITE_BE_PORT, 10) as number, host: "0.0.0.0" },

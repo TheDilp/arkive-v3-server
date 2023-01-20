@@ -9,6 +9,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         id: string;
         nickname: string;
         email: string;
+        auth_id: string;
       };
       await prisma.user.create({
         data,
