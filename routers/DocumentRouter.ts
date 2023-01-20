@@ -20,7 +20,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
               project: {
                 members: {
                   some: {
-                    id: req.user_id,
+                    auth_id: req.user_id,
                   },
                 },
               },
