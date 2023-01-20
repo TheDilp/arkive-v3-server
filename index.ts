@@ -12,6 +12,7 @@ import { mapRouter } from "./routers/MapRouter";
 import { projectRouter } from "./routers/ProjectRouter";
 import { searchRouter } from "./routers/SearchRouter";
 import { tagRouter } from "./routers/TagRouter";
+import { userRouter } from "./routers/UserRouter";
 
 export const prisma = new PrismaClient();
 
@@ -24,6 +25,7 @@ server.register(fileupload);
 server.register(cors, {
   origin: "*",
 });
+server.register(userRouter);
 server.register(projectRouter);
 server.register(searchRouter);
 server.register(tagRouter);
