@@ -30,7 +30,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
       // });
       return true;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   });
   server.delete(
