@@ -8,6 +8,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id       String @id @default(uuid()) @db.Uuid
+  nickname String
+  email    String
+
+  projectsId String?    @db.Uuid
+  projects   projects[] @relation("project_members")
+  createrOf  projects[] @relation("project_owner")
+}
+
 model projects {
   id        String      @id @default(uuid()) @db.Uuid
   title     String      @default("New Project")
@@ -16,6 +26,10 @@ model projects {
   boards    boards[]
   image     String?
   tags      tags[]
+
+  ownerId String @db.Uuid
+  owner   User   @relation("project_owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members User[] @relation("project_members")
 }
 
 model documents {
