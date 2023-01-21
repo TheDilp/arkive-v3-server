@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "prisma generate && node ./dist/index.js",
-    "build": "tsc",
+    "build": "prisma migrate deploy && tsc",
     "runlocal": "nodemon index.ts"
   },
   "keywords": [],
