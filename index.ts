@@ -9,6 +9,7 @@ import { boardRouter } from "./routers/BoardRouter";
 import { documentRouter } from "./routers/DocumentRouter";
 import { imageRouter } from "./routers/ImageRouter";
 import { mapRouter } from "./routers/MapRouter";
+import { otherRouter } from "./routers/OtherRouter";
 import { projectRouter } from "./routers/ProjectRouter";
 import { searchRouter } from "./routers/SearchRouter";
 import { tagRouter } from "./routers/TagRouter";
@@ -32,26 +33,33 @@ const firebase = admin.initializeApp({
 
 const server = fastify();
 server.decorateRequest("user_id", null);
-server.addHook("preParsing", async (request) => {
-  const token = await firebase
-    .auth()
-    .verifyIdToken(request.headers.authorization?.split(" ")[1] as string);
-
-  request.user_id = token.uid;
-});
 
 server.register(fileupload);
 server.register(cors, {
   origin: "*",
 });
-server.register(userRouter);
-server.register(projectRouter);
-server.register(searchRouter);
-server.register(tagRouter);
-server.register(documentRouter);
-server.register(mapRouter);
-server.register(boardRouter);
-server.register(imageRouter);
+server.register(otherRouter);
+
+server.register((instance, _, done) => {
+  instance.addHook("preParsing", async (request) => {
+    const token = await firebase
+      .auth()
+      .verifyIdToken(request.headers.authorization?.split(" ")[1] as string);
+
+    request.user_id = token.uid;
+  });
+  instance.register(userRouter);
+  instance.register(projectRouter);
+  instance.register(searchRouter);
+  instance.register(tagRouter);
+  instance.register(documentRouter);
+  instance.register(mapRouter);
+  instance.register(boardRouter);
+  instance.register(imageRouter);
+
+  done();
+});
+
 if (process.env.VITE_BE_PORT) {
   server.listen(
     { port: parseInt(process.env.VITE_BE_PORT, 10) as number, host: "0.0.0.0" },
