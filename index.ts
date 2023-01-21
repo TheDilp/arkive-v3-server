@@ -53,7 +53,7 @@ server.register((instance, _, done) => {
   instance.register(documentRouter);
   instance.register(mapRouter);
   instance.register(boardRouter);
-  instance.register(imageRouter);
+  // instance.register(imageRouter);
 
   done();
 });

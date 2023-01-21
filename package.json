@@ -12,7 +12,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.252.0",
     "@fastify/cors": "^8.2.0",
     "@prisma/client": "^4.8.0",
     "fastify": "^4.10.2",
