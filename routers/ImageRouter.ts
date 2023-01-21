@@ -1,16 +1,6 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
-import {
-  createReadStream,
-  existsSync,
-  fstat,
-  mkdirSync,
-  readdirSync,
-  writeFile,
-} from "fs";
-import path from "path";
 
 import { S3, PutObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
-import { timeStamp } from "console";
 
 const s3Client = new S3({
   forcePathStyle: false, // Configures to use subdomain/virtual calling format.
