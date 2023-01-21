@@ -20,7 +20,7 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post("/createtag", async (req: FastifyRequest<{ Body: string }>) => {
-    const { title, project_id, ...rest } = JSON.parse(req.body) as {
+    const { id, title, project_id, ...rest } = JSON.parse(req.body) as {
       project_id: string;
       title: string;
       [key: string]: any;
@@ -28,6 +28,7 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
     try {
       await prisma.tags.create({
         data: {
+          id,
           title,
           project_id,
           ...rest,
@@ -36,7 +37,7 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
     } catch (error) {
       console.log(error);
     }
-    return true;
+    return;
   });
   server.post(
     "/updatetag/:id",
