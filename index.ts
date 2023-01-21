@@ -1,12 +1,12 @@
 import cors from "@fastify/cors";
 import { PrismaClient } from "@prisma/client";
-import fastify, { FastifyRequest } from "fastify";
+import fastify from "fastify";
 
 import * as admin from "firebase-admin";
 
 import { boardRouter } from "./routers/BoardRouter";
 import { documentRouter } from "./routers/DocumentRouter";
-import { imageRouter } from "./routers/ImageRouter";
+// import { imageRouter } from "./routers/ImageRouter";
 import { mapRouter } from "./routers/MapRouter";
 import { otherRouter } from "./routers/OtherRouter";
 import { projectRouter } from "./routers/ProjectRouter";
