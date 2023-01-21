@@ -46,9 +46,7 @@ server.register((instance, _, done) => {
 
     request.user_id = token.uid;
   });
-  instance.register(cors, {
-    origin: "*",
-  });
+
   instance.register(userRouter);
   instance.register(projectRouter);
   instance.register(searchRouter);
