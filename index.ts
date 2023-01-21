@@ -1,7 +1,6 @@
 import cors from "@fastify/cors";
 import { PrismaClient } from "@prisma/client";
 import fastify, { FastifyRequest } from "fastify";
-import fileupload from "fastify-file-upload";
 
 import * as admin from "firebase-admin";
 
@@ -34,7 +33,6 @@ const firebase = admin.initializeApp({
 const server = fastify();
 server.decorateRequest("user_id", null);
 
-server.register(fileupload);
 server.register(cors, {
   origin: "*",
 });
