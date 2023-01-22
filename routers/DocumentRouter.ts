@@ -78,7 +78,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
       return doc;
     }
   );
-  server.get(
+  server.post(
     "/getmanydocuments",
     async (req: FastifyRequest<{ Body: string }>) => {
       const ids = JSON.parse(req.body) as string[];
