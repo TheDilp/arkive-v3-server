@@ -12,7 +12,7 @@ model User {
   id       String @id @default(uuid()) @db.Uuid
   auth_id  String @unique
   nickname String
-  email    String
+  email    String @unique
 
   projectsId String?    @db.Uuid
   projects   projects[] @relation("project_members")
@@ -29,8 +29,9 @@ model projects {
   tags      tags[]
 
   ownerId String
-  owner   User   @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
-  members User[] @relation("project_members")
+  owner   User      @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
+  members User[]    @relation("project_members")
+  screens screens[]
 }
 
 model documents {
@@ -58,6 +59,8 @@ model documents {
 
   tags   tags[]
   tagsId String? @db.Uuid
+
+  cards cards[]
 }
 
 model maps {
@@ -216,6 +219,31 @@ model edges {
   target_id String @db.Uuid
   parentId  String @db.Uuid
   tags      tags[]
+}
+
+model screens {
+  id         String   @id @default(uuid()) @db.Uuid
+  title      String
+  project    projects @relation(fields: [project_id], references: [id])
+  project_id String   @db.Uuid
+}
+
+model sections {
+  id    String  @id @default(uuid()) @db.Uuid
+  title String
+  size  String  @default("xs")
+  cards cards[]
+}
+
+model cards {
+  id   String @id @default(uuid()) @db.Uuid
+  sort Int
+
+  document    documents @relation(fields: [documentsId], references: [id])
+  documentsId String    @db.Uuid
+
+  sections   sections? @relation(fields: [sectionsId], references: [id])
+  sectionsId String?   @db.Uuid
 }
 
 model tags {
