@@ -39,6 +39,23 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     ),
     server.post(
+      "/createsection",
+      async (req: FastifyRequest<{ Body: string }>) => {
+        const data = JSON.parse(req.body) as {
+          title: string;
+          section: string;
+          screen_id: string;
+        };
+        await prisma.sections.create({
+          data: {
+            title: data.title,
+            size: data.section,
+            screen_id: data.screen_id,
+          },
+        });
+      }
+    ),
+    server.post(
       "/createscreen",
       async (req: FastifyRequest<{ Body: string }>) => {
         const data = JSON.parse(req.body) as {
