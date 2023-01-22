@@ -226,6 +226,18 @@ model screens {
   title      String
   project    projects @relation(fields: [project_id], references: [id])
   project_id String   @db.Uuid
+
+  parentId String?   @db.Uuid
+  parent   screens?  @relation("parentChildScreens", fields: [parentId], references: [id], onDelete: Cascade)
+  children screens[] @relation("parentChildScreens")
+
+  icon     String  @default("fluent:board-24-regular")
+  folder   Boolean @default(false)
+  isPublic Boolean @default(false)
+  expanded Boolean @default(false)
+  sort     Int     @default(0)
+
+  tags tags[]
 }
 
 model sections {
@@ -259,6 +271,7 @@ model tags {
   boards    boards[]
   nodes     nodes[]
   edges     edges[]
+  screens   screens[]
 
   @@unique([title, project_id])
 }
