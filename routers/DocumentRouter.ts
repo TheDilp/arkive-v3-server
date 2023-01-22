@@ -82,34 +82,39 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     "/getmanydocuments",
     async (req: FastifyRequest<{ Body: string }>) => {
       const ids = JSON.parse(req.body) as string[];
-      const documents = await prisma.documents.findMany({
-        where: {
-          id: {
-            in: ids,
-          },
-          OR: [
-            {
-              project: {
-                ownerId: req.user_id,
-              },
+      try {
+        const documents = await prisma.documents.findMany({
+          where: {
+            id: {
+              in: ids,
             },
-            {
-              project: {
-                members: {
-                  some: {
-                    auth_id: req.user_id,
+            OR: [
+              {
+                project: {
+                  ownerId: req.user_id,
+                },
+              },
+              {
+                project: {
+                  members: {
+                    some: {
+                      auth_id: req.user_id,
+                    },
                   },
                 },
               },
-            },
-          ],
-        },
-        select: {
-          id: true,
-          title: true,
-          content: true,
-        },
-      });
+            ],
+          },
+          select: {
+            id: true,
+            title: true,
+            content: true,
+          },
+        });
+        return documents;
+      } catch (error) {
+        return false;
+      }
     }
   );
 
