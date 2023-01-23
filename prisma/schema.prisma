@@ -246,8 +246,8 @@ model sections {
   title String
   size  String @default("xs")
 
-  screens   screens? @relation(fields: [screen_id], references: [id])
-  screen_id String?  @db.Uuid
+  screens  screens? @relation(fields: [parentId], references: [id])
+  parentId String?  @db.Uuid
 
   cards cards[]
 }
