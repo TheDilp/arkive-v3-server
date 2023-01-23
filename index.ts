@@ -14,6 +14,7 @@ import { searchRouter } from "./routers/SearchRouter";
 import { tagRouter } from "./routers/TagRouter";
 import { userRouter } from "./routers/UserRouter";
 import fileUpload from "fastify-file-upload";
+import { screenRouter } from "./routers/ScreenRouter";
 declare module "fastify" {
   interface FastifyRequest {
     user_id: string;
@@ -56,6 +57,7 @@ server.register((instance, _, done) => {
   instance.register(documentRouter);
   instance.register(mapRouter);
   instance.register(boardRouter);
+  instance.register(screenRouter);
   instance.register(imageRouter);
 
   done();
