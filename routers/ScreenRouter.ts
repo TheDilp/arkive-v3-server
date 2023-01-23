@@ -69,6 +69,27 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     ),
     server.post(
+      "/createscreen",
+      async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+        try {
+          const data = JSON.parse(req.body) as {
+            title: string;
+            project_id: string;
+          };
+          const newScreen = await prisma.screens.create({
+            data: {
+              title: data.title,
+              project_id: data.project_id,
+            },
+          });
+          return screen;
+        } catch (error) {
+          rep.code(500);
+          return false;
+        }
+      }
+    ),
+    server.post(
       "/createsection",
       async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
         const data = JSON.parse(req.body) as {
@@ -85,21 +106,6 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         });
         rep.code(200);
         return true;
-      }
-    ),
-    server.post(
-      "/createscreen",
-      async (req: FastifyRequest<{ Body: string }>) => {
-        const data = JSON.parse(req.body) as {
-          title: string;
-          project_id: string;
-        };
-        await prisma.screens.create({
-          data: {
-            title: data.title,
-            project_id: data.project_id,
-          },
-        });
       }
     ),
     done();
