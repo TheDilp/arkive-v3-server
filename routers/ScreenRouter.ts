@@ -38,12 +38,12 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   ),
     server.get(
-      "/getsinglescreen/:project_id",
-      async (req: FastifyRequest<{ Params: { project_id: string } }>) => {
+      "/getsinglescreen/:id",
+      async (req: FastifyRequest<{ Params: { id: string } }>) => {
         try {
-          const screens = await prisma.screens.findMany({
+          const screens = await prisma.screens.findUnique({
             where: {
-              project_id: req.params.project_id,
+              id: req.params.id,
               OR: [
                 {
                   project: {
@@ -60,6 +60,13 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
                   },
                 },
               ],
+            },
+            include: {
+              sections: {
+                include: {
+                  cards: true,
+                },
+              },
             },
           });
           return screens;
@@ -82,7 +89,8 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
               project_id: data.project_id,
             },
           });
-          return screen;
+          rep.code(200);
+          return true;
         } catch (error) {
           rep.code(500);
           return false;
@@ -97,7 +105,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           section: string;
           parentId: string;
         };
-        await prisma.sections.create({
+        const section = await prisma.sections.create({
           data: {
             title: data.title,
             size: data.section,
