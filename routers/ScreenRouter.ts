@@ -66,6 +66,9 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
                 include: {
                   cards: true,
                 },
+                orderBy: {
+                  sort: "asc",
+                },
               },
             },
           });
@@ -117,18 +120,14 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     ),
     server.post(
-      "/updatescreen/:id",
+      "/updatesection/:id",
       async (req: FastifyRequest<{ Params: { id: string }; Body: string }>) => {
         const data = JSON.parse(req.body) as {
           title: string;
-          icon: string;
-          folder: boolean;
-          isPublic: boolean;
-          expanded: boolean;
-          sort: number;
+          size: string;
         };
         try {
-          await prisma.screens.update({
+          await prisma.sections.update({
             where: {
               id: req.params.id,
             },
@@ -141,6 +140,53 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         }
       }
     );
+  server.post(
+    "/sortsections",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const indexes: { id: string; parentId: string; sort: number }[] =
+          JSON.parse(req.body);
+        const updates = indexes.map((idx) =>
+          prisma.sections.update({
+            data: {
+              parentId: idx.parentId,
+              sort: idx.sort,
+            },
+            where: { id: idx.id },
+          })
+        );
+        await prisma.$transaction(updates);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+  );
+  server.post(
+    "/updatescreen/:id",
+    async (req: FastifyRequest<{ Params: { id: string }; Body: string }>) => {
+      const data = JSON.parse(req.body) as {
+        title: string;
+        icon: string;
+        folder: boolean;
+        isPublic: boolean;
+        expanded: boolean;
+        sort: number;
+      };
+      try {
+        await prisma.screens.update({
+          where: {
+            id: req.params.id,
+          },
+          data,
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
   server.delete(
     "/deletescreen/:id",
     async (req: FastifyRequest<{ Params: { id: string } }>) => {

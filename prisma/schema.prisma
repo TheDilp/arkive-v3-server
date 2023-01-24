@@ -245,6 +245,7 @@ model sections {
   id    String @id @default(uuid()) @db.Uuid
   title String
   size  String @default("xs")
+  sort  Int    @default(0)
 
   screens  screens? @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId String?  @db.Uuid
@@ -253,8 +254,9 @@ model sections {
 }
 
 model cards {
-  id   String @id @default(uuid()) @db.Uuid
-  sort Int
+  id       String  @id @default(uuid()) @db.Uuid
+  sort     Int
+  expanded Boolean @default(true)
 
   document    documents @relation(fields: [documentsId], references: [id])
   documentsId String    @db.Uuid
