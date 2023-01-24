@@ -116,5 +116,46 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         return true;
       }
     ),
-    done();
+    server.post(
+      "/updatescreen/:id",
+      async (req: FastifyRequest<{ Params: { id: string }; Body: string }>) => {
+        const data = JSON.parse(req.body) as {
+          title: string;
+          icon: string;
+          folder: boolean;
+          isPublic: boolean;
+          expanded: boolean;
+          sort: number;
+        };
+        try {
+          await prisma.screens.update({
+            where: {
+              id: req.params.id,
+            },
+            data,
+          });
+          return true;
+        } catch (error) {
+          console.log(error);
+          return false;
+        }
+      }
+    );
+  server.delete(
+    "/deletescreen/:id",
+    async (req: FastifyRequest<{ Params: { id: string } }>) => {
+      try {
+        await prisma.screens.delete({
+          where: {
+            id: req.params.id,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+      return true;
+    }
+  );
+  done();
 };
