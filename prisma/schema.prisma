@@ -255,14 +255,14 @@ model sections {
 
 model cards {
   id       String  @id @default(uuid()) @db.Uuid
-  sort     Int
+  sort     Int     @default(0)
   expanded Boolean @default(true)
 
   document    documents @relation(fields: [documentsId], references: [id])
   documentsId String    @db.Uuid
 
-  sections   sections? @relation(fields: [sectionsId], references: [id], onDelete: Cascade)
-  sectionsId String?   @db.Uuid
+  sections sections? @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  parentId String?   @db.Uuid
 }
 
 model tags {
