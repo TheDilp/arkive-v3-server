@@ -246,7 +246,7 @@ model sections {
   title String
   size  String @default("xs")
 
-  screens  screens? @relation(fields: [parentId], references: [id])
+  screens  screens? @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId String?  @db.Uuid
 
   cards cards[]
@@ -259,7 +259,7 @@ model cards {
   document    documents @relation(fields: [documentsId], references: [id])
   documentsId String    @db.Uuid
 
-  sections   sections? @relation(fields: [sectionsId], references: [id])
+  sections   sections? @relation(fields: [sectionsId], references: [id], onDelete: Cascade)
   sectionsId String?   @db.Uuid
 }
 
