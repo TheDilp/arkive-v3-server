@@ -64,7 +64,17 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
             include: {
               sections: {
                 include: {
-                  cards: true,
+                  cards: {
+                    include: {
+                      document: {
+                        select: {
+                          id: true,
+                          title: true,
+                          content: true,
+                        },
+                      },
+                    },
+                  },
                 },
                 orderBy: {
                   sort: "asc",
@@ -141,27 +151,47 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     );
   server.post(
-    "/sortsections",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    "/createcard",
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
-        const indexes: { id: string; parentId: string; sort: number }[] =
-          JSON.parse(req.body);
-        const updates = indexes.map((idx) =>
-          prisma.sections.update({
-            data: {
-              parentId: idx.parentId,
-              sort: idx.sort,
-            },
-            where: { id: idx.id },
-          })
-        );
-        await prisma.$transaction(updates);
+        const data = JSON.parse(req.body) as {
+          id: string;
+          parentId: string;
+          documentsId: string;
+        }[];
+        await prisma.cards.createMany({
+          data,
+        });
+        rep.code(200);
         return true;
       } catch (error) {
+        rep.code(500);
         return false;
       }
     }
-  );
+  ),
+    server.post(
+      "/sortsections",
+      async (req: FastifyRequest<{ Body: string }>) => {
+        try {
+          const indexes: { id: string; parentId: string; sort: number }[] =
+            JSON.parse(req.body);
+          const updates = indexes.map((idx) =>
+            prisma.sections.update({
+              data: {
+                parentId: idx.parentId,
+                sort: idx.sort,
+              },
+              where: { id: idx.id },
+            })
+          );
+          await prisma.$transaction(updates);
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }
+    );
   server.post(
     "/updatescreen/:id",
     async (req: FastifyRequest<{ Params: { id: string }; Body: string }>) => {

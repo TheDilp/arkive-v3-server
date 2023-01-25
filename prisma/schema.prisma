@@ -258,7 +258,7 @@ model cards {
   sort     Int     @default(0)
   expanded Boolean @default(true)
 
-  document    documents @relation(fields: [documentsId], references: [id])
+  document    documents @relation(fields: [documentsId], references: [id], onDelete: Cascade)
   documentsId String    @db.Uuid
 
   sections sections? @relation(fields: [parentId], references: [id], onDelete: Cascade)
