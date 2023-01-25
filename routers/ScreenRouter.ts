@@ -151,15 +151,20 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     );
   server.post(
-    "/createcard",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    "/updatecard/:id",
+    async (
+      req: FastifyRequest<{ Params: { id: string }; Body: string }>,
+      rep: FastifyReply
+    ) => {
       try {
         const data = JSON.parse(req.body) as {
-          id: string;
-          parentId: string;
-          documentsId: string;
-        }[];
-        await prisma.cards.createMany({
+          sort: number;
+          expanded: boolean;
+        };
+        await prisma.cards.update({
+          where: {
+            id: req.params.id,
+          },
           data,
         });
         rep.code(200);
@@ -170,6 +175,26 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   ),
+    server.post(
+      "/createcard",
+      async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+        try {
+          const data = JSON.parse(req.body) as {
+            id: string;
+            parentId: string;
+            documentsId: string;
+          }[];
+          await prisma.cards.createMany({
+            data,
+          });
+          rep.code(200);
+          return true;
+        } catch (error) {
+          rep.code(500);
+          return false;
+        }
+      }
+    ),
     server.post(
       "/sortsections",
       async (req: FastifyRequest<{ Body: string }>) => {
