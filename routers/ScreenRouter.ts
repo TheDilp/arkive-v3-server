@@ -74,6 +74,9 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
                         },
                       },
                     },
+                    orderBy: {
+                      sort: "asc",
+                    },
                   },
                 },
                 orderBy: {

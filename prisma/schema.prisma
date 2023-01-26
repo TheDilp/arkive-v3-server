@@ -263,6 +263,8 @@ model cards {
 
   sections sections? @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId String?   @db.Uuid
+
+  @@unique([parentId, documentsId])
 }
 
 model tags {
