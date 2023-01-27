@@ -124,11 +124,13 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           title: string;
           section: string;
           parentId: string;
+          sort: number;
         };
         await prisma.sections.create({
           data: {
             title: data.title,
             parentId: data.parentId,
+            sort: data.sort,
           },
         });
         rep.code(200);
@@ -224,6 +226,26 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         }
       }
     );
+  server.post("/sortcards", async (req: FastifyRequest<{ Body: string }>) => {
+    try {
+      const indexes: { id: string; parentId: string; sort: number }[] =
+        JSON.parse(req.body);
+      const updates = indexes.map((idx) =>
+        prisma.cards.update({
+          data: {
+            parentId: idx.parentId,
+            sort: idx.sort,
+          },
+          where: { id: idx.id },
+        })
+      );
+      await prisma.$transaction(updates);
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  });
   server.post(
     "/updatescreen/:id",
     async (req: FastifyRequest<{ Params: { id: string }; Body: string }>) => {
@@ -254,6 +276,41 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
     async (req: FastifyRequest<{ Params: { id: string } }>) => {
       try {
         await prisma.screens.delete({
+          where: {
+            id: req.params.id,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+      return true;
+    }
+  );
+  server.delete(
+    "/deletemanysections",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      const ids = JSON.parse(req.body) as string[];
+      try {
+        await prisma.sections.deleteMany({
+          where: {
+            id: {
+              in: ids,
+            },
+          },
+        });
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+      return true;
+    }
+  );
+  server.delete(
+    "/deletecard/:id",
+    async (req: FastifyRequest<{ Params: { id: string } }>) => {
+      try {
+        await prisma.cards.delete({
           where: {
             id: req.params.id,
           },

@@ -243,9 +243,10 @@ model screens {
 }
 
 model sections {
-  id    String @id @default(uuid()) @db.Uuid
-  title String
-  sort  Int    @default(0)
+  id       String  @id @default(uuid()) @db.Uuid
+  title    String
+  sort     Int     @default(0)
+  expanded Boolean @default(true)
 
   screens  screens? @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId String?  @db.Uuid
