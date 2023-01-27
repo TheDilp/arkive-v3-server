@@ -237,14 +237,14 @@ model screens {
   expanded Boolean @default(false)
   sort     Int     @default(0)
 
-  sections sections[]
-  tags     tags[]
+  sectionSize String     @default("md")
+  sections    sections[]
+  tags        tags[]
 }
 
 model sections {
   id    String @id @default(uuid()) @db.Uuid
   title String
-  size  String @default("md")
   sort  Int    @default(0)
 
   screens  screens? @relation(fields: [parentId], references: [id], onDelete: Cascade)

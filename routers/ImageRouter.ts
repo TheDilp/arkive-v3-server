@@ -88,7 +88,6 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
         const { type, project_id } = req.params;
 
         Object.entries(files).forEach(async ([key, file]) => {
-          console.log(file);
           const filePath = `assets/${type}/${project_id}/${key}`;
           const params = {
             Bucket: process.env.DO_SPACES_NAME as string,
@@ -100,11 +99,12 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           };
 
-          const data = await s3Client.send(new PutObjectCommand(params));
-          console.log(data);
+          await s3Client.send(new PutObjectCommand(params));
+          return true;
         });
       } catch (error) {
         console.log(error);
+        return false;
       }
     }
   );

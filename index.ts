@@ -3,7 +3,6 @@ import { PrismaClient } from "@prisma/client";
 import fastify from "fastify";
 
 import * as admin from "firebase-admin";
-
 import { boardRouter } from "./routers/BoardRouter";
 import { documentRouter } from "./routers/DocumentRouter";
 import { imageRouter } from "./routers/ImageRouter";

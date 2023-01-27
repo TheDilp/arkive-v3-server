@@ -112,9 +112,65 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
               },
             },
           }),
+          prisma.screens.findMany({
+            where: {
+              title: {
+                contains: query as string,
+                mode: "insensitive",
+              },
+              folder: false,
+              project_id,
+            },
+            select: {
+              id: true,
+              title: true,
+              icon: true,
+            },
+          }),
+          prisma.sections.findMany({
+            where: {
+              OR: [
+                {
+                  title: {
+                    contains: query as string,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  cards: {
+                    some: {
+                      document: {
+                        title: {
+                          contains: query as string,
+                          mode: "insensitive",
+                        },
+                      },
+                    },
+                  },
+                },
+              ],
+              screens: {
+                project_id,
+              },
+            },
+            select: {
+              id: true,
+              title: true,
+              cards: true,
+              parentId: true,
+            },
+          }),
         ];
-        const [titleDocuments, maps, pins, boards, nodes, edges] =
-          await prisma.$transaction(searches);
+        const [
+          titleDocuments,
+          maps,
+          pins,
+          boards,
+          nodes,
+          edges,
+          screens,
+          sections,
+        ] = await prisma.$transaction(searches);
         const contentSearchedDocuments = [...(titleDocuments as any[])].filter(
           (doc: any) =>
             doc.title.toLowerCase().includes((query as string).toLowerCase()) ||
@@ -127,7 +183,16 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           title: doc.title,
           icon: doc.icon,
         }));
-        return { documents: final, maps, pins, boards, nodes, edges };
+        return {
+          documents: final,
+          maps,
+          pins,
+          boards,
+          nodes,
+          edges,
+          screens,
+          sections,
+        };
       }
       if (type === "tags" && Array.isArray(query) && query.length) {
         const searches = [

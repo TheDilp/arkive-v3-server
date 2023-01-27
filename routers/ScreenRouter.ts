@@ -1,3 +1,4 @@
+import { screens } from "@prisma/client";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { FastifyInstance } from "fastify";
 import { prisma } from "..";
@@ -95,19 +96,22 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       "/createscreen",
       async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
         try {
-          const data = JSON.parse(req.body) as {
-            title: string;
-            project_id: string;
-          };
-          const newScreen = await prisma.screens.create({
+          const data = JSON.parse(req.body) as Pick<
+            screens,
+            "title" | "sectionSize" | "project_id"
+          >;
+
+          await prisma.screens.create({
             data: {
               title: data.title,
               project_id: data.project_id,
+              sectionSize: data.sectionSize,
             },
           });
           rep.code(200);
           return true;
         } catch (error) {
+          console.log(error);
           rep.code(500);
           return false;
         }
@@ -121,10 +125,9 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           section: string;
           parentId: string;
         };
-        const section = await prisma.sections.create({
+        await prisma.sections.create({
           data: {
             title: data.title,
-            size: data.section,
             parentId: data.parentId,
           },
         });
@@ -193,6 +196,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           rep.code(200);
           return true;
         } catch (error) {
+          console.log(error);
           rep.code(500);
           return false;
         }

@@ -69,6 +69,24 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       return updatedProject;
     }
   );
+  server.delete(
+    "/deleteproject",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        await prisma.projects.delete({
+          where: {
+            id: data.id,
+            ownerId: req.user_id,
+          },
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return new Error("Error deleting the project.");
+      }
+    }
+  );
 
   done();
 };

@@ -126,8 +126,17 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
       }>
     ) => {
       try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        const { tags, ...rest } = data;
         const newDocument = await prisma.documents.create({
-          data: removeNull(JSON.parse(req.body)) as any,
+          data: {
+            tags: {
+              connect: data?.tags?.map((tag: { id: string }) => ({
+                id: tag.id,
+              })),
+            },
+            ...rest,
+          },
         });
 
         return newDocument;
@@ -182,11 +191,17 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         Params: { id: string };
       }>
     ) => {
-      await prisma.documents.delete({
-        where: {
-          id: req.params.id,
-        },
-      });
+      try {
+        await prisma.documents.delete({
+          where: {
+            id: req.params.id,
+          },
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
   server.delete(
