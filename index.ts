@@ -65,7 +65,7 @@ server.register((instance, _, done) => {
 if (process.env.VITE_BE_PORT) {
   server.listen(
     { port: parseInt(process.env.VITE_BE_PORT, 10) as number, host: "0.0.0.0" },
-    (err, address) => {
+    async (err, address) => {
       if (err) {
         console.error(err);
         process.exit(1);

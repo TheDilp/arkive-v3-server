@@ -25,22 +25,27 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
-  server.get(
-    "/getsingleproject/:id",
-    async (req: FastifyRequest<{ Params: { id: string } }>) => {
-      const singleProject = await prisma.projects.findUnique({
-        where: {
-          id: req.params.id,
-        },
-      });
-      return singleProject;
+  server.post(
+    "/getsingleproject",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        const singleProject = await prisma.projects.findUnique({
+          where: {
+            id: data.id,
+          },
+        });
+        return singleProject;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
 
   server.post(
     "/createproject",
     async (req: FastifyRequest<{ Body: string }>) => {
-      console.log("============", req.user_id);
       if (req.user_id) {
         try {
           const newProject = await prisma.projects.create({
@@ -56,17 +61,22 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/updateproject/:id",
-    async (req: FastifyRequest<{ Params: { id: string }; Body: string }>) => {
-      const data = JSON.parse(req.body) as any;
-      const updatedProject = await prisma.projects.update({
-        where: {
-          id: req.params.id,
-          ownerId: req.user_id,
-        },
-        data,
-      });
-      return updatedProject;
+    "/updateproject",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as any;
+        const updatedProject = await prisma.projects.update({
+          where: {
+            id: data.id,
+            ownerId: req.user_id,
+          },
+          data,
+        });
+        return updatedProject;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
   server.delete(

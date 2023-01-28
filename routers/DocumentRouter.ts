@@ -1,3 +1,4 @@
+import { documents } from "@prisma/client";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import { prisma } from "..";
@@ -61,21 +62,27 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
 
-  server.get(
-    "/getsingledocument/:id",
-    async (req: FastifyRequest<{ Params: { id: string } }>) => {
-      const doc = await prisma.documents.findUnique({
-        where: { id: req.params.id },
-        include: {
-          tags: {
-            select: {
-              id: true,
-              title: true,
+  server.post(
+    "/getsingledocument",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        const doc = await prisma.documents.findUnique({
+          where: { id: data.id },
+          include: {
+            tags: {
+              select: {
+                id: true,
+                title: true,
+              },
             },
           },
-        },
-      });
-      return doc;
+        });
+        return doc;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
   server.post(
@@ -147,18 +154,18 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/updatedocument/:id",
+    "/updatedocument",
     async (
       req: FastifyRequest<{
         Body: string;
-        Params: { id: string };
       }>,
       rep: FastifyReply
     ) => {
       try {
+        const data = removeNull(JSON.parse(req.body)) as any;
         await prisma.documents.update({
-          data: removeNull(JSON.parse(req.body)) as any,
-          where: { id: req.params.id },
+          data,
+          where: { id: data.id },
         });
         return true;
       } catch (error) {
@@ -185,16 +192,17 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.delete(
-    "/deletedocument/:id",
+    "/deletedocument",
     async (
       req: FastifyRequest<{
-        Params: { id: string };
+        Body: string;
       }>
     ) => {
       try {
+        const data = JSON.parse(req.body) as { id: string };
         await prisma.documents.delete({
           where: {
-            id: req.params.id,
+            id: req.body,
           },
         });
         return true;

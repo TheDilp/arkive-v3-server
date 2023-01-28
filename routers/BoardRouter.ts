@@ -39,48 +39,54 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
       return data;
     }
   );
-  server.get(
-    "/getsingleboard/:id",
-    async (req: FastifyRequest<{ Params: { id: string } }>) => {
-      const data = await prisma.boards.findUnique({
-        where: {
-          id: req.params.id,
-        },
-        include: {
-          tags: {
-            select: {
-              id: true,
-              title: true,
-            },
+  server.post(
+    "/getsingleboard",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        const board = await prisma.boards.findUnique({
+          where: {
+            id: data.id,
           },
-          nodes: {
-            include: {
-              document: {
-                select: {
-                  image: true,
-                },
-              },
-              tags: {
-                select: {
-                  id: true,
-                  title: true,
-                },
+          include: {
+            tags: {
+              select: {
+                id: true,
+                title: true,
               },
             },
-          },
-          edges: {
-            include: {
-              tags: {
-                select: {
-                  id: true,
-                  title: true,
+            nodes: {
+              include: {
+                document: {
+                  select: {
+                    image: true,
+                  },
+                },
+                tags: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
                 },
               },
             },
+            edges: {
+              include: {
+                tags: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
+                },
+              },
+            },
           },
-        },
-      });
-      return data;
+        });
+        return board;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
   server.post(
@@ -111,19 +117,19 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/updateboard/:id",
+    "/updateboard",
     async (
       req: FastifyRequest<{
         Body: string;
-        Params: { id: string };
       }>
     ) => {
       try {
+        const data = removeNull(JSON.parse(req.body)) as any;
         const newDocument = await prisma.boards.update({
+          data,
           where: {
-            id: req.params.id,
+            id: data.id,
           },
-          data: removeNull(JSON.parse(req.body)) as any,
         });
 
         return newDocument;
@@ -149,14 +155,15 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     await prisma.$transaction(updates);
   });
   server.delete(
-    "/deleteboard/:id",
+    "/deleteboard",
     async (
       req: FastifyRequest<{
-        Params: { id: string };
+        Body: string;
       }>
     ) => {
+      const data = JSON.parse(req.body) as { id: string };
       await prisma.boards.delete({
-        where: { id: req.params.id },
+        where: { id: data.id },
       });
     }
   );
@@ -328,19 +335,19 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/updatenode/:id",
+    "/updatenode",
     async (
       req: FastifyRequest<{
         Body: string;
-        Params: { id: string };
       }>
     ) => {
       try {
+        const data = removeNull(JSON.parse(req.body)) as any;
         const updatedNode = await prisma.nodes.update({
           where: {
-            id: req.params.id,
+            id: data.id,
           },
-          data: removeNull(JSON.parse(req.body)) as any,
+          data,
         });
 
         return updatedNode;
@@ -380,17 +387,17 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/updateedge/:id",
+    "/updateedge",
     async (
       req: FastifyRequest<{
         Body: string;
-        Params: { id: string };
       }>
     ) => {
       try {
+        const data = removeNull(JSON.parse(req.body)) as any;
         const newDocument = await prisma.edges.update({
           where: {
-            id: req.params.id,
+            id: data.id,
           },
           data: removeNull(JSON.parse(req.body)) as any,
         });

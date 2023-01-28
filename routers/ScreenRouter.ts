@@ -38,13 +38,14 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       } catch (error) {}
     }
   ),
-    server.get(
-      "/getsinglescreen/:id",
-      async (req: FastifyRequest<{ Params: { id: string } }>) => {
+    server.post(
+      "/getsinglescreen",
+      async (req: FastifyRequest<{ Body: string }>) => {
+        const data = JSON.parse(req.body) as { id: string };
         try {
           const screens = await prisma.screens.findUnique({
             where: {
-              id: req.params.id,
+              id: data.id,
               OR: [
                 {
                   project: {
@@ -138,16 +139,17 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     ),
     server.post(
-      "/updatesection/:id",
-      async (req: FastifyRequest<{ Params: { id: string }; Body: string }>) => {
+      "/updatesection",
+      async (req: FastifyRequest<{ Body: string }>) => {
         const data = JSON.parse(req.body) as {
+          id: string;
           title: string;
           size: string;
         };
         try {
           await prisma.sections.update({
             where: {
-              id: req.params.id,
+              id: data.id,
             },
             data,
           });
@@ -159,19 +161,17 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     );
   server.post(
-    "/updatecard/:id",
-    async (
-      req: FastifyRequest<{ Params: { id: string }; Body: string }>,
-      rep: FastifyReply
-    ) => {
+    "/updatecard",
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as {
+          id: string;
           sort: number;
           expanded: boolean;
         };
         await prisma.cards.update({
           where: {
-            id: req.params.id,
+            id: data.id,
           },
           data,
         });
@@ -247,9 +247,10 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   });
   server.post(
-    "/updatescreen/:id",
-    async (req: FastifyRequest<{ Params: { id: string }; Body: string }>) => {
+    "/updatescreen",
+    async (req: FastifyRequest<{ Body: string }>) => {
       const data = JSON.parse(req.body) as {
+        id: string;
         title: string;
         icon: string;
         folder: boolean;
@@ -260,7 +261,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       try {
         await prisma.screens.update({
           where: {
-            id: req.params.id,
+            id: data.id,
           },
           data,
         });
@@ -272,12 +273,13 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.delete(
-    "/deletescreen/:id",
-    async (req: FastifyRequest<{ Params: { id: string } }>) => {
+    "/deletescreen",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      const data = JSON.parse(req.body) as { id: string };
       try {
         await prisma.screens.delete({
           where: {
-            id: req.params.id,
+            id: data.id,
           },
         });
       } catch (error) {
@@ -307,12 +309,13 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.delete(
-    "/deletecard/:id",
-    async (req: FastifyRequest<{ Params: { id: string } }>) => {
+    "/deletecard",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      const data = JSON.parse(req.body) as { id: string };
       try {
         await prisma.cards.delete({
           where: {
-            id: req.params.id,
+            id: data.id,
           },
         });
       } catch (error) {

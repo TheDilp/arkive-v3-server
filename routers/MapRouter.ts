@@ -43,25 +43,31 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
 
-  server.get(
-    "/getsinglemap/:id",
-    async (req: FastifyRequest<{ Params: { id: string } }>) => {
-      const data = await prisma.maps.findUnique({
-        where: {
-          id: req.params.id,
-        },
-        include: {
-          map_pins: true,
-          map_layers: true,
-          tags: {
-            select: {
-              id: true,
-              title: true,
+  server.post(
+    "/getsinglemap",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        const map = await prisma.maps.findUnique({
+          where: {
+            id: data.id,
+          },
+          include: {
+            map_pins: true,
+            map_layers: true,
+            tags: {
+              select: {
+                id: true,
+                title: true,
+              },
             },
           },
-        },
-      });
-      return data;
+        });
+        return map;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
 
@@ -131,17 +137,17 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/updatemappin/:id",
+    "/updatemappin/",
     async (
       req: FastifyRequest<{
         Body: string;
-        Params: { id: string };
       }>
     ) => {
       try {
+        const data = removeNull(JSON.parse(req.body)) as any;
         await prisma.map_pins.update({
-          data: removeNull(JSON.parse(req.body)) as any,
-          where: { id: req.params.id },
+          data,
+          where: { id: data.id },
         });
         return true;
       } catch (error: any) {
@@ -151,17 +157,17 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/updatemaplayer/:id",
+    "/updatemaplayer",
     async (
       req: FastifyRequest<{
         Body: string;
-        Params: { id: string };
       }>
     ) => {
       try {
+        const data = removeNull(JSON.parse(req.body)) as any;
         await prisma.map_layers.update({
-          data: removeNull(JSON.parse(req.body)) as any,
-          where: { id: req.params.id },
+          data,
+          where: { id: data.id },
         });
         return true;
       } catch (error: any) {
@@ -171,17 +177,17 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/updatemap/:id",
+    "/updatemap",
     async (
       req: FastifyRequest<{
         Body: string;
-        Params: { id: string };
       }>
     ) => {
       try {
+        const data = removeNull(JSON.parse(req.body)) as any;
         await prisma.maps.update({
-          data: removeNull(JSON.parse(req.body)) as any,
-          where: { id: req.params.id },
+          data,
+          where: { id: data.id },
         });
         return true;
       } catch (error: any) {
@@ -205,55 +211,71 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     );
     try {
       await prisma.$transaction(updates);
+      return true;
     } catch (error) {
       console.log(error);
+      return false;
     }
   });
 
   server.delete(
-    "/deletemap/:id",
+    "/deletemap",
     async (
       req: FastifyRequest<{
-        Params: { id: string };
+        Body: string;
       }>
     ) => {
-      await prisma.maps.delete({
-        where: { id: req.params.id },
-      });
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        await prisma.maps.delete({
+          where: { id: data.id },
+        });
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
   server.delete(
-    "/deletemaplayer/:id",
+    "/deletemaplayer",
     async (
       req: FastifyRequest<{
-        Params: { id: string };
+        Body: string;
       }>
     ) => {
-      await prisma.map_layers.deleteMany({
-        where: {
-          parentId: req.params.id,
-        },
-      });
-      await prisma.map_layers.delete({
-        where: { id: req.params.id },
-      });
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        await prisma.map_layers.delete({
+          where: {
+            id: data.id,
+          },
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
   server.delete(
-    "/deletemappin/:id",
+    "/deletemappin",
     async (
       req: FastifyRequest<{
-        Params: { id: string };
+        Body: string;
       }>
     ) => {
-      await prisma.map_pins.deleteMany({
-        where: {
-          parentId: req.params.id,
-        },
-      });
-      await prisma.map_pins.delete({
-        where: { id: req.params.id },
-      });
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        await prisma.map_pins.delete({
+          where: {
+            id: data.id,
+          },
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
 

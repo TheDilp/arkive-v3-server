@@ -20,18 +20,19 @@ model User {
 }
 
 model projects {
-  id        String      @id @default(uuid()) @db.Uuid
-  title     String      @default("New Project")
-  documents documents[]
-  maps      maps[]
-  boards    boards[]
-  image     String?
-  tags      tags[]
+  id           String         @id @default(uuid()) @db.Uuid
+  title        String         @default("New Project")
+  documents    documents[]
+  maps         maps[]
+  boards       boards[]
+  screens      screens[]
+  dictionaries dictionaries[]
+  tags         tags[]
+  image        String?
 
   ownerId String
-  owner   User      @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
-  members User[]    @relation("project_members")
-  screens screens[]
+  owner   User   @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
+  members User[] @relation("project_members")
 }
 
 model documents {
@@ -223,8 +224,8 @@ model edges {
 
 model screens {
   id         String   @id @default(uuid()) @db.Uuid
-  title      String
-  project    projects @relation(fields: [project_id], references: [id])
+  title      String   @default("New Screen")
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
   parentId String?   @db.Uuid
@@ -268,6 +269,38 @@ model cards {
   @@unique([parentId, documentsId])
 }
 
+model dictionaries {
+  id    String @id @default(uuid()) @db.Uuid
+  title String @unique
+
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  project_id String   @db.Uuid
+
+  sort     Int     @default(0)
+  expanded Boolean @default(true)
+  folder   Boolean @default(false)
+  isPublic Boolean @default(false)
+
+  parentId String?        @db.Uuid
+  parent   dictionaries?  @relation("parentChildDictionaries", fields: [parentId], references: [id], onDelete: Cascade)
+  children dictionaries[] @relation("parentChildDictionaries")
+
+  tags  tags[]
+  words words[]
+}
+
+model words {
+  id    String @id @default(uuid()) @db.Uuid
+  title String
+
+  translation String
+
+  language       dictionaries @relation(fields: [dictionariesId], references: [id], onDelete: Cascade)
+  dictionariesId String       @db.Uuid
+
+  @@unique([title, translation, dictionariesId])
+}
+
 model tags {
   id    String @id @default(uuid()) @db.Uuid
   title String
@@ -275,13 +308,14 @@ model tags {
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
-  documents documents[]
-  maps      maps[]
-  map_pins  map_pins[]
-  boards    boards[]
-  nodes     nodes[]
-  edges     edges[]
-  screens   screens[]
+  documents    documents[]
+  maps         maps[]
+  map_pins     map_pins[]
+  boards       boards[]
+  nodes        nodes[]
+  edges        edges[]
+  screens      screens[]
+  dictionaries dictionaries[]
 
   @@unique([title, project_id])
 }
