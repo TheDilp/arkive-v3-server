@@ -175,6 +175,28 @@ export const dictionaryRouter = (
     }
   );
   server.post(
+    "/getsingleword",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        const word = await prisma.words.findUnique({
+          where: { id: data.id },
+          include: {
+            dictionary: {
+              select: {
+                title: true,
+              },
+            },
+          },
+        });
+        return word;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.post(
     "/updateword",
     async (
       req: FastifyRequest<{
@@ -197,23 +219,22 @@ export const dictionaryRouter = (
       }
     }
   );
-
-  server.post(
-    "/getsingleword",
-    async (req: FastifyRequest<{ Body: string }>) => {
+  server.delete(
+    "/deleteword",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
-        const word = await prisma.words.findUnique({
-          where: { id: data.id },
-          include: {
-            dictionary: {
-              select: {
-                title: true,
-              },
-            },
+        const id = JSON.parse(req.body) as string;
+        await prisma.words.delete({
+          where: {
+            id,
           },
         });
-        return word;
+
+        return true;
       } catch (error) {
         console.log(error);
         return false;

@@ -61,7 +61,6 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
       return data;
     }
   );
-
   server.post(
     "/getsingledocument",
     async (req: FastifyRequest<{ Body: string }>) => {
