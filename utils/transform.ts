@@ -3,11 +3,15 @@ export function removeNull(obj: JSON) {
     Object.entries(obj).filter(([k, v]) => {
       if ((k === "content" || k === "properties") && v === null) return false;
       return true;
-    }),
+    })
   );
 }
 
-export function onlyUniqueStrings(value: string, index: number, self: string[]) {
+export function onlyUniqueStrings(
+  value: string,
+  index: number,
+  self: string[]
+) {
   return self.indexOf(value) === index;
 }
 
@@ -19,7 +23,12 @@ export function hasValueDeep(json: any, findValue: string): boolean {
     const keys = Object.keys(json);
     keys.forEach((key) => {
       if (hasValue) return hasValue;
-      if (key === "text" || key === "label" || key === "content" || key === "attrs") {
+      if (
+        key === "text" ||
+        key === "label" ||
+        key === "content" ||
+        key === "attrs"
+      ) {
         if (typeof json[key] === "string") {
           hasValue = json[key]?.toLowerCase().includes(lowercasedFindValue);
           if (hasValue) return hasValue;
