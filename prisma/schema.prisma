@@ -290,15 +290,16 @@ model dictionaries {
 }
 
 model words {
-  id    String @id @default(uuid()) @db.Uuid
-  title String
+  id          String  @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
 
   translation String
 
-  language       dictionaries @relation(fields: [dictionariesId], references: [id], onDelete: Cascade)
-  dictionariesId String       @db.Uuid
+  dictionary dictionaries @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  parentId   String       @db.Uuid
 
-  @@unique([title, translation, dictionariesId])
+  @@unique([title, translation, parentId])
 }
 
 model tags {

@@ -324,5 +324,82 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
 
+  server.post("/search", async (req: FastifyRequest<{ Body: string }>) => {
+    try {
+      const data = JSON.parse(req.body) as {
+        query: string;
+        project_id: string;
+        type: "documents" | "maps" | "boards" | "words";
+      };
+      if (data.type === "documents")
+        return prisma.documents.findMany({
+          where: {
+            project_id: data.project_id,
+            OR: [
+              {
+                title: {
+                  contains: data.query,
+                  mode: "insensitive",
+                },
+              },
+            ],
+          },
+          select: {
+            id: true,
+            title: true,
+          },
+        });
+
+      if (data.type === "maps")
+        return prisma.maps.findMany({
+          where: {
+            project_id: data.project_id,
+            title: {
+              contains: data.query,
+              mode: "insensitive",
+            },
+          },
+          select: {
+            id: true,
+            title: true,
+          },
+        });
+      if (data.type === "boards")
+        return prisma.boards.findMany({
+          where: {
+            project_id: data.project_id,
+            title: {
+              contains: data.query,
+              mode: "insensitive",
+            },
+          },
+          select: {
+            id: true,
+            title: true,
+          },
+        });
+      if (data.type === "words")
+        return prisma.words.findMany({
+          where: {
+            dictionary: {
+              project_id: data.project_id,
+            },
+            translation: {
+              contains: data.query,
+              mode: "insensitive",
+            },
+          },
+          select: {
+            id: true,
+            title: true,
+            translation: true,
+          },
+        });
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  });
+
   done();
 };

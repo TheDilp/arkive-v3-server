@@ -57,7 +57,11 @@ export const dictionaryRouter = (
                 title: true,
               },
             },
-            words: true,
+            words: {
+              orderBy: {
+                title: "asc",
+              },
+            },
           },
         });
         return dictionary;
@@ -76,7 +80,7 @@ export const dictionaryRouter = (
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
-        const newBoard = await prisma.dictionaries.create({
+        const newDictionary = await prisma.dictionaries.create({
           data: {
             ...data,
             tags: {
@@ -87,11 +91,11 @@ export const dictionaryRouter = (
           },
         });
 
-        return newBoard;
+        return newDictionary;
       } catch (error) {
         console.log(error);
+        return false;
       }
-      return null;
     }
   );
   server.post(
@@ -145,6 +149,52 @@ export const dictionaryRouter = (
       await prisma.dictionaries.delete({
         where: { id: data.id },
       });
+    }
+  );
+
+  // WORD ROUTES
+
+  server.post(
+    "/createword",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        await prisma.words.create({
+          data,
+        });
+
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+
+  server.post(
+    "/getsingleword",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        const word = await prisma.words.findUnique({
+          where: { id: data.id },
+          include: {
+            dictionary: {
+              select: {
+                title: true,
+              },
+            },
+          },
+        });
+        return word;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
 
