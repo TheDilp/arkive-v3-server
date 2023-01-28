@@ -174,6 +174,29 @@ export const dictionaryRouter = (
       }
     }
   );
+  server.post(
+    "/updateword",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        await prisma.words.update({
+          where: {
+            id: data.id,
+          },
+          data,
+        });
+
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
 
   server.post(
     "/getsingleword",
