@@ -100,8 +100,8 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
           };
 
           await s3Client.send(new PutObjectCommand(params));
-          return true;
         });
+        return true;
       } catch (error) {
         console.log(error);
         return false;
