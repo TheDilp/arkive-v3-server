@@ -335,6 +335,8 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         return prisma.documents.findMany({
           where: {
             project_id: data.project_id,
+            folder: false,
+            template: false,
             OR: [
               {
                 title: {
@@ -353,6 +355,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
       if (data.type === "maps")
         return prisma.maps.findMany({
           where: {
+            folder: false,
             project_id: data.project_id,
             title: {
               contains: data.query,
@@ -367,6 +370,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
       if (data.type === "boards")
         return prisma.boards.findMany({
           where: {
+            folder: false,
             project_id: data.project_id,
             title: {
               contains: data.query,
