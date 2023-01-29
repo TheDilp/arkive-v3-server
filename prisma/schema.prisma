@@ -306,6 +306,10 @@ model tags {
   id    String @id @default(uuid()) @db.Uuid
   title String
 
+  textColor String @default("#ffffff")
+  bgColor   String @default("#0369a1")
+  type      String
+
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
