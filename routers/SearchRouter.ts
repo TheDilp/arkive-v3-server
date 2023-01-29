@@ -404,6 +404,11 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             id: true,
             title: true,
             translation: true,
+            dictionary: {
+              select: {
+                title: true,
+              },
+            },
           },
         });
     } catch (error) {
