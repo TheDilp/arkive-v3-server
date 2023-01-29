@@ -161,6 +161,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           }),
         ];
+
         const [
           titleDocuments,
           maps,
@@ -170,7 +171,10 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           edges,
           screens,
           sections,
-        ] = await prisma.$transaction(searches);
+        ] = await prisma.$transaction(async (prisma) => {
+          const results = await Promise.all(searches);
+          return results;
+        });
         const contentSearchedDocuments = [...(titleDocuments as any[])].filter(
           (doc: any) =>
             doc.title.toLowerCase().includes((query as string).toLowerCase()) ||
