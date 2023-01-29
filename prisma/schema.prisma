@@ -266,6 +266,8 @@ model cards {
   sections sections? @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId String?   @db.Uuid
 
+  tags tags[]
+
   @@unique([parentId, documentsId])
 }
 
@@ -306,10 +308,6 @@ model tags {
   id    String @id @default(uuid()) @db.Uuid
   title String
 
-  textColor String @default("#ffffff")
-  bgColor   String @default("#0369a1")
-  type      String
-
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
@@ -320,6 +318,7 @@ model tags {
   nodes        nodes[]
   edges        edges[]
   screens      screens[]
+  cards        cards[]
   dictionaries dictionaries[]
 
   @@unique([title, project_id])
