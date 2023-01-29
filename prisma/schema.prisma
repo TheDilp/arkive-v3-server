@@ -30,9 +30,10 @@ model projects {
   tags         tags[]
   image        String?
 
-  ownerId String
-  owner   User   @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
-  members User[] @relation("project_members")
+  ownerId   String
+  owner     User        @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
+  members   User[]      @relation("project_members")
+  calendars calendars[]
 }
 
 model documents {
@@ -304,6 +305,37 @@ model words {
   @@unique([title, translation, parentId])
 }
 
+model calendars {
+  id    String @id @default(uuid()) @db.Uuid
+  title String
+
+  project    projects @relation(fields: [project_id], references: [id])
+  project_id String   @db.Uuid
+
+  parentId String?     @db.Uuid
+  parent   calendars?  @relation("parentChildCalendar", fields: [parentId], references: [id], onDelete: Cascade)
+  children calendars[] @relation("parentChildCalendar")
+
+  sort     Int     @default(0)
+  expanded Boolean @default(true)
+  folder   Boolean @default(false)
+  isPublic Boolean @default(false)
+
+  weeks Int
+  days  days[]
+
+  tags tags[]
+}
+
+model days {
+  id    String @id @default(uuid()) @db.Uuid
+  title String
+  sort  Int
+
+  calendar calendars? @relation(fields: [parentId], references: [id])
+  parentId String?    @db.Uuid
+}
+
 model tags {
   id    String @id @default(uuid()) @db.Uuid
   title String
@@ -320,6 +352,7 @@ model tags {
   screens      screens[]
   cards        cards[]
   dictionaries dictionaries[]
+  calendars    calendars[]
 
   @@unique([title, project_id])
 }

@@ -15,6 +15,7 @@ import { userRouter } from "./routers/UserRouter";
 import fileUpload from "fastify-file-upload";
 import { screenRouter } from "./routers/ScreenRouter";
 import { dictionaryRouter } from "./routers/DictionaryRouter";
+import { calendarRouter } from "./routers/CalendarRouter";
 declare module "fastify" {
   interface FastifyRequest {
     user_id: string;
@@ -59,6 +60,7 @@ server.register((instance, _, done) => {
   instance.register(boardRouter);
   instance.register(screenRouter);
   instance.register(dictionaryRouter);
+  instance.register(calendarRouter);
   instance.register(imageRouter);
 
   done();
