@@ -30,6 +30,12 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
             id: data.id,
           },
           include: {
+            eras: true,
+            months: {
+              include: {
+                events: true,
+              },
+            },
             tags: {
               select: {
                 id: true,
@@ -55,6 +61,36 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
         const newCalendar = await prisma.calendars.create({
+          data: {
+            ...data,
+            tags: {
+              connect: data?.tags?.map((tag: { id: string }) => ({
+                id: tag.id,
+              })),
+            },
+          },
+        });
+
+        return newCalendar;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.post(
+    "/updatecalendar",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        const newCalendar = await prisma.calendars.update({
+          where: {
+            id: data.id,
+          },
           data: {
             ...data,
             tags: {

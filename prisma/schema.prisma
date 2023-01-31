@@ -321,19 +321,56 @@ model calendars {
   folder   Boolean @default(false)
   isPublic Boolean @default(false)
 
-  weeks Int
-  days  days[]
+  eras   eras[]
+  months months[]
+  days   String[]
+  events events[]
 
   tags tags[]
 }
 
-model days {
+model eras {
+  id         String @id @default(uuid()) @db.Uuid
+  title      String
+  start_year Int
+  end_year   Int
+
+  hours   Int
+  minutes Int
+
+  calendar calendars @relation(fields: [parentId], references: [id])
+  parentId String    @db.Uuid
+
+  sort   Int      @default(0)
+  events events[]
+}
+
+model months {
   id    String @id @default(uuid()) @db.Uuid
   title String
-  sort  Int
+  days  Int
 
-  calendar calendars? @relation(fields: [parentId], references: [id])
-  parentId String?    @db.Uuid
+  calendar calendars @relation(fields: [parentId], references: [id])
+  sort     Int       @default(0)
+  events   events[]
+  parentId String    @db.Uuid
+}
+
+model events {
+  id    String @id @default(uuid()) @db.Uuid
+  title String
+
+  calendar calendars? @relation(fields: [calendarsId], references: [id])
+  era      eras       @relation(fields: [erasId], references: [id])
+  year     Int
+  month    months     @relation(fields: [monthsId], references: [id])
+  day      Int
+  hours    Int
+  minutes  Int
+
+  erasId      String  @db.Uuid
+  monthsId    String  @db.Uuid
+  calendarsId String? @db.Uuid
 }
 
 model tags {
