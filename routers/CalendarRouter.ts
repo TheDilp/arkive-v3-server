@@ -174,6 +174,33 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
       return false;
     }
   });
+  server.post(
+    "/createevent",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        await prisma.events.create({
+          data: {
+            ...data,
+            tags: {
+              connect: data?.tags?.map((tag: { id: string }) => ({
+                id: tag.id,
+              })),
+            },
+          },
+        });
+
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
   server.delete(
     "/deletecalendar",
     async (

@@ -365,10 +365,12 @@ model events {
   year     Int
   month    months     @relation(fields: [monthsId], references: [id])
   day      Int
-  hours    Int
-  minutes  Int
+  hours    Int?
+  minutes  Int?
 
-  erasId      String  @db.Uuid
+  tags tags[]
+
+  erasId      String? @db.Uuid
   monthsId    String  @db.Uuid
   calendarsId String? @db.Uuid
 }
@@ -390,6 +392,7 @@ model tags {
   cards        cards[]
   dictionaries dictionaries[]
   calendars    calendars[]
+  events       events[]
 
   @@unique([title, project_id])
 }
