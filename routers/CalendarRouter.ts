@@ -108,6 +108,72 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+  server.post(
+    "/createmonth",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        const newMonth = await prisma.months.create({
+          data,
+        });
+
+        return newMonth;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.post(
+    "/updatemonth",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        await prisma.months.update({
+          where: {
+            id: data.id,
+          },
+          data,
+        });
+
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.post("/sortmonths", async (req: FastifyRequest<{ Body: string }>) => {
+    try {
+      const indexes: { id: string; parent: string; sort: number }[] =
+        JSON.parse(req.body);
+      const updates = indexes.map((idx) =>
+        prisma.months.update({
+          data: {
+            parentId: idx.parent,
+            sort: idx.sort,
+          },
+          where: { id: idx.id },
+        })
+      );
+      await prisma.$transaction(async () => {
+        Promise.all(updates);
+      });
+
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  });
   server.delete(
     "/deletecalendar",
     async (

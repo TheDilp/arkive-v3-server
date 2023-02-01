@@ -321,6 +321,9 @@ model calendars {
   folder   Boolean @default(false)
   isPublic Boolean @default(false)
 
+  hours   Int?
+  minutes Int?
+
   eras   eras[]
   months months[]
   days   String[]
@@ -334,9 +337,6 @@ model eras {
   title      String
   start_year Int
   end_year   Int
-
-  hours   Int
-  minutes Int
 
   calendar calendars @relation(fields: [parentId], references: [id])
   parentId String    @db.Uuid
@@ -361,7 +361,7 @@ model events {
   title String
 
   calendar calendars? @relation(fields: [calendarsId], references: [id])
-  era      eras       @relation(fields: [erasId], references: [id])
+  era      eras?      @relation(fields: [erasId], references: [id])
   year     Int
   month    months     @relation(fields: [monthsId], references: [id])
   day      Int
