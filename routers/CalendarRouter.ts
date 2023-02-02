@@ -201,6 +201,29 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+  server.post(
+    "/updateevent",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        await prisma.events.update({
+          where: {
+            id: data.id,
+          },
+          data,
+        });
+
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
   server.delete(
     "/deletecalendar",
     async (

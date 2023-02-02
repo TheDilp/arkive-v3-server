@@ -62,7 +62,8 @@ model documents {
   tags   tags[]
   tagsId String? @db.Uuid
 
-  cards cards[]
+  cards  cards[]
+  events events[]
 }
 
 model maps {
@@ -341,8 +342,7 @@ model eras {
   calendar calendars @relation(fields: [parentId], references: [id])
   parentId String    @db.Uuid
 
-  sort   Int      @default(0)
-  events events[]
+  sort Int @default(0)
 }
 
 model months {
@@ -357,11 +357,16 @@ model months {
 }
 
 model events {
-  id    String @id @default(uuid()) @db.Uuid
-  title String
+  id          String  @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+
+  document documents? @relation(fields: [documentsId], references: [id])
+
+  backgroundColor String @default("#075985")
+  textColor       String @default("#ffffff")
 
   calendar calendars? @relation(fields: [calendarsId], references: [id])
-  era      eras?      @relation(fields: [erasId], references: [id])
   year     Int
   month    months     @relation(fields: [monthsId], references: [id])
   day      Int
@@ -370,9 +375,9 @@ model events {
 
   tags tags[]
 
-  erasId      String? @db.Uuid
   monthsId    String  @db.Uuid
   calendarsId String? @db.Uuid
+  documentsId String? @db.Uuid
 }
 
 model tags {
