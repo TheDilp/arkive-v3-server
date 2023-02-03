@@ -109,7 +109,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/createra",
+    "/createera",
     async (
       req: FastifyRequest<{
         Body: string;
