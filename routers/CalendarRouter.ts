@@ -231,10 +231,16 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         Body: string;
       }>
     ) => {
-      const data = JSON.parse(req.body) as { id: string };
-      await prisma.events.delete({
-        where: { id: data.id },
-      });
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        await prisma.events.delete({
+          where: { id: data.id },
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
   server.delete(
@@ -244,10 +250,16 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         Body: string;
       }>
     ) => {
-      const data = JSON.parse(req.body) as { id: string };
-      await prisma.calendars.delete({
-        where: { id: data.id },
-      });
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        await prisma.calendars.delete({
+          where: { id: data.id },
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
 
