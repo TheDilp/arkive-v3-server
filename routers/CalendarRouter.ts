@@ -30,7 +30,11 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
             id: data.id,
           },
           include: {
-            eras: true,
+            eras: {
+              orderBy: {
+                start_year: "asc",
+              },
+            },
             months: {
               orderBy: {
                 sort: "asc",
