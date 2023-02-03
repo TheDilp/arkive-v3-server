@@ -176,18 +176,26 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
   server.post(
     "/sortdocuments",
     async (req: FastifyRequest<{ Body: string }>) => {
-      const indexes: { id: string; parent: string; sort: number }[] =
-        JSON.parse(req.body);
-      const updates = indexes.map((idx) =>
-        prisma.documents.update({
-          data: {
-            parentId: idx.parent,
-            sort: idx.sort,
-          },
-          where: { id: idx.id },
-        })
-      );
-      await prisma.$transaction(updates);
+      try {
+        const indexes: { id: string; parent: string; sort: number }[] =
+          JSON.parse(req.body);
+        const updates = indexes.map((idx) =>
+          prisma.documents.update({
+            data: {
+              parentId: idx.parent,
+              sort: idx.sort,
+            },
+            where: { id: idx.id },
+          })
+        );
+        await prisma.$transaction(async () => {
+          Promise.all(updates);
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
   server.delete(
