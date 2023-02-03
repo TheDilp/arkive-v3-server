@@ -31,11 +31,8 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
           },
           include: {
             eras: true,
-            months: {
-              include: {
-                events: true,
-              },
-            },
+            months: true,
+            events: true,
             tags: {
               select: {
                 id: true,

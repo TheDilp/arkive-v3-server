@@ -350,7 +350,6 @@ model months {
 
   calendar calendars @relation(fields: [parentId], references: [id])
   sort     Int       @default(0)
-  events   events[]
   parentId String    @db.Uuid
 }
 
@@ -366,14 +365,13 @@ model events {
 
   calendar calendars? @relation(fields: [calendarsId], references: [id])
   year     Int
-  month    months     @relation(fields: [monthsId], references: [id])
+  month    Int
   day      Int
   hours    Int?
   minutes  Int?
 
   tags tags[]
 
-  monthsId    String  @db.Uuid
   calendarsId String? @db.Uuid
   documentsId String? @db.Uuid
 }
