@@ -109,6 +109,49 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
+    "/createra",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        await prisma.eras.create({
+          data,
+        });
+
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.post(
+    "/updateera",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        await prisma.eras.update({
+          where: {
+            id: data.id,
+          },
+          data,
+        });
+
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.post(
     "/createmonth",
     async (
       req: FastifyRequest<{
@@ -225,7 +268,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.delete(
-    "/deleteevent",
+    "/deletecalendar",
     async (
       req: FastifyRequest<{
         Body: string;
@@ -233,7 +276,27 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
-        await prisma.events.delete({
+        await prisma.calendars.delete({
+          where: { id: data.id },
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+
+  server.delete(
+    "/deleteera",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        await prisma.eras.delete({
           where: { id: data.id },
         });
         return true;
@@ -244,7 +307,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.delete(
-    "/deletecalendar",
+    "/deletemonth",
     async (
       req: FastifyRequest<{
         Body: string;
@@ -252,7 +315,26 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
-        await prisma.calendars.delete({
+        await prisma.months.delete({
+          where: { id: data.id },
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.delete(
+    "/deleteevent",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        await prisma.events.delete({
           where: { id: data.id },
         });
         return true;
