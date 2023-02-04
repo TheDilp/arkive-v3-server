@@ -46,7 +46,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   server.post(
     "/createproject",
     async (req: FastifyRequest<{ Body: string }>) => {
-      console.log(req.user_id);
       if (req.user_id) {
         try {
           const newProject = await prisma.projects.create({
