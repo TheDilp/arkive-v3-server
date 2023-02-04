@@ -99,7 +99,7 @@ model map_pins {
   color           String  @default("#ffffff")
   backgroundColor String  @default("#000000")
   icon            String
-  isPublic        Boolean @default(true)
+  isPublic        Boolean @default(false)
   tags            tags[]
 
   map_link String? @db.Uuid
