@@ -16,6 +16,7 @@ import fileUpload from "fastify-file-upload";
 import { screenRouter } from "./routers/ScreenRouter";
 import { dictionaryRouter } from "./routers/DictionaryRouter";
 import { calendarRouter } from "./routers/CalendarRouter";
+import { publicRouter } from "./routers/PublicRouter";
 declare module "fastify" {
   interface FastifyRequest {
     user_id: string;
@@ -44,6 +45,7 @@ server.register(otherRouter);
 
 server.register((instance, _, done) => {
   instance.addHook("preParsing", async (request) => {
+    console.log(request);
     const token = await firebase
       .auth()
       .verifyIdToken(request.headers.authorization?.split(" ")[1] as string);
@@ -65,6 +67,8 @@ server.register((instance, _, done) => {
 
   done();
 });
+
+server.register(publicRouter);
 
 if (process.env.VITE_BE_PORT) {
   server.listen(

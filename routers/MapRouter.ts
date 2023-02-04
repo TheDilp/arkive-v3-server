@@ -137,7 +137,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/updatemappin/",
+    "/updatemappin",
     async (
       req: FastifyRequest<{
         Body: string;
