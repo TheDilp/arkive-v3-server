@@ -33,8 +33,16 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
         const map = await prisma.maps.findUnique({
           where: { id: data.id, isPublic: true },
           include: {
-            map_layers: true,
-            map_pins: true,
+            map_layers: {
+              where: {
+                isPublic: true,
+              },
+            },
+            map_pins: {
+              where: {
+                isPublic: true,
+              },
+            },
             tags: {
               select: {
                 id: true,
@@ -69,6 +77,28 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         return board;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.post(
+    "/getpublicword",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        const word = await prisma.words.findUnique({
+          where: { id: data.id },
+          include: {
+            dictionary: {
+              select: {
+                title: true,
+              },
+            },
+          },
+        });
+        return word;
       } catch (error) {
         console.log(error);
         return false;
