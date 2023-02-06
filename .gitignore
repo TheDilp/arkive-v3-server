@@ -12,7 +12,8 @@ prisma/migrations
 dist
 dist-ssr
 *.local
-.env
+.env.dev
+.env.prod
 .envrc
 # Editor directories and files
 .vscode/*
