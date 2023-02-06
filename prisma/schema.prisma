@@ -277,7 +277,7 @@ model cards {
 
 model dictionaries {
   id    String @id @default(uuid()) @db.Uuid
-  title String @unique
+  title String
 
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
@@ -293,6 +293,8 @@ model dictionaries {
 
   tags  tags[]
   words words[]
+
+  @@unique([project_id, title])
 }
 
 model words {

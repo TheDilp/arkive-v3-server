@@ -22,6 +22,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         return data;
       } catch (error) {
         console.log(error);
+        return false;
       }
     }
   );
