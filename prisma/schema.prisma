@@ -380,6 +380,30 @@ model events {
   documentsId String? @db.Uuid
 }
 
+model random_tables {
+  id          String  @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+
+  isShared Boolean @default(false)
+
+  icon                String                @default("arcticons:reroll")
+  folder              Boolean               @default(false)
+  isPublic            Boolean               @default(false)
+  expanded            Boolean               @default(false)
+  sort                Int                   @default(0)
+  random_table_option random_table_option[]
+}
+
+model random_table_option {
+  id           String        @id @default(uuid()) @db.Uuid
+  title        String
+  description  String?
+  sort         Int           @default(0)
+  random_table random_tables @relation(fields: [parentId], references: [id])
+  parentId     String        @db.Uuid
+}
+
 model tags {
   id    String @id @default(uuid()) @db.Uuid
   title String

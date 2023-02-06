@@ -6,7 +6,8 @@
   "scripts": {
     "start": "prisma generate && node ./dist/index.js",
     "build": "tsc",
-    "runlocal": "nodemon index.ts"
+    "runlocal": "dotenv -e .env.dev -- nodemon index.ts",
+    "migrate:dev": "dotenv -e .env.dev -- pnpm prisma migrate dev --name update dev db"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,8 @@
   },
   "devDependencies": {
     "@types/node": "^18.11.16",
+    "dotenv": "^16.0.3",
+    "dotenv-cli": "^7.0.0",
     "nodemon": "^2.0.20",
     "prisma": "^4.9.0",
     "ts-node": "^10.9.1",
