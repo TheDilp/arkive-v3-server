@@ -81,6 +81,7 @@ if (process.env.VITE_BE_PORT) {
       }
 
       console.log(`Server listening at ${address}`);
+      console.log("===============================");
     }
   );
 } else {
