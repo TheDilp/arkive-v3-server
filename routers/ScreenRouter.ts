@@ -219,7 +219,9 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
               where: { id: idx.id },
             })
           );
-          await prisma.$transaction(updates);
+          await prisma.$transaction(async () => {
+            await Promise.all(updates);
+          });
           return true;
         } catch (error) {
           return false;
@@ -239,7 +241,9 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           where: { id: idx.id },
         })
       );
-      await prisma.$transaction(updates);
+      await prisma.$transaction(async () => {
+        await Promise.all(updates);
+      });
       return true;
     } catch (error) {
       console.log(error);
@@ -282,6 +286,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
             id: data.id,
           },
         });
+        return true;
       } catch (error) {
         console.log(error);
         return false;
@@ -301,6 +306,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
+        return true;
       } catch (error) {
         console.log(error);
         return false;
@@ -318,6 +324,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
             id: data.id,
           },
         });
+        return true;
       } catch (error) {
         console.log(error);
         return false;
