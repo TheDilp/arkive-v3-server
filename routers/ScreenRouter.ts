@@ -102,7 +102,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
             "title" | "sectionSize" | "project_id"
           >;
 
-          await prisma.screens.create({
+          const newScreen = await prisma.screens.create({
             data: {
               title: data.title,
               project_id: data.project_id,
@@ -110,7 +110,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           });
           rep.code(200);
-          return true;
+          return newScreen;
         } catch (error) {
           console.log(error);
           rep.code(500);
@@ -127,7 +127,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           parentId: string;
           sort: number;
         };
-        await prisma.sections.create({
+        const newSection = await prisma.sections.create({
           data: {
             title: data.title,
             parentId: data.parentId,
@@ -135,7 +135,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         rep.code(200);
-        return true;
+        return newSection;
       }
     ),
     server.post(
@@ -192,11 +192,11 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
             parentId: string;
             documentsId: string;
           }[];
-          await prisma.cards.createMany({
+          const newCards = await prisma.cards.createMany({
             data,
           });
           rep.code(200);
-          return true;
+          return newCards;
         } catch (error) {
           console.log(error);
           rep.code(500);
