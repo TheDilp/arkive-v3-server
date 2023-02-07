@@ -209,7 +209,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         const data = JSON.parse(req.body) as { id: string };
         await prisma.documents.delete({
           where: {
-            id: req.body,
+            id: data.id,
           },
         });
         return true;
