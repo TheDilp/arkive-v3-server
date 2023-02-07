@@ -30,10 +30,11 @@ model projects {
   tags         tags[]
   image        String?
 
-  ownerId   String
-  owner     User        @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
-  members   User[]      @relation("project_members")
-  calendars calendars[]
+  ownerId       String
+  owner         User            @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
+  members       User[]          @relation("project_members")
+  calendars     calendars[]
+  random_tables random_tables[]
 }
 
 model documents {
@@ -384,6 +385,13 @@ model random_tables {
   id          String  @id @default(uuid()) @db.Uuid
   title       String
   description String?
+
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  project_id String   @db.Uuid
+
+  parent   random_tables?  @relation("parentChildRandomTables", fields: [parentId], references: [id], onDelete: Cascade)
+  children random_tables[] @relation("parentChildRandomTables")
+  parentId String?         @db.Uuid
 
   isShared Boolean @default(false)
 

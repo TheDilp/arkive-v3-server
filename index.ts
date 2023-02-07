@@ -17,6 +17,7 @@ import { screenRouter } from "./routers/ScreenRouter";
 import { dictionaryRouter } from "./routers/DictionaryRouter";
 import { calendarRouter } from "./routers/CalendarRouter";
 import { publicRouter } from "./routers/PublicRouter";
+import { randomTableRouter } from "./routers/RandomTableRouter";
 declare module "fastify" {
   interface FastifyRequest {
     user_id: string;
@@ -63,6 +64,7 @@ server.register((instance, _, done) => {
   instance.register(screenRouter);
   instance.register(dictionaryRouter);
   instance.register(calendarRouter);
+  instance.register(randomTableRouter);
   instance.register(imageRouter);
 
   done();
