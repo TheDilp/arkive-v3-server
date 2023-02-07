@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 
+import sharp from "sharp";
 import { S3, PutObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
 
 const s3Client = new S3({
@@ -89,17 +90,34 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
 
         Object.entries(files).forEach(async ([key, file]) => {
           const filePath = `assets/${type}/${project_id}/${key}`;
-          const params = {
-            Bucket: process.env.DO_SPACES_NAME as string,
-            Key: filePath,
-            Body: file.data,
-            ACL: "public-read",
-            Metadata: {
-              "content-type": file?.mimetype,
-            },
-          };
+          try {
+            const webpImage = await sharp(file.data)
+              .toFormat("webp")
+              .toBuffer();
 
-          await s3Client.send(new PutObjectCommand(params));
+            const params = {
+              Bucket: process.env.DO_SPACES_NAME as string,
+              Key: filePath.substring(0, filePath.lastIndexOf(".")) + ".webp",
+
+              Body: webpImage,
+              ACL: "public-read",
+              Metadata: {
+                "content-type": file?.mimetype,
+              },
+            };
+
+            await s3Client.send(new PutObjectCommand(params));
+            return true;
+          } catch (error) {
+            console.log(
+              "================ BEGIN IMAGE ROUTER ERROR ================"
+            );
+            console.log(error);
+            console.log(
+              "================ END IMAGE ROUTER ERROR ================"
+            );
+            return false;
+          }
         });
         return true;
       } catch (error) {

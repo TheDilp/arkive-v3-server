@@ -20,10 +20,14 @@
     "fastify-file-upload": "^4.0.0",
     "fastify-plugin": "^4.5.0",
     "firebase-admin": "^11.5.0",
+    "sharp": "^0.31.3",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/imagemin": "^8.0.0",
+    "@types/imagemin-webp": "^7.0.0",
     "@types/node": "^18.11.16",
+    "@types/sharp": "^0.31.1",
     "dotenv": "^16.0.3",
     "dotenv-cli": "^7.0.0",
     "nodemon": "^2.0.20",
