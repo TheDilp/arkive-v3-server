@@ -46,7 +46,6 @@ server.register(otherRouter);
 
 server.register((instance, _, done) => {
   instance.addHook("preParsing", async (request) => {
-    console.log(request);
     const token = await firebase
       .auth()
       .verifyIdToken(request.headers.authorization?.split(" ")[1] as string);
