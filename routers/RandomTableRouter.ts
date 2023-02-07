@@ -40,5 +40,26 @@ export const randomTableRouter = (
       }
     }
   );
+  server.post(
+    "/createrandomtable",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        const newTable = await prisma.random_tables.create({
+          data,
+        });
+
+        return newTable;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+      return null;
+    }
+  );
   done();
 };
