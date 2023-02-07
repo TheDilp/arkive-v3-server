@@ -41,6 +41,24 @@ export const randomTableRouter = (
     }
   );
   server.post(
+    "/getsinglerandomtable",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        const doc = await prisma.random_tables.findUnique({
+          where: { id: data.id },
+          include: {
+            random_table_options: true,
+          },
+        });
+        return doc;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.post(
     "/createrandomtable",
     async (
       req: FastifyRequest<{
@@ -58,7 +76,113 @@ export const randomTableRouter = (
         console.log(error);
         return false;
       }
-      return null;
+    }
+  );
+  server.post(
+    "/updaterandomtable",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        const newTable = await prisma.random_tables.update({
+          where: {
+            id: data,
+          },
+          data,
+        });
+
+        return newTable;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+
+  // TABLE OPTION ROUTES
+
+  server.post(
+    "/createrandomtableoption",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        const newOption = await prisma.random_table_options.create({
+          data,
+        });
+
+        return newOption;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.post(
+    "/updaterandomtableoption",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        const newOption = await prisma.random_table_options.update({
+          where: {
+            id: data.id,
+          },
+          data,
+        });
+
+        return newOption;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.delete(
+    "/deleterandomtable",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      const ids = JSON.parse(req.body) as string[];
+      if (ids)
+        await prisma.random_tables.deleteMany({
+          where: {
+            id: {
+              in: ids,
+            },
+          },
+        });
+      return true;
+    }
+  );
+  server.delete(
+    "/deleterandomtableoption",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>
+    ) => {
+      const ids = JSON.parse(req.body) as string[];
+      if (ids)
+        await prisma.random_table_options.deleteMany({
+          where: {
+            id: {
+              in: ids,
+            },
+          },
+        });
+      return true;
     }
   );
   done();

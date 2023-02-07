@@ -395,15 +395,15 @@ model random_tables {
 
   isShared Boolean @default(false)
 
-  icon                String                @default("arcticons:reroll")
-  folder              Boolean               @default(false)
-  isPublic            Boolean               @default(false)
-  expanded            Boolean               @default(false)
-  sort                Int                   @default(0)
-  random_table_option random_table_option[]
+  icon                 String                 @default("arcticons:reroll")
+  folder               Boolean                @default(false)
+  isPublic             Boolean                @default(false)
+  expanded             Boolean                @default(false)
+  sort                 Int                    @default(0)
+  random_table_options random_table_options[]
 }
 
-model random_table_option {
+model random_table_options {
   id           String        @id @default(uuid()) @db.Uuid
   title        String
   description  String?
