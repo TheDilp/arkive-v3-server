@@ -154,16 +154,19 @@ export const randomTableRouter = (
         Body: string;
       }>
     ) => {
-      const ids = JSON.parse(req.body) as string[];
-      if (ids)
-        await prisma.random_tables.deleteMany({
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+
+        await prisma.random_tables.delete({
           where: {
-            id: {
-              in: ids,
-            },
+            id: data.id,
           },
         });
-      return true;
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
   server.delete(

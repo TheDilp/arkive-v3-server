@@ -408,7 +408,7 @@ model random_table_options {
   title        String
   description  String?
   sort         Int           @default(0)
-  random_table random_tables @relation(fields: [parentId], references: [id])
+  random_table random_tables @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId     String        @db.Uuid
 }
 
