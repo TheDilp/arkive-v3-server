@@ -283,6 +283,7 @@ model dictionaries {
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
+  icon     String  @default("mdi-light:book")
   sort     Int     @default(0)
   expanded Boolean @default(true)
   folder   Boolean @default(false)
@@ -322,6 +323,7 @@ model calendars {
   parent   calendars?  @relation("parentChildCalendar", fields: [parentId], references: [id], onDelete: Cascade)
   children calendars[] @relation("parentChildCalendar")
 
+  icon     String  @default("ph:calendar-blank")
   sort     Int     @default(0)
   expanded Boolean @default(true)
   folder   Boolean @default(false)
