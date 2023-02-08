@@ -87,14 +87,14 @@ export const randomTableRouter = (
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
-        const newTable = await prisma.random_tables.update({
+        await prisma.random_tables.update({
           where: {
-            id: data,
+            id: data.id,
           },
           data,
         });
 
-        return newTable;
+        return true;
       } catch (error) {
         console.log(error);
         return false;
@@ -133,14 +133,14 @@ export const randomTableRouter = (
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
-        const newOption = await prisma.random_table_options.update({
+        await prisma.random_table_options.update({
           where: {
             id: data.id,
           },
           data,
         });
 
-        return newOption;
+        return true;
       } catch (error) {
         console.log(error);
         return false;
