@@ -37,17 +37,22 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
   });
   server.post("/updateuser", async (req: FastifyRequest<{ Body: string }>) => {
     try {
-      // const data = JSON.parse(req.body) as {
-      //   id: string;
-      //   nickname: string;
-      //   email: string;
-      // };
-      // await prisma.user.create({
-      //   data,
-      // });
+      const data = JSON.parse(req.body) as {
+        id: string;
+        nickname: string;
+        email: string;
+      };
+      await prisma.user.update({
+        where: {
+          id: data.id,
+          auth_id: req.user_id,
+        },
+        data,
+      });
       return true;
     } catch (error) {
-      // console.log(error);
+      console.log(error);
+      return false;
     }
   });
   server.delete(
