@@ -7,7 +7,8 @@
     "start": "prisma generate && node ./dist/index.js",
     "build": "tsc",
     "runlocal": "dotenv -e .env.dev -- nodemon index.ts",
-    "migrate:dev": "dotenv -e .env.dev -- pnpm prisma migrate dev --name update dev db"
+    "migrate:dev": "dotenv -e .env.dev -- pnpm prisma migrate dev --name update dev db",
+    "migrate:prod": "dotenv -e .env.prod -- pnpm prisma migrate deploy"
   },
   "keywords": [],
   "author": "",

@@ -3,6 +3,22 @@ import { FastifyInstance, FastifyRequest } from "fastify";
 import { prisma } from "..";
 
 export const userRouter = (server: FastifyInstance, _: any, done: any) => {
+  server.get(
+    "/user/:user_id",
+    async (req: FastifyRequest<{ Params: { user_id: string } }>) => {
+      try {
+        const user = await prisma.user.findUnique({
+          where: {
+            auth_id: req.params.user_id,
+          },
+        });
+        return user;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
   server.post("/createuser", async (req: FastifyRequest<{ Body: string }>) => {
     try {
       const data = JSON.parse(req.body) as {
@@ -41,11 +57,13 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         const data = JSON.parse(req.body) as {
           id: string;
         };
-        await prisma.user.delete({
-          where: {
-            id: data.id,
-          },
-        });
+        if (data.id === req.user_id)
+          await prisma.user.delete({
+            where: {
+              id: data.id,
+              auth_id: req.user_id,
+            },
+          });
         return true;
       } catch (error) {
         console.log(error);

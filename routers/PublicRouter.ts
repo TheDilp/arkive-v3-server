@@ -105,6 +105,22 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+  server.get(
+    "/publicuser/:user_id",
+    async (req: FastifyRequest<{ Params: { user_id: string } }>) => {
+      try {
+        const user = await prisma.user.findUnique({
+          where: {
+            id: req.params.user_id,
+          },
+          select: {
+            image: true,
+            nickname: true,
+          },
+        });
+      } catch (error) {}
+    }
+  );
 
   done();
 };
