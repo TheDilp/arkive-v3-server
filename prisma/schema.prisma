@@ -378,6 +378,8 @@ model events {
   title       String
   description String?
 
+  isPublic Boolean @default(false)
+
   document documents? @relation(fields: [documentsId], references: [id])
 
   backgroundColor String @default("#075985")

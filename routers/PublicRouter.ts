@@ -84,6 +84,38 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
+    "/getpubliccalendar",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        const word = await prisma.calendars.findUnique({
+          where: { id: data.id },
+          include: {
+            eras: {
+              orderBy: {
+                start_year: "asc",
+              },
+            },
+            months: {
+              orderBy: {
+                sort: "asc",
+              },
+            },
+            events: {
+              where: {
+                isPublic: true,
+              },
+            },
+          },
+        });
+        return word;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.post(
     "/getpublicword",
     async (req: FastifyRequest<{ Body: string }>) => {
       try {
