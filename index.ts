@@ -4,6 +4,7 @@ import fastify from "fastify";
 
 import fileUpload from "fastify-file-upload";
 import * as admin from "firebase-admin";
+import set from "lodash.set";
 import { boardRouter } from "./routers/BoardRouter";
 import { calendarRouter } from "./routers/CalendarRouter";
 import { dictionaryRouter } from "./routers/DictionaryRouter";
@@ -24,7 +25,14 @@ declare module "fastify" {
   }
 }
 export const prisma = new PrismaClient();
-
+const mainIncrementItems = [
+  "documents",
+  "maps",
+  "boards",
+  "calendars",
+  "screens",
+  "randomtables",
+];
 const firebase = admin.initializeApp({
   credential: admin.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
@@ -34,6 +42,36 @@ const firebase = admin.initializeApp({
 });
 
 const server = fastify();
+prisma.$use(async (params, next) => {
+  if (
+    params.action === "create" &&
+    params?.model &&
+    mainIncrementItems.includes(params.model)
+  ) {
+    try {
+      // @ts-ignore
+      const count = await prisma[params.model].count({
+        where: {
+          project_id: params.args.data.project_id,
+        },
+      });
+      const newSort = count + 1;
+      const tempParams = { ...params };
+
+      set(tempParams, "args.data.sort", newSort);
+      const result = await next(tempParams);
+      // See results here
+      return result;
+    } catch (error) {
+      const result = await next(params);
+      // See results here
+      return result;
+    }
+  }
+  const result = await next(params);
+  // See results here
+  return result;
+});
 
 server.decorateRequest("user_id", null);
 server.register(fileUpload);
