@@ -9,14 +9,33 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       try {
         const data = await prisma.projects.findMany({
           where: {
-            owner: {
-              auth_id: req.user_id,
-            },
+            OR: [
+              {
+                owner: {
+                  auth_id: req.auth_id,
+                },
+              },
+              {
+                members: {
+                  some: {
+                    member: {
+                      auth_id: req.auth_id,
+                    },
+                  },
+                },
+              },
+            ],
           },
           select: {
             id: true,
             title: true,
             image: true,
+            ownerId: true,
+            members: {
+              select: {
+                user_id: true,
+              },
+            },
           },
         });
         return data;
@@ -35,6 +54,13 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           where: {
             id: data.id,
           },
+          include: {
+            members: {
+              select: {
+                user_id: true,
+              },
+            },
+          },
         });
         return singleProject;
       } catch (error) {
@@ -47,11 +73,11 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   server.post(
     "/createproject",
     async (req: FastifyRequest<{ Body: string }>) => {
-      if (req.user_id) {
+      if (req.auth_id) {
         try {
           const newProject = await prisma.projects.create({
             data: {
-              ownerId: req.user_id,
+              ownerId: req.auth_id,
             },
           });
           return newProject;
@@ -70,7 +96,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         const updatedProject = await prisma.projects.update({
           where: {
             id: data.id,
-            ownerId: req.user_id,
+            ownerId: req.auth_id,
           },
           data,
         });
@@ -89,7 +115,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         await prisma.projects.delete({
           where: {
             id: data.id,
-            ownerId: req.user_id,
+            ownerId: req.auth_id,
           },
         });
         return true;

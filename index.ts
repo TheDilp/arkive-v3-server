@@ -2,28 +2,27 @@ import cors from "@fastify/cors";
 import { PrismaClient } from "@prisma/client";
 import fastify from "fastify";
 
+import fileUpload from "fastify-file-upload";
 import * as admin from "firebase-admin";
 import { boardRouter } from "./routers/BoardRouter";
+import { calendarRouter } from "./routers/CalendarRouter";
+import { dictionaryRouter } from "./routers/DictionaryRouter";
 import { documentRouter } from "./routers/DocumentRouter";
 import { imageRouter } from "./routers/ImageRouter";
 import { mapRouter } from "./routers/MapRouter";
 import { otherRouter } from "./routers/OtherRouter";
 import { projectRouter } from "./routers/ProjectRouter";
+import { publicRouter } from "./routers/PublicRouter";
+import { randomTableRouter } from "./routers/RandomTableRouter";
+import { screenRouter } from "./routers/ScreenRouter";
 import { searchRouter } from "./routers/SearchRouter";
 import { tagRouter } from "./routers/TagRouter";
 import { userRouter } from "./routers/UserRouter";
-import fileUpload from "fastify-file-upload";
-import { screenRouter } from "./routers/ScreenRouter";
-import { dictionaryRouter } from "./routers/DictionaryRouter";
-import { calendarRouter } from "./routers/CalendarRouter";
-import { publicRouter } from "./routers/PublicRouter";
-import { randomTableRouter } from "./routers/RandomTableRouter";
 declare module "fastify" {
   interface FastifyRequest {
-    user_id: string;
+    auth_id: string;
   }
 }
-
 export const prisma = new PrismaClient();
 
 const firebase = admin.initializeApp({
@@ -50,7 +49,7 @@ server.register((instance, _, done) => {
       .auth()
       .verifyIdToken(request.headers.authorization?.split(" ")[1] as string);
 
-    request.user_id = token.uid;
+    request.auth_id = token.uid;
   });
 
   instance.register(userRouter);
@@ -70,7 +69,6 @@ server.register((instance, _, done) => {
 });
 
 server.register(publicRouter);
-
 if (process.env.VITE_BE_PORT) {
   server.listen(
     { port: parseInt(process.env.VITE_BE_PORT, 10) as number, host: "0.0.0.0" },

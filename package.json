@@ -7,7 +7,8 @@
     "start": "prisma generate && node ./dist/index.js",
     "build": "tsc",
     "runlocal": "dotenv -e .env.dev -- nodemon index.ts",
-    "migrate:dev": "dotenv -e .env.dev -- pnpm prisma migrate dev --name update dev db"
+    "migrate:dev": "dotenv -e .env.dev -- pnpm prisma migrate dev --name update dev db",
+    "migrate:prod": "dotenv -e .env.prod -- pnpm prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
@@ -24,8 +25,6 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@types/imagemin": "^8.0.0",
-    "@types/imagemin-webp": "^7.0.0",
     "@types/node": "^18.11.16",
     "@types/sharp": "^0.31.1",
     "dotenv": "^16.0.3",

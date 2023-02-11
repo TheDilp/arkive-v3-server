@@ -15,22 +15,6 @@ export const dictionaryRouter = (
         const data = await prisma.dictionaries.findMany({
           where: {
             project_id: req.params.project_id,
-            OR: [
-              {
-                project: {
-                  ownerId: req.user_id,
-                },
-              },
-              {
-                project: {
-                  members: {
-                    some: {
-                      auth_id: req.user_id,
-                    },
-                  },
-                },
-              },
-            ],
           },
         });
         return data;

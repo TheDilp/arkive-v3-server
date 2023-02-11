@@ -9,14 +9,26 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid()) @db.Uuid
-  auth_id  String @unique
+  id       String  @id @default(uuid()) @db.Uuid
+  auth_id  String  @unique
   nickname String
-  email    String @unique
+  email    String  @unique
+  image    String?
 
   projectsId String?    @db.Uuid
-  projects   projects[] @relation("project_members")
   createrOf  projects[] @relation("project_owner")
+  members    members[]
+}
+
+model members {
+  id      String   @id @default(uuid()) @db.Uuid
+  project projects @relation(fields: [project_id], references: [id])
+  member  User     @relation(fields: [user_id], references: [id])
+
+  project_id String @db.Uuid
+  user_id    String @db.Uuid
+
+  @@unique([project_id, user_id])
 }
 
 model projects {
@@ -30,11 +42,12 @@ model projects {
   tags         tags[]
   image        String?
 
-  ownerId       String
-  owner         User            @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
-  members       User[]          @relation("project_members")
+  ownerId String
+  owner   User   @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
+
   calendars     calendars[]
   random_tables random_tables[]
+  members       members[]
 }
 
 model documents {

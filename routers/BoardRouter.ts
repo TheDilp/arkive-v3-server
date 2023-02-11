@@ -10,22 +10,6 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
       const data = await prisma.boards.findMany({
         where: {
           project_id: req.params.project_id,
-          OR: [
-            {
-              project: {
-                ownerId: req.user_id,
-              },
-            },
-            {
-              project: {
-                members: {
-                  some: {
-                    auth_id: req.user_id,
-                  },
-                },
-              },
-            },
-          ],
         },
         select: {
           id: true,

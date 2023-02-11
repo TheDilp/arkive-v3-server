@@ -15,22 +15,6 @@ export const randomTableRouter = (
         const allTables = await prisma.random_tables.findMany({
           where: {
             project_id: req.params.project_id,
-            OR: [
-              {
-                project: {
-                  ownerId: req.user_id,
-                },
-              },
-              {
-                project: {
-                  members: {
-                    some: {
-                      auth_id: req.user_id,
-                    },
-                  },
-                },
-              },
-            ],
           },
         });
         return allTables;
