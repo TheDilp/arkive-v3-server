@@ -345,6 +345,18 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
               id: true,
               label: true,
               parentId: true,
+              source: {
+                select: {
+                  id: true,
+                  label: true,
+                },
+              },
+              target: {
+                select: {
+                  id: true,
+                  label: true,
+                },
+              },
             },
           }),
         ];
