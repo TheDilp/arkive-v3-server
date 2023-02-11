@@ -28,6 +28,8 @@ model members {
   permission String @default("viewer")
   project_id String @db.Uuid
   user_id    String @db.Uuid
+
+  @@unique([project_id, user_id])
 }
 
 model projects {
