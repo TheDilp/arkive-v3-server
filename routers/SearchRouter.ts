@@ -160,6 +160,23 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
               parentId: true,
             },
           }),
+          prisma.events.findMany({
+            where: {
+              title: {
+                contains: query as string,
+                mode: "insensitive",
+              },
+
+              calendar: {
+                project_id,
+              },
+            },
+            select: {
+              id: true,
+              title: true,
+              calendarsId: true,
+            },
+          }),
         ];
 
         const [
@@ -171,6 +188,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           edges,
           screens,
           sections,
+          events,
         ] = await prisma.$transaction(async () => {
           const results = await Promise.all(searches);
           return results;
@@ -196,6 +214,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           edges,
           screens,
           sections,
+          events,
         };
       }
       if (type === "tags" && Array.isArray(query) && query.length) {
