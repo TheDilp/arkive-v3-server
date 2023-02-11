@@ -30,9 +30,11 @@ const mainIncrementItems = [
   "maps",
   "boards",
   "calendars",
+  "dictionaries",
   "screens",
   "randomtables",
 ];
+
 const firebase = admin.initializeApp({
   credential: admin.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
@@ -42,6 +44,34 @@ const firebase = admin.initializeApp({
 });
 
 const server = fastify();
+prisma.$use(async (params, next) => {
+  try {
+    if (params.action === "create" && params?.model) {
+      const parentId = params.args.data.parentId;
+      if (parentId) {
+        let count = 0;
+
+        // @ts-ignore
+        count = await prisma[params.model].count({
+          where: {
+            parentId,
+          },
+        });
+        const newSort = count + 1;
+        const tempParams = { ...params };
+
+        set(tempParams, "args.data.sort", newSort);
+        const result = await next(tempParams);
+        // See results here
+        return result;
+      }
+    }
+  } catch (error) {}
+
+  const result = await next(params);
+  // See results here
+  return result;
+});
 prisma.$use(async (params, next) => {
   if (
     params.action === "create" &&
