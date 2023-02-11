@@ -160,6 +160,20 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
               parentId: true,
             },
           }),
+          prisma.calendars.findMany({
+            where: {
+              title: {
+                contains: query as string,
+                mode: "insensitive",
+              },
+              project_id,
+            },
+            select: {
+              id: true,
+              title: true,
+              icon: true,
+            },
+          }),
           prisma.events.findMany({
             where: {
               title: {
@@ -188,6 +202,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           edges,
           screens,
           sections,
+          calendars,
           events,
         ] = await prisma.$transaction(async () => {
           const results = await Promise.all(searches);
@@ -214,6 +229,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           edges,
           screens,
           sections,
+          calendars,
           events,
         };
       }
