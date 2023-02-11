@@ -20,15 +20,6 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
                   ownerId: req.user_id,
                 },
               },
-              {
-                project: {
-                  members: {
-                    some: {
-                      auth_id: req.user_id,
-                    },
-                  },
-                },
-              },
             ],
           },
         });
@@ -50,15 +41,6 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
                 {
                   project: {
                     ownerId: req.user_id,
-                  },
-                },
-                {
-                  project: {
-                    members: {
-                      some: {
-                        auth_id: req.user_id,
-                      },
-                    },
                   },
                 },
               ],

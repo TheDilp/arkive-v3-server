@@ -23,8 +23,14 @@ declare module "fastify" {
     user_id: string;
   }
 }
-
 export const prisma = new PrismaClient();
+
+// prisma.$use(async (params, next) => {
+//   if (params.action === "create" || params.action === "update") {
+//   }
+
+//   return next(params);
+// });
 
 const firebase = admin.initializeApp({
   credential: admin.credential.cert({

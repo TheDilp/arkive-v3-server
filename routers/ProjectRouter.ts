@@ -9,14 +9,34 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       try {
         const data = await prisma.projects.findMany({
           where: {
-            owner: {
-              auth_id: req.user_id,
-            },
+            OR: [
+              {
+                owner: {
+                  auth_id: req.user_id,
+                },
+              },
+              {
+                members: {
+                  some: {
+                    member: {
+                      auth_id: req.user_id,
+                    },
+                  },
+                },
+              },
+            ],
           },
           select: {
             id: true,
             title: true,
             image: true,
+            ownerId: true,
+            members: {
+              select: {
+                permission: true,
+                user_id: true,
+              },
+            },
           },
         });
         return data;
@@ -34,6 +54,14 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         const singleProject = await prisma.projects.findUnique({
           where: {
             id: data.id,
+          },
+          include: {
+            members: {
+              select: {
+                permission: true,
+                user_id: true,
+              },
+            },
           },
         });
         return singleProject;

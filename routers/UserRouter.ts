@@ -11,6 +11,14 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
           where: {
             auth_id: req.params.user_id,
           },
+          include: {
+            members: {
+              select: {
+                permission: true,
+                project_id: true,
+              },
+            },
+          },
         });
         return user;
       } catch (error) {
@@ -55,6 +63,37 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
       return false;
     }
   });
+  server.post(
+    "/addtoproject",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as {
+          email: string;
+          project_id: string;
+          permission: string;
+        };
+        const newMember = await prisma.user.findUnique({
+          where: {
+            email: data.email,
+          },
+        });
+        if (newMember) {
+          await prisma.members.create({
+            data: {
+              project_id: data.project_id,
+              permission: data.permission,
+              user_id: newMember.id,
+            },
+          });
+        } else {
+          return new Error("NO USER FOUND");
+        }
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
   server.delete(
     "/deleteuser",
     async (req: FastifyRequest<{ Body: string }>) => {

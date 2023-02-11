@@ -21,15 +21,6 @@ export const randomTableRouter = (
                   ownerId: req.user_id,
                 },
               },
-              {
-                project: {
-                  members: {
-                    some: {
-                      auth_id: req.user_id,
-                    },
-                  },
-                },
-              },
             ],
           },
         });
