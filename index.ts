@@ -20,17 +20,21 @@ import { publicRouter } from "./routers/PublicRouter";
 import { randomTableRouter } from "./routers/RandomTableRouter";
 declare module "fastify" {
   interface FastifyRequest {
-    user_id: string;
+    auth_id: string;
   }
 }
 export const prisma = new PrismaClient();
 
-// prisma.$use(async (params, next) => {
-//   if (params.action === "create" || params.action === "update") {
-//   }
-
-//   return next(params);
-// });
+const permissionActions = [
+  "create",
+  "createMany",
+  "update",
+  "updateMany",
+  "upsert",
+  "delete",
+  "deleteMany",
+  "queryRaw",
+];
 
 const firebase = admin.initializeApp({
   credential: admin.credential.cert({
@@ -56,7 +60,7 @@ server.register((instance, _, done) => {
       .auth()
       .verifyIdToken(request.headers.authorization?.split(" ")[1] as string);
 
-    request.user_id = token.uid;
+    request.auth_id = token.uid;
   });
 
   instance.register(userRouter);

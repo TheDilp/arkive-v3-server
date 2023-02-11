@@ -12,14 +12,14 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             OR: [
               {
                 owner: {
-                  auth_id: req.user_id,
+                  auth_id: req.auth_id,
                 },
               },
               {
                 members: {
                   some: {
                     member: {
-                      auth_id: req.user_id,
+                      auth_id: req.auth_id,
                     },
                   },
                 },
@@ -33,7 +33,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             ownerId: true,
             members: {
               select: {
-                permission: true,
                 user_id: true,
               },
             },
@@ -58,7 +57,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           include: {
             members: {
               select: {
-                permission: true,
                 user_id: true,
               },
             },
@@ -75,11 +73,11 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   server.post(
     "/createproject",
     async (req: FastifyRequest<{ Body: string }>) => {
-      if (req.user_id) {
+      if (req.auth_id) {
         try {
           const newProject = await prisma.projects.create({
             data: {
-              ownerId: req.user_id,
+              ownerId: req.auth_id,
             },
           });
           return newProject;
@@ -98,7 +96,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         const updatedProject = await prisma.projects.update({
           where: {
             id: data.id,
-            ownerId: req.user_id,
+            ownerId: req.auth_id,
           },
           data,
         });
@@ -117,7 +115,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         await prisma.projects.delete({
           where: {
             id: data.id,
-            ownerId: req.user_id,
+            ownerId: req.auth_id,
           },
         });
         return true;

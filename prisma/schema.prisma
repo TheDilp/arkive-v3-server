@@ -25,7 +25,6 @@ model members {
   project projects @relation(fields: [project_id], references: [id])
   member  User     @relation(fields: [user_id], references: [id])
 
-  permission String @default("viewer")
   project_id String @db.Uuid
   user_id    String @db.Uuid
 

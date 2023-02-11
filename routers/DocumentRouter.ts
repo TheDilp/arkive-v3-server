@@ -11,13 +11,6 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
       const data = await prisma.documents.findMany({
         where: {
           project_id: req.params.project_id,
-          OR: [
-            {
-              project: {
-                ownerId: req.user_id,
-              },
-            },
-          ],
         },
         select: {
           id: true,
@@ -85,13 +78,6 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
             id: {
               in: ids,
             },
-            OR: [
-              {
-                project: {
-                  ownerId: req.user_id,
-                },
-              },
-            ],
           },
           select: {
             id: true,

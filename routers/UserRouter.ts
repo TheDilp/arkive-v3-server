@@ -14,7 +14,6 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
           include: {
             members: {
               select: {
-                permission: true,
                 project_id: true,
               },
             },
@@ -53,7 +52,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
       await prisma.user.update({
         where: {
           id: data.id,
-          auth_id: req.user_id,
+          auth_id: req.auth_id,
         },
         data,
       });
@@ -70,7 +69,6 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         const data = JSON.parse(req.body) as {
           email: string;
           project_id: string;
-          permission: string;
         };
         const newMember = await prisma.user.findUnique({
           where: {
@@ -81,7 +79,6 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
           await prisma.members.create({
             data: {
               project_id: data.project_id,
-              permission: data.permission,
               user_id: newMember.id,
             },
           });
@@ -101,11 +98,11 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         const data = JSON.parse(req.body) as {
           id: string;
         };
-        if (data.id === req.user_id)
+        if (data.id === req.auth_id)
           await prisma.user.delete({
             where: {
               id: data.id,
-              auth_id: req.user_id,
+              auth_id: req.auth_id,
             },
           });
         return true;

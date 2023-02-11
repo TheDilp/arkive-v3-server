@@ -14,13 +14,6 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         const screens = await prisma.screens.findMany({
           where: {
             project_id: req.params.project_id,
-            OR: [
-              {
-                project: {
-                  ownerId: req.user_id,
-                },
-              },
-            ],
           },
         });
 
@@ -37,13 +30,6 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           const screens = await prisma.screens.findUnique({
             where: {
               id: data.id,
-              OR: [
-                {
-                  project: {
-                    ownerId: req.user_id,
-                  },
-                },
-              ],
             },
             include: {
               sections: {
