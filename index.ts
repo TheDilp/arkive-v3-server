@@ -34,6 +34,13 @@ const mainIncrementItems = [
   "screens",
   "randomtables",
 ];
+const subIncrementItems = [
+  "sections",
+  "cards",
+  "events",
+  "months",
+  "random_table_options",
+];
 
 const firebase = admin.initializeApp({
   credential: admin.credential.cert({
@@ -47,26 +54,38 @@ const server = fastify();
 prisma.$use(async (params, next) => {
   try {
     if (params.action === "create" && params?.model) {
-      const parentId = params.args.data.parentId;
-      if (parentId) {
-        let count = 0;
+      if (subIncrementItems.includes(params.model)) {
+        const parentId = params.args.data.parentId;
+        if (parentId) {
+          let count = 0;
 
-        // @ts-ignore
-        count = await prisma[params.model].count({
-          where: {
-            parentId,
-          },
-        });
-        const newSort = count + 1;
-        const tempParams = { ...params };
+          // @ts-ignore
+          count = await prisma[params.model].count({
+            where: {
+              parentId,
+            },
+          });
+          const newSort = count + 1;
+          const tempParams = { ...params };
 
-        set(tempParams, "args.data.sort", newSort);
-        const result = await next(tempParams);
+          set(tempParams, "args.data.sort", newSort);
+          const result = await next(tempParams);
+          // See results here
+          return result;
+        }
+        const result = await next(params);
         // See results here
         return result;
       }
+      const result = await next(params);
+      // See results here
+      return result;
     }
-  } catch (error) {}
+  } catch (error) {
+    const result = await next(params);
+    // See results here
+    return result;
+  }
 
   const result = await next(params);
   // See results here
