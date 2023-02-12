@@ -161,10 +161,16 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
         Body: string;
       }>
     ) => {
-      const data = JSON.parse(req.body) as { id: string };
-      await prisma.boards.delete({
-        where: { id: data.id },
-      });
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        await prisma.boards.delete({
+          where: { id: data.id },
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
   server.post(
