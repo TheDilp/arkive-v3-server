@@ -37,6 +37,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
               },
             },
           },
+          orderBy: {
+            title: "asc",
+          },
         });
         return data;
       } catch (error) {
