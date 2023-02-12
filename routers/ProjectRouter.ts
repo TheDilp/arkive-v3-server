@@ -57,6 +57,13 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           include: {
             members: {
               select: {
+                member: {
+                  select: {
+                    id: true,
+                    nickname: true,
+                    image: true,
+                  },
+                },
                 user_id: true,
               },
             },
