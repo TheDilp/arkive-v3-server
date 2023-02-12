@@ -36,8 +36,10 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
           ...rest,
         },
       });
+      return true;
     } catch (error) {
       console.log(error);
+      return false;
     }
     return;
   });
@@ -60,22 +62,27 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
       return true;
     } catch (error) {
       console.log(error);
+      return false;
     }
-    return true;
   });
   server.delete(
     "/deletetags",
     async (req: FastifyRequest<{ Body: string }>) => {
-      const { ids } = JSON.parse(req.body) as { ids: string[] };
+      try {
+        const { ids } = JSON.parse(req.body) as { ids: string[] };
 
-      await prisma.tags.deleteMany({
-        where: {
-          id: {
-            in: ids,
+        await prisma.tags.deleteMany({
+          where: {
+            id: {
+              in: ids,
+            },
           },
-        },
-      });
-      return true;
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
   server.get(
@@ -132,6 +139,41 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
               id: true,
               label: true,
               parentId: true,
+              source: {
+                select: {
+                  label: true,
+                },
+              },
+              target: {
+                select: {
+                  label: true,
+                },
+              },
+            },
+          },
+          calendars: {
+            select: {
+              id: true,
+              title: true,
+              icon: true,
+              folder: true,
+            },
+          },
+          cards: {
+            select: {
+              id: true,
+              document: {
+                select: {
+                  title: true,
+                },
+              },
+            },
+          },
+          dictionaries: {
+            select: {
+              id: true,
+              title: true,
+              folder: true,
             },
           },
         },
