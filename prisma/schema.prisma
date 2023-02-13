@@ -139,10 +139,9 @@ model boards {
 
   icon String? @default("mdi:draw")
 
-  defaultNodeShape String  @default("rectangle")
-  defaultNodeColor String  @default("#595959")
-  defaultEdgeColor String  @default("#595959")
-  defaultGrid      Boolean @default(false)
+  defaultNodeShape String @default("rectangle")
+  defaultNodeColor String @default("#595959")
+  defaultEdgeColor String @default("#595959")
 
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
