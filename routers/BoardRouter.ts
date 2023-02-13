@@ -20,7 +20,6 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           parentId: true,
           isPublic: true,
           tags: true,
-          defaultGrid: true,
           defaultEdgeColor: true,
           defaultNodeColor: true,
           defaultNodeShape: true,

@@ -159,6 +159,21 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
               folder: true,
             },
           },
+          events: {
+            select: {
+              id: true,
+              title: true,
+              calendarsId: true,
+            },
+          },
+          screens: {
+            select: {
+              id: true,
+              title: true,
+              folder: true,
+              icon: true,
+            },
+          },
           cards: {
             select: {
               id: true,
@@ -174,6 +189,7 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
               id: true,
               title: true,
               folder: true,
+              icon: true,
             },
           },
         },
