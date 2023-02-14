@@ -388,6 +388,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             ...whereTagsClause,
             select: {
               id: true,
+              title: true,
               calendarsId: true,
               calendar: {
                 select: {
