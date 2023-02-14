@@ -398,11 +398,22 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           }),
         ];
-        const [titleDocuments, maps, map_pins, boards, nodes, edges] =
-          await prisma.$transaction(async () => {
-            const results = await Promise.all(searches);
-            return results;
-          });
+        const [
+          titleDocuments,
+          maps,
+          map_pins,
+          boards,
+          nodes,
+          edges,
+          screens,
+          cards,
+          dictionaries,
+          calendars,
+          events,
+        ] = await prisma.$transaction(async () => {
+          const results = await Promise.all(searches);
+          return results;
+        });
         return {
           documents: titleDocuments,
           maps,
@@ -410,6 +421,11 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           boards,
           nodes,
           edges,
+          screens,
+          cards,
+          dictionaries,
+          calendars,
+          events,
         };
       }
       return {};
