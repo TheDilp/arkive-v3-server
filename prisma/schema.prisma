@@ -329,7 +329,7 @@ model calendars {
   id    String @id @default(uuid()) @db.Uuid
   title String
 
-  project    projects @relation(fields: [project_id], references: [id])
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
   parentId String?     @db.Uuid
