@@ -131,14 +131,23 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
         await prisma.documents.update({
-          data,
+          data: {
+            ...data,
+            tags: {
+              connect: data?.tags?.map((tag: { id: string }) => ({
+                id: tag.id,
+              })),
+            },
+          },
           where: { id: data.id },
         });
+        rep.code(200);
         return true;
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        return false;
       }
-      return null;
     }
   );
   server.post(
