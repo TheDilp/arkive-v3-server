@@ -359,7 +359,7 @@ model eras {
   start_year Int
   end_year   Int
 
-  calendar calendars @relation(fields: [parentId], references: [id])
+  calendar calendars @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId String    @db.Uuid
 }
 
@@ -368,7 +368,7 @@ model months {
   title String
   days  Int
 
-  calendar calendars @relation(fields: [parentId], references: [id])
+  calendar calendars @relation(fields: [parentId], references: [id], onDelete: Cascade)
   sort     Int       @default(0)
   parentId String    @db.Uuid
 }
@@ -385,7 +385,7 @@ model events {
   backgroundColor String @default("#075985")
   textColor       String @default("#ffffff")
 
-  calendar calendars? @relation(fields: [calendarsId], references: [id])
+  calendar calendars? @relation(fields: [calendarsId], references: [id], onDelete: Cascade)
   year     Int
   month    Int
   day      Int
