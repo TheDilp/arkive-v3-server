@@ -281,6 +281,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+
   server.delete(
     "/deletecalendar",
     async (
@@ -300,7 +301,6 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
-
   server.delete(
     "/deleteera",
     async (
