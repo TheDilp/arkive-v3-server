@@ -15,11 +15,17 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           where: {
             project_id: req.params.project_id,
           },
+          orderBy: {
+            sort: "asc",
+          },
         });
 
         rep.code(200);
         return screens;
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   ),
     server.post(

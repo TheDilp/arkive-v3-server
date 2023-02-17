@@ -16,6 +16,9 @@ export const dictionaryRouter = (
           where: {
             project_id: req.params.project_id,
           },
+          orderBy: {
+            sort: "asc",
+          },
         });
         return data;
       } catch (error) {

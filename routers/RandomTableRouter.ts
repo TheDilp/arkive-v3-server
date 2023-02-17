@@ -16,6 +16,9 @@ export const randomTableRouter = (
           where: {
             project_id: req.params.project_id,
           },
+          orderBy: {
+            sort: "asc",
+          },
         });
         return allTables;
       } catch (error) {
