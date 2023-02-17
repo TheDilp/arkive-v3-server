@@ -111,18 +111,24 @@ export const dictionaryRouter = (
   server.post(
     "/sortdictionaries",
     async (req: FastifyRequest<{ Body: string }>) => {
-      const indexes: { id: string; parent: string; sort: number }[] =
-        JSON.parse(req.body);
-      const updates = indexes.map((idx) =>
-        prisma.dictionaries.update({
-          data: {
-            parentId: idx.parent,
-            sort: idx.sort,
-          },
-          where: { id: idx.id },
-        })
-      );
-      await prisma.$transaction(updates);
+      try {
+        const indexes: { id: string; parent: string; sort: number }[] =
+          JSON.parse(req.body);
+        const updates = indexes.map((idx) =>
+          prisma.dictionaries.update({
+            data: {
+              parentId: idx.parent,
+              sort: idx.sort,
+            },
+            where: { id: idx.id },
+          })
+        );
+        await prisma.$transaction(updates);
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     }
   );
   server.delete(

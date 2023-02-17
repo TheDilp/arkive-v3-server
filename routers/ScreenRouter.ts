@@ -93,25 +93,49 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     ),
     server.post(
-      "/createsection",
-      async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-        const data = JSON.parse(req.body) as {
-          title: string;
-          section: string;
-          parentId: string;
-          sort: number;
-        };
-        const newSection = await prisma.sections.create({
-          data: {
-            title: data.title,
-            parentId: data.parentId,
-            sort: data.sort,
-          },
-        });
-        rep.code(200);
-        return newSection;
+      "/sortscreens",
+      async (req: FastifyRequest<{ Body: string }>) => {
+        try {
+          const indexes: { id: string; parentId: string; sort: number }[] =
+            JSON.parse(req.body);
+          const updates = indexes.map((idx) =>
+            prisma.screens.update({
+              data: {
+                parentId: idx.parentId,
+                sort: idx.sort,
+              },
+              where: { id: idx.id },
+            })
+          );
+          await prisma.$transaction(async () => {
+            await Promise.all(updates);
+          });
+          return true;
+        } catch (error) {
+          return false;
+        }
       }
-    ),
+    );
+  server.post(
+    "/createsection",
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      const data = JSON.parse(req.body) as {
+        title: string;
+        section: string;
+        parentId: string;
+        sort: number;
+      };
+      const newSection = await prisma.sections.create({
+        data: {
+          title: data.title,
+          parentId: data.parentId,
+          sort: data.sort,
+        },
+      });
+      rep.code(200);
+      return newSection;
+    }
+  ),
     server.post(
       "/updatesection",
       async (req: FastifyRequest<{ Body: string }>) => {
