@@ -32,22 +32,23 @@ model members {
 }
 
 model projects {
-  id           String         @id @default(uuid()) @db.Uuid
-  title        String         @default("New Project")
-  documents    documents[]
-  maps         maps[]
-  boards       boards[]
-  screens      screens[]
-  dictionaries dictionaries[]
-  tags         tags[]
-  image        String?
+  id    String  @id @default(uuid()) @db.Uuid
+  title String  @default("New Project")
+  image String?
 
   ownerId String
   owner   User   @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
 
+  documents     documents[]
+  maps          maps[]
+  boards        boards[]
+  screens       screens[]
+  dictionaries  dictionaries[]
   calendars     calendars[]
   random_tables random_tables[]
   members       members[]
+  tags          tags[]
+  swatches      swatches[]
 }
 
 model documents {
@@ -449,4 +450,13 @@ model tags {
   events       events[]
 
   @@unique([title, project_id])
+}
+
+model swatches {
+  id    String  @id @default(uuid()) @db.Uuid
+  title String?
+  color String
+
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  project_id String   @db.Uuid
 }
