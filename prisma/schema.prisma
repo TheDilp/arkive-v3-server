@@ -459,4 +459,6 @@ model swatches {
 
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
+
+  @@unique([color, project_id])
 }
