@@ -70,6 +70,13 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 user_id: true,
               },
             },
+            swatches: {
+              select: {
+                id: true,
+                title: true,
+                color: true,
+              },
+            },
           },
         });
         return singleProject;
