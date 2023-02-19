@@ -455,7 +455,7 @@ model tags {
 model swatches {
   id    String  @id @default(uuid()) @db.Uuid
   title String?
-  color String
+  color String  @default("#595959")
 
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
