@@ -166,6 +166,29 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+  server.post(
+    "/updateswatch",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      if (req.auth_id) {
+        try {
+          const data = JSON.parse(req.body) as {
+            id: string;
+            title: string;
+          };
+          await prisma.swatches.update({
+            where: {
+              id: data.id,
+            },
+            data,
+          });
+          return true;
+        } catch (error) {
+          console.log(error);
+          return false;
+        }
+      }
+    }
+  );
 
   server.delete(
     "/deleteswatch",
