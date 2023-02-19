@@ -143,5 +143,50 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
 
+  // SWATCHES
+  server.post(
+    "/createswatch",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      if (req.auth_id) {
+        try {
+          const data = JSON.parse(req.body) as {
+            id: string;
+            title: string;
+            color: string;
+            project_id: string;
+          };
+          const newSwatch = await prisma.swatches.create({
+            data,
+          });
+          return newSwatch;
+        } catch (error) {
+          console.log(error);
+          return false;
+        }
+      }
+    }
+  );
+
+  server.delete(
+    "/deleteswatch",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        await prisma.swatches.delete({
+          where: {
+            id: data.id,
+            project: {
+              ownerId: req.auth_id,
+            },
+          },
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return new Error("Error deleting the project.");
+      }
+    }
+  );
+
   done();
 };
