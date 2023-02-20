@@ -16,6 +16,9 @@ export const randomTableRouter = (
           where: {
             project_id: req.params.project_id,
           },
+          orderBy: {
+            sort: "asc",
+          },
         });
         return allTables;
       } catch (error) {
@@ -77,6 +80,30 @@ export const randomTableRouter = (
           },
           data,
         });
+
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.post(
+    "/sortrandomtables",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const indexes: { id: string; parent: string; sort: number }[] =
+          JSON.parse(req.body);
+        const updates = indexes.map((idx) =>
+          prisma.random_tables.update({
+            data: {
+              parentId: idx.parent,
+              sort: idx.sort,
+            },
+            where: { id: idx.id },
+          })
+        );
+        await prisma.$transaction(updates);
 
         return true;
       } catch (error) {

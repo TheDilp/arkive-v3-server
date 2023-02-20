@@ -197,19 +197,18 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post("/sortmaps", async (req: FastifyRequest<{ Body: string }>) => {
-    const indexes: { id: string; parent: string; sort: number }[] = JSON.parse(
-      req.body
-    );
-    const updates = indexes.map((idx) =>
-      prisma.maps.update({
-        data: {
-          parentId: idx.parent,
-          sort: idx.sort,
-        },
-        where: { id: idx.id },
-      })
-    );
     try {
+      const indexes: { id: string; parent: string; sort: number }[] =
+        JSON.parse(req.body);
+      const updates = indexes.map((idx) =>
+        prisma.maps.update({
+          data: {
+            parentId: idx.parent,
+            sort: idx.sort,
+          },
+          where: { id: idx.id },
+        })
+      );
       await prisma.$transaction(updates);
       return true;
     } catch (error) {

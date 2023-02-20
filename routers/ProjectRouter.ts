@@ -70,6 +70,13 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 user_id: true,
               },
             },
+            swatches: {
+              select: {
+                id: true,
+                title: true,
+                color: true,
+              },
+            },
           },
         });
         return singleProject;
@@ -126,6 +133,74 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           where: {
             id: data.id,
             ownerId: req.auth_id,
+          },
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        return new Error("Error deleting the project.");
+      }
+    }
+  );
+
+  // SWATCHES
+  server.post(
+    "/createswatch",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      if (req.auth_id) {
+        try {
+          const data = JSON.parse(req.body) as {
+            id: string;
+            title: string;
+            color: string;
+            project_id: string;
+          };
+          const newSwatch = await prisma.swatches.create({
+            data,
+          });
+          return newSwatch;
+        } catch (error) {
+          console.log(error);
+          return false;
+        }
+      }
+    }
+  );
+  server.post(
+    "/updateswatch",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      if (req.auth_id) {
+        try {
+          const data = JSON.parse(req.body) as {
+            id: string;
+            title: string;
+          };
+          await prisma.swatches.update({
+            where: {
+              id: data.id,
+            },
+            data,
+          });
+          return true;
+        } catch (error) {
+          console.log(error);
+          return false;
+        }
+      }
+    }
+  );
+
+  server.delete(
+    "/deleteswatch",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        await prisma.swatches.delete({
+          where: {
+            id: data.id,
+            project: {
+              ownerId: req.auth_id,
+            },
           },
         });
         return true;

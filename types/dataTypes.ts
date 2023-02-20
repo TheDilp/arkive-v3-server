@@ -1,1 +1,1 @@
-export type AvailableTypes = "documents" | "maps" | "boards";
+export type AvailableTypes = "documents" | "maps" | "boards" | "calendars";
