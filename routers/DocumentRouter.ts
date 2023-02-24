@@ -125,6 +125,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     async (req: FastifyRequest<{ Body: string }>) => {
       try {
         const data = JSON.parse(req.body) as {
+          title: string;
           template_id: string;
           project_id: string;
         };
@@ -137,6 +138,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         if (templateContent) {
           const newDocument = await prisma.documents.create({
             data: {
+              title: data.title,
               content: templateContent.content as any,
               project_id: data.project_id,
             },
