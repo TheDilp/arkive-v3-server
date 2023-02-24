@@ -121,6 +121,37 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
+    "/createfromtemplate",
+    async (req: FastifyRequest<{ Body: string }>) => {
+      try {
+        const data = JSON.parse(req.body) as {
+          title: string;
+          template_id: string;
+          project_id: string;
+        };
+        const templateContent = await prisma.documents.findUnique({
+          where: { id: data.template_id },
+          select: {
+            content: true,
+          },
+        });
+        if (templateContent) {
+          const newDocument = await prisma.documents.create({
+            data: {
+              title: data.title,
+              content: templateContent.content as any,
+              project_id: data.project_id,
+            },
+          });
+          return newDocument;
+        }
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
+  server.post(
     "/updatedocument",
     async (
       req: FastifyRequest<{
