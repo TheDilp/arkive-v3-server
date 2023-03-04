@@ -389,7 +389,7 @@ model events {
 
   calendar calendars? @relation(fields: [calendarsId], references: [id], onDelete: Cascade)
   year     Int
-  month    months     @relation(fields: [monthsId], references: [id])
+  month    months     @relation(fields: [monthsId], references: [id], onDelete: Cascade)
   day      Int
   hours    Int?
   minutes  Int?

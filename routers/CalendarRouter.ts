@@ -39,20 +39,21 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
               },
             },
             months: {
+              events: {
+                include: {
+                  tags: {
+                    select: {
+                      id: true,
+                      title: true,
+                    },
+                  },
+                },
+              },
               orderBy: {
                 sort: "asc",
               },
             },
-            events: {
-              include: {
-                tags: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-              },
-            },
+
             tags: {
               select: {
                 id: true,
