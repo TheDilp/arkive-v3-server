@@ -1,4 +1,4 @@
-import { FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { FastifyInstance } from "fastify";
 import { prisma } from "..";
 import { removeNull } from "../utils/transform";
@@ -25,7 +25,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/getsinglecalendar",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         const calendar = await prisma.calendars.findUnique({
@@ -64,6 +64,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         return calendar;
       } catch (error) {
         console.log(error);
+        rep.code(500);
         return false;
       }
     }
