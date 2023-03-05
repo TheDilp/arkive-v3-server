@@ -14,7 +14,9 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
           where: {
             project_id: req.params.project_id,
           },
-          include: {
+          select: {
+            id: true,
+            title: true,
             calendars: {
               select: {
                 id: true,
