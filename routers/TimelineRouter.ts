@@ -80,7 +80,14 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
         const newTimeline = await prisma.timelines.create({
-          data,
+          data: {
+            ...data,
+            calendars: {
+              connect: data?.calendars?.map((cal: { id: string }) => ({
+                id: cal.id,
+              })),
+            },
+          },
         });
 
         return newTimeline;
@@ -107,9 +114,9 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
           },
           data: {
             ...data,
-            tags: {
-              connect: data?.tags?.map((tag: { id: string }) => ({
-                id: tag.id,
+            calendars: {
+              connect: data?.calendars?.map((cal: { id: string }) => ({
+                id: cal.id,
               })),
             },
           },
