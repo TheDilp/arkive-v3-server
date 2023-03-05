@@ -23,6 +23,27 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+  server.get(
+    "/getallevents/:project_id",
+    async (req: FastifyRequest<{ Params: { project_id: string } }>) => {
+      try {
+        const calendars = await prisma.events.findMany({
+          where: {
+            calendar: {
+              project_id: req.params.project_id,
+            },
+          },
+          orderBy: {
+            year: "asc",
+          },
+        });
+        return calendars;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
   server.post(
     "/getsinglecalendar",
     async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
