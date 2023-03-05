@@ -75,8 +75,7 @@ model documents {
   parent   documents?  @relation("parentChildDocuments", fields: [parentId], references: [id], onDelete: Cascade)
   children documents[] @relation("parentChildDocuments")
 
-  tags   tags[]
-  tagsId String? @db.Uuid
+  tags tags[]
 
   cards  cards[]
   events events[]
