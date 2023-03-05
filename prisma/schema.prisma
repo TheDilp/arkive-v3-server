@@ -352,7 +352,8 @@ model calendars {
   days   String[]
   events events[]
 
-  tags tags[]
+  tags      tags[]
+  timelines timelines[]
 }
 
 model eras {
@@ -417,6 +418,8 @@ model timelines {
   sort     Int     @default(0)
   folder   Boolean @default(false)
   isPublic Boolean @default(false)
+
+  calendars calendars[]
 }
 
 model random_tables {
