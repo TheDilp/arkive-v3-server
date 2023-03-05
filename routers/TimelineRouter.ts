@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { prisma } from "..";
 
-export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
+export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
     "/getalltimelines/:project_id",
     async (
