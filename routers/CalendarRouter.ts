@@ -67,7 +67,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         return calendar;
       } catch (error) {
         console.log(error);
-        rep.code(500);
+        rep.status(500);
         return false;
       }
     }
