@@ -108,7 +108,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
-        const newCalendar = await prisma.calendars.update({
+        const updatedCalendar = await prisma.calendars.update({
           where: {
             id: data.id,
           },
@@ -122,7 +122,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
 
-        return newCalendar;
+        return updatedCalendar;
       } catch (error) {
         console.log(error);
         return false;

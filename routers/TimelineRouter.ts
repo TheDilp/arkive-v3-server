@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { prisma } from "..";
+import { removeNull } from "../utils/transform";
 
 export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
@@ -39,6 +40,80 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
       } catch (error) {
         rep.status(500);
         console.log(error);
+        return false;
+      }
+    }
+  );
+  server.post(
+    "/createtimeline",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        const newTimeline = await prisma.timelines.create({
+          data,
+        });
+
+        return newTimeline;
+      } catch (error) {
+        console.log(error);
+        rep.status(500);
+        return false;
+      }
+    }
+  );
+  server.post(
+    "/updatetimeline",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        const updatedTimeline = await prisma.timelines.update({
+          where: {
+            id: data.id,
+          },
+          data: {
+            ...data,
+            tags: {
+              connect: data?.tags?.map((tag: { id: string }) => ({
+                id: tag.id,
+              })),
+            },
+          },
+        });
+        return updatedTimeline;
+      } catch (error) {
+        console.log(error);
+        rep.status(500);
+        return false;
+      }
+    }
+  );
+  server.delete(
+    "/deletetimeline",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        await prisma.timelines.delete({
+          where: { id: data.id },
+        });
+        return true;
+      } catch (error) {
+        console.log(error);
+        rep.status(500);
         return false;
       }
     }
