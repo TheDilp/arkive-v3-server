@@ -83,8 +83,8 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
           data: {
             ...data,
             calendars: {
-              connect: data?.calendars?.map((cal: { id: string }) => ({
-                id: cal.id,
+              connect: data?.calendars?.map((id: string) => ({
+                id,
               })),
             },
           },
@@ -115,8 +115,8 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
           data: {
             ...data,
             calendars: {
-              connect: data?.calendars?.map((cal: { id: string }) => ({
-                id: cal.id,
+              connect: data?.calendars?.map((id: string) => ({
+                id,
               })),
             },
           },
