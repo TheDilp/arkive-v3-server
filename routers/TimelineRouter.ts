@@ -43,12 +43,13 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
                 title: true,
 
                 events: {
-                  select: {
-                    id: true,
-                    title: true,
-                    year: true,
-                    backgroundColor: true,
-                    textColor: true,
+                  include: {
+                    month: {
+                      select: {
+                        id: true,
+                        title: true,
+                      },
+                    },
                   },
                   orderBy: {
                     year: "asc",
