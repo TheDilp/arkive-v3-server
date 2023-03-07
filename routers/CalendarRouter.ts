@@ -1,4 +1,4 @@
-import { FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { FastifyInstance } from "fastify";
 import { prisma } from "..";
 import { removeNull } from "../utils/transform";
@@ -23,9 +23,30 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+  server.get(
+    "/getallevents/:project_id",
+    async (req: FastifyRequest<{ Params: { project_id: string } }>) => {
+      try {
+        const calendars = await prisma.events.findMany({
+          where: {
+            calendar: {
+              project_id: req.params.project_id,
+            },
+          },
+          orderBy: {
+            year: "asc",
+          },
+        });
+        return calendars;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    }
+  );
   server.post(
     "/getsinglecalendar",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         const calendar = await prisma.calendars.findUnique({
@@ -39,20 +60,23 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
               },
             },
             months: {
+              include: {
+                events: {
+                  include: {
+                    tags: {
+                      select: {
+                        id: true,
+                        title: true,
+                      },
+                    },
+                  },
+                },
+              },
               orderBy: {
                 sort: "asc",
               },
             },
-            events: {
-              include: {
-                tags: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-              },
-            },
+
             tags: {
               select: {
                 id: true,
@@ -64,6 +88,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         return calendar;
       } catch (error) {
         console.log(error);
+        rep.status(500);
         return false;
       }
     }
@@ -104,7 +129,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
-        const newCalendar = await prisma.calendars.update({
+        const updatedCalendar = await prisma.calendars.update({
           where: {
             id: data.id,
           },
@@ -118,7 +143,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
 
-        return newCalendar;
+        return updatedCalendar;
       } catch (error) {
         console.log(error);
         return false;

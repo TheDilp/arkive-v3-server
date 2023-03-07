@@ -49,6 +49,7 @@ model projects {
   members       members[]
   tags          tags[]
   swatches      swatches[]
+  timelines     timelines[]
 }
 
 model documents {
@@ -74,8 +75,7 @@ model documents {
   parent   documents?  @relation("parentChildDocuments", fields: [parentId], references: [id], onDelete: Cascade)
   children documents[] @relation("parentChildDocuments")
 
-  tags   tags[]
-  tagsId String? @db.Uuid
+  tags tags[]
 
   cards  cards[]
   events events[]
@@ -351,7 +351,8 @@ model calendars {
   days   String[]
   events events[]
 
-  tags tags[]
+  tags      tags[]
+  timelines timelines[]
 }
 
 model eras {
@@ -372,6 +373,7 @@ model months {
   calendar calendars @relation(fields: [parentId], references: [id], onDelete: Cascade)
   sort     Int       @default(0)
   parentId String    @db.Uuid
+  events   events[]
 }
 
 model events {
@@ -388,7 +390,7 @@ model events {
 
   calendar calendars? @relation(fields: [calendarsId], references: [id], onDelete: Cascade)
   year     Int
-  month    Int
+  month    months     @relation(fields: [monthsId], references: [id], onDelete: Cascade)
   day      Int
   hours    Int?
   minutes  Int?
@@ -397,6 +399,26 @@ model events {
 
   calendarsId String? @db.Uuid
   documentsId String? @db.Uuid
+  monthsId    String  @db.Uuid
+}
+
+model timelines {
+  id    String @id @default(uuid()) @db.Uuid
+  title String
+
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  project_id String   @db.Uuid
+
+  parentId String?     @db.Uuid
+  parent   timelines?  @relation("parentChildTimeline", fields: [parentId], references: [id], onDelete: Cascade)
+  children timelines[] @relation("parentChildTimeline")
+
+  icon     String  @default("mdi:timeline-clock-outline")
+  sort     Int     @default(0)
+  folder   Boolean @default(false)
+  isPublic Boolean @default(false)
+
+  calendars calendars[]
 }
 
 model random_tables {
