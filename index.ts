@@ -9,6 +9,7 @@ import { boardRouter } from "./routers/BoardRouter";
 import { calendarRouter } from "./routers/CalendarRouter";
 import { dictionaryRouter } from "./routers/DictionaryRouter";
 import { documentRouter } from "./routers/DocumentRouter";
+import { generatorRouter } from "./routers/GeneratorRouter";
 import { imageRouter } from "./routers/ImageRouter";
 import { mapRouter } from "./routers/MapRouter";
 import { otherRouter } from "./routers/OtherRouter";
@@ -20,6 +21,7 @@ import { searchRouter } from "./routers/SearchRouter";
 import { tagRouter } from "./routers/TagRouter";
 import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
+
 declare module "fastify" {
   interface FastifyRequest {
     auth_id: string;
@@ -152,6 +154,7 @@ server.register((instance, _, done) => {
   instance.register(calendarRouter);
   instance.register(timelineRouter);
   instance.register(randomTableRouter);
+  instance.register(generatorRouter);
   instance.register(imageRouter);
 
   done();
