@@ -20,6 +20,7 @@ import { searchRouter } from "./routers/SearchRouter";
 import { tagRouter } from "./routers/TagRouter";
 import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
+
 declare module "fastify" {
   interface FastifyRequest {
     auth_id: string;
