@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import { prisma } from "..";
 import { removeNull } from "../utils/transform";
@@ -10,7 +10,10 @@ export const randomTableRouter = (
 ) => {
   server.get(
     "/getallrandomtables/:project_id",
-    async (req: FastifyRequest<{ Params: { project_id: string } }>) => {
+    async (
+      req: FastifyRequest<{ Params: { project_id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
         const allTables = await prisma.random_tables.findMany({
           where: {
@@ -22,6 +25,7 @@ export const randomTableRouter = (
         });
         return allTables;
       } catch (error) {
+        rep.code(500);
         console.log(error);
         return false;
       }
@@ -29,7 +33,7 @@ export const randomTableRouter = (
   );
   server.post(
     "/getsinglerandomtable",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         const doc = await prisma.random_tables.findUnique({
@@ -40,6 +44,7 @@ export const randomTableRouter = (
         });
         return doc;
       } catch (error) {
+        rep.code(500);
         console.log(error);
         return false;
       }
@@ -50,7 +55,8 @@ export const randomTableRouter = (
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -60,6 +66,7 @@ export const randomTableRouter = (
 
         return newTable;
       } catch (error) {
+        rep.status(500);
         console.log(error);
         return false;
       }
@@ -70,7 +77,8 @@ export const randomTableRouter = (
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -83,6 +91,8 @@ export const randomTableRouter = (
 
         return true;
       } catch (error) {
+        rep.status(500);
+
         console.log(error);
         return false;
       }
@@ -90,7 +100,7 @@ export const randomTableRouter = (
   );
   server.post(
     "/sortrandomtables",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const indexes: { id: string; parent: string; sort: number }[] =
           JSON.parse(req.body);
@@ -107,6 +117,7 @@ export const randomTableRouter = (
 
         return true;
       } catch (error) {
+        rep.code(500);
         console.log(error);
         return false;
       }
@@ -120,16 +131,17 @@ export const randomTableRouter = (
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
         const newOption = await prisma.random_table_options.create({
           data,
         });
-
         return newOption;
       } catch (error) {
+        rep.code(500);
         console.log(error);
         return false;
       }
@@ -140,7 +152,8 @@ export const randomTableRouter = (
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -153,6 +166,7 @@ export const randomTableRouter = (
 
         return true;
       } catch (error) {
+        rep.code(500);
         console.log(error);
         return false;
       }
@@ -185,18 +199,25 @@ export const randomTableRouter = (
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
-      const ids = JSON.parse(req.body) as string[];
-      if (ids)
-        await prisma.random_table_options.deleteMany({
-          where: {
-            id: {
-              in: ids,
+      try {
+        const ids = JSON.parse(req.body) as string[];
+        if (ids)
+          await prisma.random_table_options.deleteMany({
+            where: {
+              id: {
+                in: ids,
+              },
             },
-          },
-        });
-      return true;
+          });
+        return true;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        return false;
+      }
     }
   );
   done();
