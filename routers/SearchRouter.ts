@@ -433,7 +433,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           const results = await Promise.all(searches);
           return results;
         });
-        return {
+        rep.send({
           documents: titleDocuments,
           maps,
           map_pins,
@@ -445,9 +445,9 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           dictionaries,
           calendars,
           events,
-        };
+        });
       }
-      return {};
+      rep.send({});
     }
   );
 
@@ -542,8 +542,9 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           rep.send(items);
         }
 
-        return [];
+        rep.send([]);
       } catch (error) {
+        rep.code(500);
         console.log(error);
         return false;
       }

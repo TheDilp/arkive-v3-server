@@ -7,47 +7,56 @@ import { removeNull } from "../utils/transform";
 export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
     "/getalldocuments/:project_id",
-    async (req: FastifyRequest<{ Params: { project_id: string } }>) => {
-      const data = await prisma.documents.findMany({
-        where: {
-          project_id: req.params.project_id,
-        },
-        select: {
-          id: true,
-          title: true,
-          icon: true,
-          parentId: true,
-          parent: {
-            select: {
-              id: true,
-              title: true,
+    async (
+      req: FastifyRequest<{ Params: { project_id: string } }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = await prisma.documents.findMany({
+          where: {
+            project_id: req.params.project_id,
+          },
+          select: {
+            id: true,
+            title: true,
+            icon: true,
+            parentId: true,
+            parent: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+            template: true,
+            folder: true,
+            sort: true,
+            expanded: true,
+            isPublic: true,
+            project_id: true,
+            alter_names: true,
+            image: true,
+            tags: {
+              select: {
+                id: true,
+                title: true,
+              },
             },
           },
-          template: true,
-          folder: true,
-          sort: true,
-          expanded: true,
-          isPublic: true,
-          project_id: true,
-          alter_names: true,
-          image: true,
-          tags: {
-            select: {
-              id: true,
-              title: true,
-            },
+          orderBy: {
+            sort: "asc",
           },
-        },
-        orderBy: {
-          sort: "asc",
-        },
-      });
-      return data;
+        });
+        rep.send(data);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
     }
   );
   server.post(
     "/getsingledocument",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         const doc = await prisma.documents.findUnique({
@@ -61,16 +70,17 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return doc;
+        rep.send(doc);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
   server.post(
     "/getmanydocuments",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       const ids = JSON.parse(req.body) as string[];
       try {
         const documents = await prisma.documents.findMany({
@@ -85,9 +95,10 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
             content: true,
           },
         });
-        return documents;
+        rep.send(documents);
       } catch (error) {
-        return false;
+        console.log(error);
+        rep.send(false);
       }
     }
   );
@@ -97,7 +108,8 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -113,16 +125,16 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
 
-        return newDocument;
+        rep.send(newDocument);
       } catch (error) {
         console.log(error);
+        rep.send(false);
       }
-      return null;
     }
   );
   server.post(
     "/createfromtemplate",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as {
           title: string;
@@ -143,11 +155,11 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
               project_id: data.project_id,
             },
           });
-          return newDocument;
+          rep.send(newDocument);
         }
       } catch (error) {
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -173,17 +185,17 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
           where: { id: data.id },
         });
         rep.code(200);
-        return true;
+        rep.send(true);
       } catch (error) {
         rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
   server.post(
     "/sortdocuments",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const indexes: { id: string; parent: string; sort: number }[] =
           JSON.parse(req.body);
@@ -199,10 +211,10 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         await prisma.$transaction(async () => {
           Promise.all(updates);
         });
-        return true;
+        rep.send(true);
       } catch (error) {
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -211,7 +223,8 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
@@ -220,10 +233,10 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
             id: data.id,
           },
         });
-        return true;
+        rep.send(true);
       } catch (error) {
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -232,18 +245,24 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
-      const ids = JSON.parse(req.body) as string[];
-      if (ids)
-        await prisma.documents.deleteMany({
-          where: {
-            id: {
-              in: ids,
+      try {
+        const ids = JSON.parse(req.body) as string[];
+        if (ids)
+          await prisma.documents.deleteMany({
+            where: {
+              id: {
+                in: ids,
+              },
             },
-          },
-        });
-      return true;
+          });
+        rep.send(true);
+      } catch (error) {
+        console.log(error);
+        rep.send(false);
+      }
     }
   );
 
