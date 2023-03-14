@@ -1,11 +1,11 @@
-import { FastifyInstance, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import { prisma } from "..";
 
 export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
     "/getallprojects",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = await prisma.projects.findMany({
           where: {
@@ -41,16 +41,17 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             title: "asc",
           },
         });
-        return data;
+        rep.send(data);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
   server.post(
     "/getsingleproject",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         const singleProject = await prisma.projects.findUnique({
@@ -79,17 +80,18 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return singleProject;
+        rep.send(singleProject);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
 
   server.post(
     "/createproject",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       if (req.auth_id) {
         try {
           const newProject = await prisma.projects.create({
@@ -97,17 +99,18 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
               ownerId: req.auth_id,
             },
           });
-          return newProject;
+          rep.send(newProject);
         } catch (error) {
+          rep.code(500);
           console.log(error);
-          return false;
+          rep.send(false);
         }
       }
     }
   );
   server.post(
     "/updateproject",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as any;
         const updatedProject = await prisma.projects.update({
@@ -117,16 +120,17 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           },
           data,
         });
-        return updatedProject;
+        rep.send(updatedProject);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
   server.delete(
     "/deleteproject",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         await prisma.projects.delete({
@@ -137,8 +141,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         });
         return true;
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return new Error("Error deleting the project.");
+        rep.send(false);
       }
     }
   );
@@ -146,7 +151,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   // SWATCHES
   server.post(
     "/createswatch",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       if (req.auth_id) {
         try {
           const data = JSON.parse(req.body) as {
@@ -160,15 +165,16 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           });
           return newSwatch;
         } catch (error) {
+          rep.code(500);
           console.log(error);
-          return false;
+          rep.send(false);
         }
       }
     }
   );
   server.post(
     "/updateswatch",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       if (req.auth_id) {
         try {
           const data = JSON.parse(req.body) as {
@@ -183,8 +189,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           });
           return true;
         } catch (error) {
+          rep.code(500);
           console.log(error);
-          return false;
+          rep.send(false);
         }
       }
     }
@@ -192,7 +199,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
 
   server.delete(
     "/deleteswatch",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         await prisma.swatches.delete({
@@ -205,8 +212,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         });
         return true;
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return new Error("Error deleting the project.");
+        rep.send(false);
       }
     }
   );

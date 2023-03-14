@@ -1,11 +1,14 @@
-import { FastifyInstance, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import { prisma } from "..";
 
 export const userRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
     "/user/:user_id",
-    async (req: FastifyRequest<{ Params: { user_id: string } }>) => {
+    async (
+      req: FastifyRequest<{ Params: { user_id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
         const user = await prisma.user.findUnique({
           where: {
@@ -19,52 +22,62 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return user;
+        rep.send(user);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
-  server.post("/createuser", async (req: FastifyRequest<{ Body: string }>) => {
-    try {
-      const data = JSON.parse(req.body) as {
-        id: string;
-        nickname: string;
-        email: string;
-        auth_id: string;
-      };
-      await prisma.user.create({
-        data,
-      });
-      return true;
-    } catch (error) {
-      console.log(error);
+  server.post(
+    "/createuser",
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      try {
+        const data = JSON.parse(req.body) as {
+          id: string;
+          nickname: string;
+          email: string;
+          auth_id: string;
+        };
+        await prisma.user.create({
+          data,
+        });
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
     }
-  });
-  server.post("/updateuser", async (req: FastifyRequest<{ Body: string }>) => {
-    try {
-      const data = JSON.parse(req.body) as {
-        id: string;
-        nickname: string;
-        email: string;
-      };
-      await prisma.user.update({
-        where: {
-          id: data.id,
-          auth_id: req.auth_id,
-        },
-        data,
-      });
-      return true;
-    } catch (error) {
-      console.log(error);
-      return false;
+  );
+  server.post(
+    "/updateuser",
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      try {
+        const data = JSON.parse(req.body) as {
+          id: string;
+          nickname: string;
+          email: string;
+        };
+        await prisma.user.update({
+          where: {
+            id: data.id,
+            auth_id: req.auth_id,
+          },
+          data,
+        });
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
     }
-  });
+  );
   server.post(
     "/addtoproject",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as {
           email: string;
@@ -83,17 +96,19 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           });
         } else {
-          return new Error("NO USER FOUND");
+          rep.code(500);
+          rep.send("NO USER FOUND");
         }
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(500);
       }
     }
   );
   server.delete(
     "/deleteuser",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as {
           id: string;
@@ -105,9 +120,11 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
               auth_id: req.auth_id,
             },
           });
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        rep.send(false);
       }
     }
   );

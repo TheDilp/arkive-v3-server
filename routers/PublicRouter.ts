@@ -1,10 +1,10 @@
-import { FastifyInstance, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { prisma } from "..";
 
 export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
   server.post(
     "/getpublicdocument",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         const doc = await prisma.documents.findUnique({
@@ -18,16 +18,17 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return doc;
+        rep.send(doc);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
   server.post(
     "/getpublicmap",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         const map = await prisma.maps.findUnique({
@@ -51,16 +52,17 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return map;
+        rep.send(map);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
   server.post(
     "/getpublicboard",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         const board = await prisma.boards.findUnique({
@@ -76,16 +78,17 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return board;
+        rep.send(board);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
   server.post(
     "/getpubliccalendar",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         const word = await prisma.calendars.findUnique({
@@ -108,16 +111,17 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return word;
+        rep.send(word);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
   server.post(
     "/getpublicword",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         const word = await prisma.words.findUnique({
@@ -130,16 +134,20 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return word;
+        rep.send(word);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
   server.get(
     "/publicuser/:user_id",
-    async (req: FastifyRequest<{ Params: { user_id: string } }>) => {
+    async (
+      req: FastifyRequest<{ Params: { user_id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
         const user = await prisma.user.findUnique({
           where: {
@@ -150,7 +158,12 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
             nickname: true,
           },
         });
-      } catch (error) {}
+        rep.send(user);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
     }
   );
 

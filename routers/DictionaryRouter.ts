@@ -1,4 +1,4 @@
-import { FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { FastifyInstance } from "fastify";
 import { prisma } from "..";
 import { removeNull } from "../utils/transform";
@@ -10,7 +10,10 @@ export const dictionaryRouter = (
 ) => {
   server.get(
     "/getalldictionaries/:project_id",
-    async (req: FastifyRequest<{ Params: { project_id: string } }>) => {
+    async (
+      req: FastifyRequest<{ Params: { project_id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
         const data = await prisma.dictionaries.findMany({
           where: {
@@ -20,17 +23,17 @@ export const dictionaryRouter = (
             sort: "asc",
           },
         });
-        return data;
+        rep.send(data);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
-
   server.post(
     "/getsingledictionary",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         const dictionary = await prisma.dictionaries.findUnique({
@@ -51,10 +54,11 @@ export const dictionaryRouter = (
             },
           },
         });
-        return dictionary;
+        rep.send(dictionary);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -63,7 +67,8 @@ export const dictionaryRouter = (
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -78,10 +83,11 @@ export const dictionaryRouter = (
           },
         });
 
-        return newDictionary;
+        rep.send(newDictionary);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -90,7 +96,8 @@ export const dictionaryRouter = (
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -101,16 +108,17 @@ export const dictionaryRouter = (
           },
         });
 
-        return newDictionary;
+        rep.send(newDictionary);
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        rep.send(error);
       }
-      return null;
     }
   );
   server.post(
     "/sortdictionaries",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const indexes: { id: string; parent: string; sort: number }[] =
           JSON.parse(req.body);
@@ -124,10 +132,11 @@ export const dictionaryRouter = (
           })
         );
         await prisma.$transaction(updates);
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -136,12 +145,20 @@ export const dictionaryRouter = (
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
-      const data = JSON.parse(req.body) as { id: string };
-      await prisma.dictionaries.delete({
-        where: { id: data.id },
-      });
+      try {
+        const data = JSON.parse(req.body) as { id: string };
+        await prisma.dictionaries.delete({
+          where: { id: data.id },
+        });
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
     }
   );
 
@@ -152,7 +169,8 @@ export const dictionaryRouter = (
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -160,16 +178,17 @@ export const dictionaryRouter = (
           data,
         });
 
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
   server.post(
     "/getsingleword",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         const word = await prisma.words.findUnique({
@@ -182,10 +201,11 @@ export const dictionaryRouter = (
             },
           },
         });
-        return word;
+        rep.send(word);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -194,7 +214,8 @@ export const dictionaryRouter = (
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -205,10 +226,11 @@ export const dictionaryRouter = (
           data,
         });
 
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -217,7 +239,8 @@ export const dictionaryRouter = (
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const id = JSON.parse(req.body) as string;
@@ -226,11 +249,11 @@ export const dictionaryRouter = (
             id,
           },
         });
-
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );

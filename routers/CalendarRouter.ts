@@ -6,7 +6,10 @@ import { removeNull } from "../utils/transform";
 export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
     "/getallcalendars/:project_id",
-    async (req: FastifyRequest<{ Params: { project_id: string } }>) => {
+    async (
+      req: FastifyRequest<{ Params: { project_id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
         const calendars = await prisma.calendars.findMany({
           where: {
@@ -16,16 +19,20 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
             sort: "asc",
           },
         });
-        return calendars;
+        rep.send(calendars);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
   server.get(
     "/getallevents/:project_id",
-    async (req: FastifyRequest<{ Params: { project_id: string } }>) => {
+    async (
+      req: FastifyRequest<{ Params: { project_id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
         const calendars = await prisma.events.findMany({
           where: {
@@ -37,10 +44,11 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
             year: "asc",
           },
         });
-        return calendars;
+        rep.send(calendars);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -98,7 +106,8 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -113,10 +122,11 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
 
-        return newCalendar;
+        rep.send(newCalendar);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -125,7 +135,8 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -143,21 +154,143 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
 
-        return updatedCalendar;
+        rep.send(updatedCalendar);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
   server.post(
     "/sortcalendars",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const indexes: { id: string; parent: string; sort: number }[] =
           JSON.parse(req.body);
         const updates = indexes.map((idx) =>
           prisma.calendars.update({
+            data: {
+              parentId: idx.parent,
+              sort: idx.sort,
+            },
+            where: { id: idx.id },
+          })
+        );
+        await prisma.$transaction(async () => {
+          Promise.all(updates);
+        });
+
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
+    }
+  );
+  server.post(
+    "/createera",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        await prisma.eras.create({
+          data,
+        });
+
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
+    }
+  );
+  server.post(
+    "/updateera",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        await prisma.eras.update({
+          where: {
+            id: data.id,
+          },
+          data,
+        });
+
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
+    }
+  );
+  server.post(
+    "/createmonth",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        const newMonth = await prisma.months.create({
+          data,
+        });
+
+        rep.send(newMonth);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
+    }
+  );
+  server.post(
+    "/updatemonth",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        await prisma.months.update({
+          where: {
+            id: data.id,
+          },
+          data,
+        });
+
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
+    }
+  );
+  server.post(
+    "/sortmonths",
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      try {
+        const indexes: { id: string; parent: string; sort: number }[] =
+          JSON.parse(req.body);
+        const updates = indexes.map((idx) =>
+          prisma.months.update({
             data: {
               parentId: idx.parent,
               sort: idx.sort,
@@ -177,120 +310,12 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/createera",
-    async (
-      req: FastifyRequest<{
-        Body: string;
-      }>
-    ) => {
-      try {
-        const data = removeNull(JSON.parse(req.body)) as any;
-        await prisma.eras.create({
-          data,
-        });
-
-        return true;
-      } catch (error) {
-        console.log(error);
-        return false;
-      }
-    }
-  );
-  server.post(
-    "/updateera",
-    async (
-      req: FastifyRequest<{
-        Body: string;
-      }>
-    ) => {
-      try {
-        const data = removeNull(JSON.parse(req.body)) as any;
-        await prisma.eras.update({
-          where: {
-            id: data.id,
-          },
-          data,
-        });
-
-        return true;
-      } catch (error) {
-        console.log(error);
-        return false;
-      }
-    }
-  );
-  server.post(
-    "/createmonth",
-    async (
-      req: FastifyRequest<{
-        Body: string;
-      }>
-    ) => {
-      try {
-        const data = removeNull(JSON.parse(req.body)) as any;
-        const newMonth = await prisma.months.create({
-          data,
-        });
-
-        return newMonth;
-      } catch (error) {
-        console.log(error);
-        return false;
-      }
-    }
-  );
-  server.post(
-    "/updatemonth",
-    async (
-      req: FastifyRequest<{
-        Body: string;
-      }>
-    ) => {
-      try {
-        const data = removeNull(JSON.parse(req.body)) as any;
-        await prisma.months.update({
-          where: {
-            id: data.id,
-          },
-          data,
-        });
-
-        return true;
-      } catch (error) {
-        console.log(error);
-        return false;
-      }
-    }
-  );
-  server.post("/sortmonths", async (req: FastifyRequest<{ Body: string }>) => {
-    try {
-      const indexes: { id: string; parent: string; sort: number }[] =
-        JSON.parse(req.body);
-      const updates = indexes.map((idx) =>
-        prisma.months.update({
-          data: {
-            parentId: idx.parent,
-            sort: idx.sort,
-          },
-          where: { id: idx.id },
-        })
-      );
-      await prisma.$transaction(async () => {
-        Promise.all(updates);
-      });
-
-      return true;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
-  });
-  server.post(
     "/createevent",
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -305,10 +330,11 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
 
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -317,7 +343,8 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -328,10 +355,11 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
           data,
         });
 
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -341,17 +369,19 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         await prisma.calendars.delete({
           where: { id: data.id },
         });
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -360,17 +390,19 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         await prisma.eras.delete({
           where: { id: data.id },
         });
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -379,17 +411,19 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         await prisma.months.delete({
           where: { id: data.id },
         });
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -398,17 +432,19 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         await prisma.events.delete({
           where: { id: data.id },
         });
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );

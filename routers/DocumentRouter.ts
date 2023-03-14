@@ -97,12 +97,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         });
         rep.send(documents);
       } catch (error) {
+        rep.code(500);
         console.log(error);
         rep.send(false);
       }
     }
   );
-
   server.post(
     "/createdocument",
     async (
@@ -127,6 +127,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
 
         rep.send(newDocument);
       } catch (error) {
+        rep.code(500);
         console.log(error);
         rep.send(false);
       }
@@ -157,7 +158,10 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
           });
           rep.send(newDocument);
         }
+        rep.code(500);
+        rep.send(false);
       } catch (error) {
+        rep.code(500);
         console.log(error);
         rep.send(false);
       }
@@ -213,6 +217,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         });
         rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
         rep.send(false);
       }
@@ -235,6 +240,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         });
         rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
         rep.send(false);
       }
@@ -260,6 +266,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
           });
         rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
         rep.send(false);
       }

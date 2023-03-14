@@ -19,11 +19,11 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
             sort: "asc",
           },
         });
-        return timelines;
+        rep.send(timelines);
       } catch (error) {
         rep.status(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -59,11 +59,11 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return timeline;
+        rep.send(timeline);
       } catch (error) {
         rep.status(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -88,11 +88,11 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
 
-        return newTimeline;
+        rep.send(newTimeline);
       } catch (error) {
-        console.log(error);
         rep.status(500);
-        return false;
+        console.log(error);
+        rep.send(false);
       }
     }
   );
@@ -119,11 +119,11 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return updatedTimeline;
+        rep.send(updatedTimeline);
       } catch (error) {
-        console.log(error);
         rep.status(500);
-        return false;
+        console.log(error);
+        rep.send(false);
       }
     }
   );
@@ -140,11 +140,11 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
         await prisma.timelines.delete({
           where: { id: data.id },
         });
-        return true;
+        rep.send(true);
       } catch (error) {
-        console.log(error);
         rep.status(500);
-        return false;
+        console.log(error);
+        rep.send(false);
       }
     }
   );

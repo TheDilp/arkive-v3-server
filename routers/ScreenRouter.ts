@@ -19,18 +19,17 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
             sort: "asc",
           },
         });
-
-        rep.code(200);
-        return screens;
+        rep.send(screens);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   ),
     server.post(
       "/getsinglescreen",
-      async (req: FastifyRequest<{ Body: string }>) => {
+      async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
         const data = JSON.parse(req.body) as { id: string };
         try {
           const screens = await prisma.screens.findUnique({
@@ -61,9 +60,11 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
               },
             },
           });
-          return screens;
+          rep.send(screens);
         } catch (error) {
-          return false;
+          rep.code(500);
+          console.log(error);
+          rep.send(false);
         }
       }
     ),
@@ -83,18 +84,17 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
               sectionSize: data.sectionSize,
             },
           });
-          rep.code(200);
-          return newScreen;
+          rep.send(newScreen);
         } catch (error) {
-          console.log(error);
           rep.code(500);
-          return false;
+          console.log(error);
+          rep.send(false);
         }
       }
     ),
     server.post(
       "/sortscreens",
-      async (req: FastifyRequest<{ Body: string }>) => {
+      async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
         try {
           const indexes: { id: string; parentId: string; sort: number }[] =
             JSON.parse(req.body);
@@ -110,35 +110,42 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           await prisma.$transaction(async () => {
             await Promise.all(updates);
           });
-          return true;
+          rep.send(true);
         } catch (error) {
-          return false;
+          rep.code(500);
+          console.log(error);
+          rep.send(false);
         }
       }
     );
   server.post(
     "/createsection",
     async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      const data = JSON.parse(req.body) as {
-        title: string;
-        section: string;
-        parentId: string;
-        sort: number;
-      };
-      const newSection = await prisma.sections.create({
-        data: {
-          title: data.title,
-          parentId: data.parentId,
-          sort: data.sort,
-        },
-      });
-      rep.code(200);
-      return newSection;
+      try {
+        const data = JSON.parse(req.body) as {
+          title: string;
+          section: string;
+          parentId: string;
+          sort: number;
+        };
+        const newSection = await prisma.sections.create({
+          data: {
+            title: data.title,
+            parentId: data.parentId,
+            sort: data.sort,
+          },
+        });
+        rep.send(newSection);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
     }
   ),
     server.post(
       "/updatesection",
-      async (req: FastifyRequest<{ Body: string }>) => {
+      async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
         const data = JSON.parse(req.body) as {
           id: string;
           title: string;
@@ -151,10 +158,11 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
             },
             data,
           });
-          return true;
+          rep.send(true);
         } catch (error) {
+          rep.code(500);
           console.log(error);
-          return false;
+          rep.send(false);
         }
       }
     );
@@ -173,11 +181,11 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           },
           data,
         });
-        rep.code(200);
-        return true;
+        rep.send(true);
       } catch (error) {
         rep.code(500);
-        return false;
+        console.log(error);
+        rep.send(false);
       }
     }
   ),
@@ -193,18 +201,17 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           const newCards = await prisma.cards.createMany({
             data,
           });
-          rep.code(200);
-          return newCards;
+          rep.send(newCards);
         } catch (error) {
-          console.log(error);
           rep.code(500);
-          return false;
+          console.log(error);
+          rep.send(false);
         }
       }
     ),
     server.post(
       "/sortsections",
-      async (req: FastifyRequest<{ Body: string }>) => {
+      async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
         try {
           const indexes: { id: string; parentId: string; sort: number }[] =
             JSON.parse(req.body);
@@ -220,37 +227,43 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           await prisma.$transaction(async () => {
             await Promise.all(updates);
           });
-          return true;
+          rep.send(true);
         } catch (error) {
-          return false;
+          rep.code(500);
+          console.log(error);
+          rep.send(false);
         }
       }
     );
-  server.post("/sortcards", async (req: FastifyRequest<{ Body: string }>) => {
-    try {
-      const indexes: { id: string; parentId: string; sort: number }[] =
-        JSON.parse(req.body);
-      const updates = indexes.map((idx) =>
-        prisma.cards.update({
-          data: {
-            parentId: idx.parentId,
-            sort: idx.sort,
-          },
-          where: { id: idx.id },
-        })
-      );
-      await prisma.$transaction(async () => {
-        await Promise.all(updates);
-      });
-      return true;
-    } catch (error) {
-      console.log(error);
-      return false;
+  server.post(
+    "/sortcards",
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      try {
+        const indexes: { id: string; parentId: string; sort: number }[] =
+          JSON.parse(req.body);
+        const updates = indexes.map((idx) =>
+          prisma.cards.update({
+            data: {
+              parentId: idx.parentId,
+              sort: idx.sort,
+            },
+            where: { id: idx.id },
+          })
+        );
+        await prisma.$transaction(async () => {
+          await Promise.all(updates);
+        });
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
     }
-  });
+  );
   server.post(
     "/updatescreen",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       const data = JSON.parse(req.body) as {
         id: string;
         title: string;
@@ -267,16 +280,17 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           },
           data,
         });
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
   server.delete(
     "/deletescreen",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       const data = JSON.parse(req.body) as { id: string };
       try {
         await prisma.screens.delete({
@@ -284,17 +298,17 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
             id: data.id,
           },
         });
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
-      return true;
     }
   );
   server.delete(
     "/deletemanysections",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       const ids = JSON.parse(req.body) as string[];
       try {
         await prisma.sections.deleteMany({
@@ -304,17 +318,17 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
-      return true;
     }
   );
   server.delete(
     "/deletecard",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       const data = JSON.parse(req.body) as { id: string };
       try {
         await prisma.cards.delete({
@@ -322,12 +336,12 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
             id: data.id,
           },
         });
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
-      return true;
     }
   );
   done();

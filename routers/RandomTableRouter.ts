@@ -23,11 +23,11 @@ export const randomTableRouter = (
             sort: "asc",
           },
         });
-        return allTables;
+        rep.send(allTables);
       } catch (error) {
         rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -42,11 +42,11 @@ export const randomTableRouter = (
             random_table_options: true,
           },
         });
-        return doc;
+        rep.send(doc);
       } catch (error) {
         rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -64,11 +64,11 @@ export const randomTableRouter = (
           data,
         });
 
-        return newTable;
+        rep.send(newTable);
       } catch (error) {
         rep.status(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -89,12 +89,11 @@ export const randomTableRouter = (
           data,
         });
 
-        return true;
+        rep.send(true);
       } catch (error) {
         rep.status(500);
-
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -115,11 +114,11 @@ export const randomTableRouter = (
         );
         await prisma.$transaction(updates);
 
-        return true;
+        rep.send(true);
       } catch (error) {
         rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -139,11 +138,11 @@ export const randomTableRouter = (
         const newOption = await prisma.random_table_options.create({
           data,
         });
-        return newOption;
+        rep.send(newOption);
       } catch (error) {
         rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -164,11 +163,11 @@ export const randomTableRouter = (
           data,
         });
 
-        return true;
+        rep.send(true);
       } catch (error) {
         rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -177,7 +176,8 @@ export const randomTableRouter = (
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
@@ -187,10 +187,11 @@ export const randomTableRouter = (
             id: data.id,
           },
         });
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -212,11 +213,11 @@ export const randomTableRouter = (
               },
             },
           });
-        return true;
+        rep.send(true);
       } catch (error) {
         rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );

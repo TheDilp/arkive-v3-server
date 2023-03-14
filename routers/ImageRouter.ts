@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import sharp from "sharp";
 import { S3, PutObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
@@ -15,7 +15,10 @@ const s3Client = new S3({
 export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
     "/getallimages/:project_id",
-    async (req: FastifyRequest<{ Params: { project_id: string } }>) => {
+    async (
+      req: FastifyRequest<{ Params: { project_id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
         const key = `assets/images/${req.params.project_id}/`;
         const data = await s3Client.send(
@@ -25,15 +28,20 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
             Prefix: key,
           })
         );
-        return data?.Contents || [];
+        rep.send(data?.Contents || []);
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        rep.send(false);
       }
     }
   );
   server.get(
     "/getallmapimages/:project_id",
-    async (req: FastifyRequest<{ Params: { project_id: string } }>) => {
+    async (
+      req: FastifyRequest<{ Params: { project_id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
         const key = `assets/maps/${req.params.project_id}/`;
         const data = await s3Client.send(
@@ -43,11 +51,12 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
             Prefix: key,
           })
         );
-        return data?.Contents || [];
+        rep.send(data?.Contents || []);
       } catch (error) {
-        return [];
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
       }
-      return [];
     }
   );
 
@@ -82,7 +91,8 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
       req: FastifyRequest<{
         Params: { type: "images" | "maps"; project_id: string };
         Body: any[];
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const files = req.body;
@@ -119,10 +129,11 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
             return false;
           }
         });
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );

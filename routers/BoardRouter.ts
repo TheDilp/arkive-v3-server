@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import { prisma } from "..";
 import { removeNull } from "../utils/transform";
@@ -6,41 +6,50 @@ import { removeNull } from "../utils/transform";
 export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
     "/getallboards/:project_id",
-    async (req: FastifyRequest<{ Params: { project_id: string } }>) => {
-      const data = await prisma.boards.findMany({
-        where: {
-          project_id: req.params.project_id,
-        },
-        select: {
-          id: true,
-          title: true,
-          folder: true,
-          sort: true,
-          icon: true,
-          parentId: true,
-          isPublic: true,
-          tags: true,
-          defaultEdgeColor: true,
-          defaultNodeColor: true,
-          defaultNodeShape: true,
-          parent: {
-            select: {
-              id: true,
-              title: true,
-            },
+    async (
+      req: FastifyRequest<{ Params: { project_id: string } }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = await prisma.boards.findMany({
+          where: {
+            project_id: req.params.project_id,
           },
-          expanded: true,
-        },
-        orderBy: {
-          sort: "asc",
-        },
-      });
-      return data;
+          select: {
+            id: true,
+            title: true,
+            folder: true,
+            sort: true,
+            icon: true,
+            parentId: true,
+            isPublic: true,
+            tags: true,
+            defaultEdgeColor: true,
+            defaultNodeColor: true,
+            defaultNodeShape: true,
+            parent: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+            expanded: true,
+          },
+          orderBy: {
+            sort: "asc",
+          },
+        });
+        rep.send(data);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
     }
   );
   server.post(
     "/getsingleboard",
-    async (req: FastifyRequest<{ Body: string }>) => {
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         const board = await prisma.boards.findUnique({
@@ -81,10 +90,11 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return board;
+        rep.send(board);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -93,7 +103,8 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -108,11 +119,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
 
-        return newBoard;
+        rep.send(newBoard);
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        rep.send(false);
       }
-      return null;
     }
   );
   server.post(
@@ -120,7 +132,8 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -131,49 +144,56 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
 
-        return newDocument;
+        rep.send(newDocument);
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        rep.send(false);
       }
-      return null;
     }
   );
-  server.post("/sortboards", async (req: FastifyRequest<{ Body: string }>) => {
-    try {
-      const indexes: { id: string; parent: string; sort: number }[] =
-        JSON.parse(req.body);
-      const updates = indexes.map((idx) =>
-        prisma.boards.update({
-          data: {
-            parentId: idx.parent,
-            sort: idx.sort,
-          },
-          where: { id: idx.id },
-        })
-      );
-      await prisma.$transaction(updates);
-      return true;
-    } catch (error) {
-      console.log(error);
-      return false;
+  server.post(
+    "/sortboards",
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      try {
+        const indexes: { id: string; parent: string; sort: number }[] =
+          JSON.parse(req.body);
+        const updates = indexes.map((idx) =>
+          prisma.boards.update({
+            data: {
+              parentId: idx.parent,
+              sort: idx.sort,
+            },
+            where: { id: idx.id },
+          })
+        );
+        await prisma.$transaction(updates);
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
     }
-  });
+  );
   server.delete(
     "/deleteboard",
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
         await prisma.boards.delete({
           where: { id: data.id },
         });
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return false;
+        rep.send(false);
       }
     }
   );
@@ -183,7 +203,8 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
       req: FastifyRequest<{
         Body: string;
         Params: { id: string };
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -199,10 +220,11 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
 
-        return newNode;
+        rep.send(newNode);
       } catch (error) {
+        rep.code(500);
         console.log(error);
-        return new Error("Cannot create node.");
+        rep.send(false);
       }
     }
   );
@@ -211,7 +233,8 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const ids: string[] = JSON.parse(req.body);
@@ -238,11 +261,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        rep.send(false);
       }
-      return null;
     }
   );
   server.delete(
@@ -250,7 +274,8 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const ids: string[] = JSON.parse(req.body);
@@ -262,11 +287,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
 
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        rep.send(false);
       }
-      return null;
     }
   );
   server.post(
@@ -274,7 +300,8 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const body: { ids: string[]; data: any } = JSON.parse(req.body);
@@ -286,10 +313,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           },
           data: removeNull(body.data) as any,
         });
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        rep.send(false);
       }
-      return null;
     }
   );
   server.post(
@@ -297,7 +326,8 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const body: { id: string; x: number; y: number }[] = JSON.parse(
@@ -313,11 +343,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           })
         );
         await prisma.$transaction(updates);
-        return true;
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        rep.send(false);
       }
-      return null;
     }
   );
   server.post(
@@ -325,7 +356,8 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const body: { ids: string[]; data: any } = JSON.parse(req.body);
@@ -337,10 +369,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           },
           data: removeNull(body.data) as any,
         });
+        rep.send(true);
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        rep.send(false);
       }
-      return null;
     }
   );
   server.post(
@@ -348,7 +382,8 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -359,11 +394,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           data,
         });
 
-        return updatedNode;
+        rep.send(updatedNode);
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        rep.send(false);
       }
-      return null;
     }
   );
   server.post(
@@ -372,11 +408,11 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
       req: FastifyRequest<{
         Body: string;
         Params: { id: string };
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
-
         const newEdge = await prisma.edges.create({
           data: {
             ...data,
@@ -388,11 +424,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
 
-        return newEdge;
+        rep.send(newEdge);
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        rep.send(false);
       }
-      return null;
     }
   );
   server.post(
@@ -400,7 +437,8 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: string;
-      }>
+      }>,
+      rep: FastifyReply
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
@@ -411,11 +449,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           data: removeNull(JSON.parse(req.body)) as any,
         });
 
-        return newDocument;
+        rep.send(newDocument);
       } catch (error) {
+        rep.code(500);
         console.log(error);
+        rep.send(false);
       }
-      return null;
     }
   );
 
