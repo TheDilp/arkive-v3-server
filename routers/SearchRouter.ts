@@ -17,10 +17,11 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
       const { query } = JSON.parse(req.body) as { query: string | string[] };
 
       if (type === "namecontent") {
+        // lower(content->>'content'::text) like lower(${`%${query}%`}) or
         const searches = [
-          // prisma.$queryRaw`
-          // select id,title,content,icon from documents where (project_id::text = ${project_id} and ( lower(content->>'content'::text) like lower(${`%${query}%`}) or (lower(title) like lower(${`%${query}%`}) ) ) and folder = false)
-          // ;`,
+          prisma.$queryRaw`
+          select id,title,icon from documents where (project_id::text = ${project_id} and ((lower(title) like lower(${`%${query}%`}) ) ) and folder = false)
+          ;`,
           prisma.maps.findMany({
             where: {
               title: {
