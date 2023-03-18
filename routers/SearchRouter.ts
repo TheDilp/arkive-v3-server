@@ -277,6 +277,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           title: doc.title,
           icon: doc.icon,
         }));
+        await prisma.$disconnect();
         rep.send({
           documents: final,
           maps,
