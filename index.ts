@@ -4,8 +4,6 @@ import fastify from "fastify";
 
 import fileUpload from "fastify-file-upload";
 import * as admin from "firebase-admin";
-import set from "lodash.set";
-import prisma from "./client";
 import { boardRouter } from "./routers/BoardRouter";
 import { calendarRouter } from "./routers/CalendarRouter";
 import { dictionaryRouter } from "./routers/DictionaryRouter";
