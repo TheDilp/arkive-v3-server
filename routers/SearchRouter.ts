@@ -68,6 +68,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             select: {
               id: true,
               text: true,
+              parentId: true,
               parent: {
                 select: {
                   title: true,
