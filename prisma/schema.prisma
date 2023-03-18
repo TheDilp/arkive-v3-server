@@ -56,7 +56,7 @@ model documents {
   id          String   @id @default(uuid()) @db.Uuid
   title       String   @default("New Document")
   content     Json?    @db.JsonB
-  icon        String?  @default("mdi:file")
+  icon        String?  @default("ph:files-thin")
   expanded    Boolean  @default(false)
   folder      Boolean  @default(false)
   isPublic    Boolean  @default(false)
@@ -90,7 +90,7 @@ model maps {
   sort     Int     @default(0)
 
   image String?
-  icon  String? @default("mdi:map")
+  icon  String? @default("ph:map-trifold")
 
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
@@ -138,7 +138,7 @@ model boards {
   expanded Boolean @default(false)
   sort     Int     @default(0)
 
-  icon String? @default("mdi:draw")
+  icon String? @default("ph:graph-light")
 
   defaultNodeShape String @default("rectangle")
   defaultNodeColor String @default("#595959")
@@ -297,7 +297,7 @@ model dictionaries {
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
-  icon     String  @default("mdi-light:book")
+  icon     String  @default("ph:book-bookmark-light")
   sort     Int     @default(0)
   expanded Boolean @default(true)
   folder   Boolean @default(false)
@@ -337,7 +337,7 @@ model calendars {
   parent   calendars?  @relation("parentChildCalendar", fields: [parentId], references: [id], onDelete: Cascade)
   children calendars[] @relation("parentChildCalendar")
 
-  icon     String  @default("ph:calendar-blank")
+  icon     String  @default("ph:calendar-blank-light")
   sort     Int     @default(0)
   expanded Boolean @default(true)
   folder   Boolean @default(false)
@@ -435,7 +435,7 @@ model random_tables {
 
   isShared Boolean @default(false)
 
-  icon                 String                 @default("arcticons:reroll")
+  icon                 String                 @default("game-icons:perspective-dice-six-faces-random")
   folder               Boolean                @default(false)
   isPublic             Boolean                @default(false)
   expanded             Boolean                @default(false)
