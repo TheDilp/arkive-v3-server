@@ -1,7 +1,7 @@
 import { screens } from "@prisma/client";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { FastifyInstance } from "fastify";
-import { prisma } from "..";
+import prisma from "../client";
 
 export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(

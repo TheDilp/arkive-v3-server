@@ -1,10 +1,11 @@
 import cors from "@fastify/cors";
-import { PrismaClient } from "@prisma/client";
+
 import fastify from "fastify";
 
 import fileUpload from "fastify-file-upload";
 import * as admin from "firebase-admin";
 import set from "lodash.set";
+import prisma from "./client";
 import { boardRouter } from "./routers/BoardRouter";
 import { calendarRouter } from "./routers/CalendarRouter";
 import { dictionaryRouter } from "./routers/DictionaryRouter";
@@ -26,7 +27,7 @@ declare module "fastify" {
     auth_id: string;
   }
 }
-export const prisma = new PrismaClient();
+
 const mainIncrementItems = [
   "documents",
   "maps",

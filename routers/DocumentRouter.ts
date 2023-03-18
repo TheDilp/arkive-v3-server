@@ -1,7 +1,7 @@
 import { documents } from "@prisma/client";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
-import { prisma } from "..";
+import prisma from "../client";
 import { removeNull } from "../utils/transform";
 
 export const documentRouter = (server: FastifyInstance, _: any, done: any) => {

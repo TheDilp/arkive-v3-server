@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { prisma } from "..";
+import prisma from "../client";
 import { removeNull } from "../utils/transform";
 
 export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {

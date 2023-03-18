@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
-import { prisma } from "..";
+import prisma from "../client";
 
 export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(

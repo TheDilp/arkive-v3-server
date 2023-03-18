@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { FastifyInstance } from "fastify";
-import { prisma } from "..";
+import prisma from "../client";
 import { removeNull } from "../utils/transform";
 
 export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {

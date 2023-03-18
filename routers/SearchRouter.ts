@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
-import { prisma } from "..";
+import prisma from "../client";
 import { hasValueDeep } from "../utils/transform";
 
 export const searchRouter = (server: FastifyInstance, _: any, done: any) => {

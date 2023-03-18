@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import prisma from "../client";
 
-import { prisma } from "..";
 import { removeNull } from "../utils/transform";
 
 export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
