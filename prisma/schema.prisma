@@ -113,7 +113,8 @@ model map_pins {
   lng             Float
   color           String  @default("#ffffff")
   backgroundColor String  @default("#000000")
-  icon            String
+  icon            String?
+  image           String?
   isPublic        Boolean @default(false)
   tags            tags[]
 
