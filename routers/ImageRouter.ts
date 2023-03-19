@@ -5,6 +5,7 @@ import sharp from "sharp";
 import { s3Client } from "../client";
 
 export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
+  console.log("IMAGE ROUTER");
   server.get(
     "/getallimages/:project_id",
     async (
