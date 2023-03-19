@@ -509,9 +509,11 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           query: string;
           project_id: string;
           type: AvailableTypes;
+          take?: number;
         };
         if (data.type === "documents") {
           const items = await prisma.documents.findMany({
+            take: data?.take,
             where: {
               project_id: data.project_id,
               folder: false,
@@ -531,6 +533,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
 
         if (data.type === "maps") {
           const items = await prisma.maps.findMany({
+            take: data?.take,
             where: {
               folder: false,
               project_id: data.project_id,
@@ -549,6 +552,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         if (data.type === "map_pins") {
           rep.send(
             prisma.map_pins.findMany({
+              take: data?.take,
               where: {
                 text: {
                   contains: data.query as string,
@@ -575,6 +579,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         }
         if (data.type === "boards") {
           const items = await prisma.boards.findMany({
+            take: data?.take,
             where: {
               folder: false,
               project_id: data.project_id,
@@ -594,6 +599,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         if (data.type === "nodes") {
           rep.send(
             await prisma.nodes.findMany({
+              take: data?.take,
               where: {
                 label: {
                   contains: data.query as string,
@@ -620,6 +626,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         if (data.type === "edges") {
           rep.send(
             await prisma.edges.findMany({
+              take: data?.take,
               where: {
                 label: {
                   contains: data.query as string,
@@ -659,6 +666,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         if (data.type === "screens") {
           rep.send(
             await prisma.screens.findMany({
+              take: data?.take,
               where: {
                 title: {
                   contains: data.query as string,
@@ -679,6 +687,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         if (data.type === "sections") {
           rep.send(
             await prisma.sections.findMany({
+              take: data?.take,
               where: {
                 OR: [
                   {
@@ -716,6 +725,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         if (data.type === "calendars") {
           rep.send(
             await prisma.calendars.findMany({
+              take: data?.take,
               where: {
                 title: {
                   contains: data.query as string,
@@ -735,6 +745,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         if (data.type === "timelines") {
           rep.send(
             await prisma.timelines.findMany({
+              take: data?.take,
               where: {
                 title: {
                   contains: data.query as string,
@@ -754,6 +765,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         if (data.type === "events") {
           rep.send(
             await prisma.events.findMany({
+              take: data?.take,
               where: {
                 title: {
                   contains: data.query as string,
@@ -776,6 +788,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
 
         if (data.type === "words") {
           const items = await prisma.words.findMany({
+            take: data?.take,
             where: {
               dictionary: {
                 project_id: data.project_id,
@@ -800,6 +813,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         }
 
         rep.send([]);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
