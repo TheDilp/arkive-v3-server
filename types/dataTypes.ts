@@ -9,4 +9,5 @@ export type AvailableTypes =
   | "sections"
   | "calendars"
   | "timelines"
-  | "events";
+  | "events"
+  | "words";

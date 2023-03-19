@@ -18,9 +18,9 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       const { project_id, type } = req.params;
-      const { query, itemType } = JSON.parse(req.body) as {
+      const { query, data } = JSON.parse(req.body) as {
         query: string | string[];
-        itemType?: AvailableTypes;
+        data?: AvailableTypes;
       };
 
       if (type === "namecontent") {
@@ -495,57 +495,67 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         });
         return;
       }
-      if (type === "category" && itemType) {
-        if (itemType === "documents") {
-          rep.send(
-            await prisma.documents.findMany({
-              where: {
-                title: {
-                  contains: query as string,
-                  mode: "insensitive",
-                },
-                project_id,
-                folder: false,
+
+      rep.send({});
+      return;
+    }
+  );
+
+  server.post(
+    "/search",
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      try {
+        const data = JSON.parse(req.body) as {
+          query: string;
+          project_id: string;
+          type: AvailableTypes;
+        };
+        if (data.type === "documents") {
+          const items = await prisma.documents.findMany({
+            where: {
+              project_id: data.project_id,
+              folder: false,
+              template: false,
+              title: {
+                contains: data.query,
+                mode: "insensitive",
               },
-              select: {
-                id: true,
-                title: true,
-                icon: true,
-              },
-            })
-          );
-          return;
+            },
+            select: {
+              id: true,
+              title: true,
+            },
+          });
+          rep.send(items);
         }
-        if (itemType === "maps") {
-          rep.send(
-            await prisma.maps.findMany({
-              where: {
-                title: {
-                  contains: query as string,
-                  mode: "insensitive",
-                },
-                project_id,
-                folder: false,
+
+        if (data.type === "maps") {
+          const items = await prisma.maps.findMany({
+            where: {
+              folder: false,
+              project_id: data.project_id,
+              title: {
+                contains: data.query,
+                mode: "insensitive",
               },
-              select: {
-                id: true,
-                title: true,
-                icon: true,
-              },
-            })
-          );
-          return;
+            },
+            select: {
+              id: true,
+              title: true,
+            },
+          });
+          rep.send(items);
         }
-        if (itemType === "map_pins") {
+        if (data.type === "map_pins") {
           rep.send(
             prisma.map_pins.findMany({
               where: {
                 text: {
-                  contains: query as string,
+                  contains: data.query as string,
                   mode: "insensitive",
                 },
                 parent: {
-                  project_id,
+                  project_id: data.project_id,
                 },
               },
               select: {
@@ -563,35 +573,34 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           );
           return;
         }
-        if (itemType === "boards") {
-          rep.send(
-            await prisma.boards.findMany({
-              where: {
-                title: {
-                  contains: query as string,
-                  mode: "insensitive",
-                },
-                folder: false,
-                project_id,
+        if (data.type === "boards") {
+          const items = await prisma.boards.findMany({
+            where: {
+              folder: false,
+              project_id: data.project_id,
+              title: {
+                contains: data.query,
+                mode: "insensitive",
               },
-              select: {
-                id: true,
-                title: true,
-                icon: true,
-              },
-            })
-          );
+            },
+            select: {
+              id: true,
+              title: true,
+            },
+          });
+          rep.send(items);
         }
-        if (itemType === "nodes") {
+
+        if (data.type === "nodes") {
           rep.send(
             await prisma.nodes.findMany({
               where: {
                 label: {
-                  contains: query as string,
+                  contains: data.query as string,
                   mode: "insensitive",
                 },
                 board: {
-                  project_id,
+                  project_id: data.project_id,
                 },
               },
               select: {
@@ -608,16 +617,16 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           );
           return;
         }
-        if (itemType === "edges") {
+        if (data.type === "edges") {
           rep.send(
             await prisma.edges.findMany({
               where: {
                 label: {
-                  contains: query as string,
+                  contains: data.query as string,
                   mode: "insensitive",
                 },
                 board: {
-                  project_id,
+                  project_id: data.project_id,
                 },
               },
               select: {
@@ -647,16 +656,16 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
 
           return;
         }
-        if (itemType === "screens") {
+        if (data.type === "screens") {
           rep.send(
             await prisma.screens.findMany({
               where: {
                 title: {
-                  contains: query as string,
+                  contains: data.query as string,
                   mode: "insensitive",
                 },
                 folder: false,
-                project_id,
+                project_id: data.project_id,
               },
               select: {
                 id: true,
@@ -667,14 +676,14 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           );
           return;
         }
-        if (itemType === "sections") {
+        if (data.type === "sections") {
           rep.send(
             await prisma.sections.findMany({
               where: {
                 OR: [
                   {
                     title: {
-                      contains: query as string,
+                      contains: data.query as string,
                       mode: "insensitive",
                     },
                   },
@@ -683,7 +692,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
                       some: {
                         document: {
                           title: {
-                            contains: query as string,
+                            contains: data.query as string,
                             mode: "insensitive",
                           },
                         },
@@ -692,7 +701,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
                   },
                 ],
                 screens: {
-                  project_id,
+                  project_id: data.project_id,
                 },
               },
               select: {
@@ -704,15 +713,15 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             })
           );
         }
-        if (itemType === "calendars") {
+        if (data.type === "calendars") {
           rep.send(
             await prisma.calendars.findMany({
               where: {
                 title: {
-                  contains: query as string,
+                  contains: data.query as string,
                   mode: "insensitive",
                 },
-                project_id,
+                project_id: data.project_id,
               },
               select: {
                 id: true,
@@ -723,15 +732,15 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           );
           return;
         }
-        if (itemType === "timelines") {
+        if (data.type === "timelines") {
           rep.send(
             await prisma.timelines.findMany({
               where: {
                 title: {
-                  contains: query as string,
+                  contains: data.query as string,
                   mode: "insensitive",
                 },
-                project_id,
+                project_id: data.project_id,
               },
               select: {
                 id: true,
@@ -742,17 +751,17 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           );
           return;
         }
-        if (itemType === "events") {
+        if (data.type === "events") {
           rep.send(
             await prisma.events.findMany({
               where: {
                 title: {
-                  contains: query as string,
+                  contains: data.query as string,
                   mode: "insensitive",
                 },
 
                 calendar: {
-                  project_id,
+                  project_id: data.project_id,
                 },
               },
               select: {
@@ -764,81 +773,9 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           );
           return;
         }
-      }
 
-      rep.send({});
-      return;
-    }
-  );
-
-  server.post(
-    "/search",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      try {
-        const data = JSON.parse(req.body) as {
-          query: string;
-          project_id: string;
-          type: "documents" | "maps" | "boards" | "words";
-        };
-        if (data.type === "documents") {
-          const items = prisma.documents.findMany({
-            where: {
-              project_id: data.project_id,
-              folder: false,
-              template: false,
-              OR: [
-                {
-                  title: {
-                    contains: data.query,
-                    mode: "insensitive",
-                  },
-                },
-              ],
-            },
-            select: {
-              id: true,
-              title: true,
-            },
-          });
-          rep.send(items);
-        }
-
-        if (data.type === "maps") {
-          const items = prisma.maps.findMany({
-            where: {
-              folder: false,
-              project_id: data.project_id,
-              title: {
-                contains: data.query,
-                mode: "insensitive",
-              },
-            },
-            select: {
-              id: true,
-              title: true,
-            },
-          });
-          rep.send(items);
-        }
-        if (data.type === "boards") {
-          const items = prisma.boards.findMany({
-            where: {
-              folder: false,
-              project_id: data.project_id,
-              title: {
-                contains: data.query,
-                mode: "insensitive",
-              },
-            },
-            select: {
-              id: true,
-              title: true,
-            },
-          });
-          rep.send(items);
-        }
         if (data.type === "words") {
-          const items = prisma.words.findMany({
+          const items = await prisma.words.findMany({
             where: {
               dictionary: {
                 project_id: data.project_id,
