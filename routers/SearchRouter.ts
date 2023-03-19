@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import prisma from "../client";
+import { AvailableTypes } from "../types/dataTypes";
 import { hasValueDeep } from "../utils/transform";
 
 export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
@@ -8,13 +9,19 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
     "/fullsearch/:project_id/:type",
     async (
       req: FastifyRequest<{
-        Params: { project_id: string; type: "tags" | "namecontent" };
+        Params: {
+          project_id: string;
+          type: "tags" | "namecontent" | "category";
+        };
         Body: string;
       }>,
       rep: FastifyReply
     ) => {
       const { project_id, type } = req.params;
-      const { query } = JSON.parse(req.body) as { query: string | string[] };
+      const { query, itemType } = JSON.parse(req.body) as {
+        query: string | string[];
+        itemType?: AvailableTypes;
+      };
 
       if (type === "namecontent") {
         // lower(content->>'content'::text) like lower(${`%${query}%`}) or
@@ -290,6 +297,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           timelines,
           events,
         });
+        return;
       }
       if (type === "tags" && Array.isArray(query) && query.length) {
         const whereTagsClause = {
@@ -485,8 +493,281 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           calendars,
           events,
         });
+        return;
       }
+      if (type === "category" && itemType) {
+        if (itemType === "documents") {
+          rep.send(
+            await prisma.documents.findMany({
+              where: {
+                title: {
+                  contains: query as string,
+                  mode: "insensitive",
+                },
+                project_id,
+                folder: false,
+              },
+              select: {
+                id: true,
+                title: true,
+                icon: true,
+              },
+            })
+          );
+          return;
+        }
+        if (itemType === "maps") {
+          rep.send(
+            await prisma.maps.findMany({
+              where: {
+                title: {
+                  contains: query as string,
+                  mode: "insensitive",
+                },
+                project_id,
+                folder: false,
+              },
+              select: {
+                id: true,
+                title: true,
+                icon: true,
+              },
+            })
+          );
+          return;
+        }
+        if (itemType === "map_pins") {
+          rep.send(
+            prisma.map_pins.findMany({
+              where: {
+                text: {
+                  contains: query as string,
+                  mode: "insensitive",
+                },
+                parent: {
+                  project_id,
+                },
+              },
+              select: {
+                id: true,
+                text: true,
+                parentId: true,
+                icon: true,
+                parent: {
+                  select: {
+                    title: true,
+                  },
+                },
+              },
+            })
+          );
+          return;
+        }
+        if (itemType === "boards") {
+          rep.send(
+            await prisma.boards.findMany({
+              where: {
+                title: {
+                  contains: query as string,
+                  mode: "insensitive",
+                },
+                folder: false,
+                project_id,
+              },
+              select: {
+                id: true,
+                title: true,
+                icon: true,
+              },
+            })
+          );
+        }
+        if (itemType === "nodes") {
+          rep.send(
+            await prisma.nodes.findMany({
+              where: {
+                label: {
+                  contains: query as string,
+                  mode: "insensitive",
+                },
+                board: {
+                  project_id,
+                },
+              },
+              select: {
+                id: true,
+                label: true,
+                parentId: true,
+                board: {
+                  select: {
+                    title: true,
+                  },
+                },
+              },
+            })
+          );
+          return;
+        }
+        if (itemType === "edges") {
+          rep.send(
+            await prisma.edges.findMany({
+              where: {
+                label: {
+                  contains: query as string,
+                  mode: "insensitive",
+                },
+                board: {
+                  project_id,
+                },
+              },
+              select: {
+                id: true,
+                label: true,
+                parentId: true,
+                board: {
+                  select: {
+                    title: true,
+                  },
+                },
+                source: {
+                  select: {
+                    id: true,
+                    label: true,
+                  },
+                },
+                target: {
+                  select: {
+                    id: true,
+                    label: true,
+                  },
+                },
+              },
+            })
+          );
+
+          return;
+        }
+        if (itemType === "screens") {
+          rep.send(
+            await prisma.screens.findMany({
+              where: {
+                title: {
+                  contains: query as string,
+                  mode: "insensitive",
+                },
+                folder: false,
+                project_id,
+              },
+              select: {
+                id: true,
+                title: true,
+                icon: true,
+              },
+            })
+          );
+          return;
+        }
+        if (itemType === "sections") {
+          rep.send(
+            await prisma.sections.findMany({
+              where: {
+                OR: [
+                  {
+                    title: {
+                      contains: query as string,
+                      mode: "insensitive",
+                    },
+                  },
+                  {
+                    cards: {
+                      some: {
+                        document: {
+                          title: {
+                            contains: query as string,
+                            mode: "insensitive",
+                          },
+                        },
+                      },
+                    },
+                  },
+                ],
+                screens: {
+                  project_id,
+                },
+              },
+              select: {
+                id: true,
+                title: true,
+                cards: true,
+                parentId: true,
+              },
+            })
+          );
+        }
+        if (itemType === "calendars") {
+          rep.send(
+            await prisma.calendars.findMany({
+              where: {
+                title: {
+                  contains: query as string,
+                  mode: "insensitive",
+                },
+                project_id,
+              },
+              select: {
+                id: true,
+                title: true,
+                icon: true,
+              },
+            })
+          );
+          return;
+        }
+        if (itemType === "timelines") {
+          rep.send(
+            await prisma.timelines.findMany({
+              where: {
+                title: {
+                  contains: query as string,
+                  mode: "insensitive",
+                },
+                project_id,
+              },
+              select: {
+                id: true,
+                title: true,
+                icon: true,
+              },
+            })
+          );
+          return;
+        }
+        if (itemType === "events") {
+          rep.send(
+            await prisma.events.findMany({
+              where: {
+                title: {
+                  contains: query as string,
+                  mode: "insensitive",
+                },
+
+                calendar: {
+                  project_id,
+                },
+              },
+              select: {
+                id: true,
+                title: true,
+                calendarsId: true,
+              },
+            })
+          );
+          return;
+        }
+      }
+
       rep.send({});
+      return;
     }
   );
 
