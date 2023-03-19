@@ -1,17 +1,9 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-
-import sharp from "sharp";
 import { S3, PutObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
 
-const s3Client = new S3({
-  forcePathStyle: false, // Configures to use subdomain/virtual calling format.
-  endpoint: process.env.DO_SPACES_ENDPOINT,
-  region: "us-east-1",
-  credentials: {
-    accessKeyId: process.env.DO_SPACES_KEY as string,
-    secretAccessKey: process.env.DO_SPACES_SECRET as string,
-  },
-});
+import sharp from "sharp";
+import { s3Client } from "../client";
+
 export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
     "/getallimages/:project_id",
@@ -29,10 +21,12 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
           })
         );
         rep.send(data?.Contents || []);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -52,10 +46,12 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
           })
         );
         rep.send(data?.Contents || []);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -130,10 +126,12 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
           }
         });
         rep.send(true);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
