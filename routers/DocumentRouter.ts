@@ -47,10 +47,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         rep.send(data);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -71,10 +73,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         rep.send(doc);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -96,10 +100,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         rep.send(documents);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -126,10 +132,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         });
 
         rep.send(newDocument);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -157,13 +165,16 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           });
           rep.send(newDocument);
+          return;
         }
         rep.code(500);
         rep.send(false);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -190,10 +201,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         });
         rep.code(200);
         rep.send(true);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -216,10 +229,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
           Promise.all(updates);
         });
         rep.send(true);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -239,10 +254,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         rep.send(true);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -265,10 +282,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           });
         rep.send(true);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );

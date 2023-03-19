@@ -42,10 +42,12 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         rep.send(data);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -81,10 +83,12 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         rep.send(singleProject);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -100,10 +104,12 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           });
           rep.send(newProject);
+          return;
         } catch (error) {
           rep.code(500);
           console.log(error);
           rep.send(false);
+          return;
         }
       }
     }
@@ -121,10 +127,12 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           data,
         });
         rep.send(updatedProject);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -139,11 +147,13 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             ownerId: req.auth_id,
           },
         });
-        return true;
+        rep.send(true);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -163,11 +173,13 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           const newSwatch = await prisma.swatches.create({
             data,
           });
-          return newSwatch;
+          rep.send(newSwatch);
+          return;
         } catch (error) {
           rep.code(500);
           console.log(error);
           rep.send(false);
+          return;
         }
       }
     }
@@ -187,11 +199,13 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             },
             data,
           });
-          return true;
+          rep.send(true);
+          return;
         } catch (error) {
           rep.code(500);
           console.log(error);
           rep.send(false);
+          return;
         }
       }
     }
@@ -210,11 +224,13 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        return true;
+        rep.send(true);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
