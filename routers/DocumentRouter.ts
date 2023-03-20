@@ -128,7 +128,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
-        const { tags, ...rest } = data;
+        const { tags, alter_names, ...rest } = data;
         const newDocument = await prisma.documents.create({
           data: {
             tags: {
@@ -202,6 +202,11 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
             ...data,
             tags: {
               connect: data?.tags?.map((tag: { id: string }) => ({
+                id: tag.id,
+              })),
+            },
+            alter_names: {
+              connect: data?.alter_names?.map((tag: { id: string }) => ({
                 id: tag.id,
               })),
             },
