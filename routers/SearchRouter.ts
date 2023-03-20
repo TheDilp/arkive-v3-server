@@ -512,40 +512,42 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           take?: number;
         };
         if (data.type === "documents") {
-          const items = await prisma.documents.findMany({
-            take: data?.take,
-            where: {
-              project_id: data.project_id,
-              folder: false,
-              template: false,
-              OR: [
-                {
-                  title: {
-                    contains: data.query,
-                    mode: "insensitive",
-                  },
-                },
-                {
-                  alter_names: {
-                    some: {
-                      title: {
-                        contains: data.query,
-                        mode: "insensitive",
-                      },
-                    },
-                  },
-                },
-              ],
-            },
-            select: {
-              id: true,
-              title: true,
-              alter_names: {
-                select: {
-                  title: true,
+          const searches = [
+            prisma.documents.findMany({
+              take: data?.take,
+              where: {
+                project_id: data.project_id,
+                folder: false,
+                template: false,
+                title: {
+                  contains: data.query,
+                  mode: "insensitive",
                 },
               },
-            },
+              select: {
+                id: true,
+                title: true,
+                alter_names: {
+                  select: {
+                    title: true,
+                  },
+                },
+              },
+            }),
+            prisma.alter_names.findMany({
+              take: data?.take,
+              where: {
+                project_id: data.project_id,
+                title: {
+                  contains: data.query,
+                  mode: "insensitive",
+                },
+              },
+            }),
+          ];
+          const items = await prisma.$transaction(async () => {
+            const results = await Promise.all(searches);
+            return results;
           });
           rep.send(items);
         }
