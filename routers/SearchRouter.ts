@@ -518,14 +518,33 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
               project_id: data.project_id,
               folder: false,
               template: false,
-              title: {
-                contains: data.query,
-                mode: "insensitive",
-              },
+              OR: [
+                {
+                  title: {
+                    contains: data.query,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  alter_names: {
+                    some: {
+                      title: {
+                        contains: data.query,
+                        mode: "insensitive",
+                      },
+                    },
+                  },
+                },
+              ],
             },
             select: {
               id: true,
               title: true,
+              alter_names: {
+                select: {
+                  title: true,
+                },
+              },
             },
           });
           rep.send(items);
