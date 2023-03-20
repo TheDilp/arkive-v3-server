@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production prisma generate && node ./dist/index.js",
+    "start": "NODE_ENV=production prisma generate && node --max-old-space-size=200 ./dist/index.js",
     "build": "tsc",
     "runlocal": "dotenv -e .env.dev -- nodemon index.ts",
     "migrate:dev": "dotenv -e .env.dev -- pnpm prisma migrate dev --name update dev db",
