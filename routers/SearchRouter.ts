@@ -31,10 +31,24 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         const searches = [
           prisma.documents.findMany({
             where: {
-              title: {
-                contains: query as string,
-                mode: "insensitive",
-              },
+              OR: [
+                {
+                  title: {
+                    contains: query as string,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  alter_names: {
+                    some: {
+                      title: {
+                        contains: query as string,
+                        mode: "insensitive",
+                      },
+                    },
+                  },
+                },
+              ],
               project_id,
               folder: false,
             },
