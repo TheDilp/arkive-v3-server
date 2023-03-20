@@ -235,16 +235,18 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
     "/createaltername",
     async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
-        const { id, title, project_id } = JSON.parse(req.body) as {
+        const { id, title, project_id, documentId } = JSON.parse(req.body) as {
           id: string;
           title: string;
           project_id: string;
+          documentId: string;
         };
         await prisma.alter_names.create({
           data: {
             id,
             title,
             project_id,
+            documentId,
           },
         });
         rep.send(true);
