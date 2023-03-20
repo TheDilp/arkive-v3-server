@@ -21,10 +21,12 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         rep.send(tags);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -48,10 +50,12 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         rep.send(true);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -74,10 +78,12 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         rep.send(true);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -95,10 +101,12 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         rep.send(true);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
       }
     }
   );
@@ -214,10 +222,120 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         rep.send(tags);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
         rep.send(false);
+        return;
+      }
+    }
+  );
+  server.post(
+    "/createaltername",
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      try {
+        const { id, title, project_id } = JSON.parse(req.body) as {
+          id: string;
+          title: string;
+          project_id: string;
+        };
+        await prisma.alter_names.create({
+          data: {
+            id,
+            title,
+            project_id,
+          },
+        });
+        rep.send(true);
+        return;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
+      }
+    }
+  );
+  server.post(
+    "/updatealtername",
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      const { id, title } = JSON.parse(req.body) as {
+        id: string;
+        title: string;
+      };
+      try {
+        await prisma.alter_names.update({
+          where: {
+            id,
+          },
+          data: {
+            title,
+          },
+        });
+        rep.send(true);
+        return;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
+      }
+    }
+  );
+  server.delete(
+    "/deletealternames",
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      try {
+        const { ids } = JSON.parse(req.body) as { ids: string[] };
+
+        await prisma.alter_names.deleteMany({
+          where: {
+            id: {
+              in: ids,
+            },
+          },
+        });
+        rep.send(true);
+        return;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
+      }
+    }
+  );
+  server.get(
+    "/allalternames/settings/:project_id",
+    async (
+      req: FastifyRequest<{ Params: { project_id: string }; Body: string }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const { project_id } = req.params;
+        const alterNames = await prisma.alter_names.findMany({
+          where: {
+            project_id,
+          },
+          include: {
+            document: {
+              select: {
+                id: true,
+                title: true,
+                icon: true,
+                folder: true,
+              },
+            },
+          },
+        });
+        rep.send(alterNames);
+        return;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
       }
     }
   );
