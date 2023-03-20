@@ -50,21 +50,21 @@ model projects {
   tags          tags[]
   swatches      swatches[]
   timelines     timelines[]
+  alter_name    alter_names[]
 }
 
 model documents {
-  id          String   @id @default(uuid()) @db.Uuid
-  title       String   @default("New Document")
-  content     Json?    @db.JsonB
-  icon        String?  @default("ph:files-thin")
-  expanded    Boolean  @default(false)
-  folder      Boolean  @default(false)
-  isPublic    Boolean  @default(false)
-  sort        Int      @default(0)
-  template    Boolean  @default(false)
-  properties  Json?
-  alter_names String[] @default([])
-  image       String?
+  id         String  @id @default(uuid()) @db.Uuid
+  title      String  @default("New Document")
+  content    Json?   @db.JsonB
+  icon       String? @default("ph:files-thin")
+  expanded   Boolean @default(false)
+  folder     Boolean @default(false)
+  isPublic   Boolean @default(false)
+  sort       Int     @default(0)
+  template   Boolean @default(false)
+  properties Json?
+  image      String?
 
   // Relations
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
@@ -75,10 +75,21 @@ model documents {
   parent   documents?  @relation("parentChildDocuments", fields: [parentId], references: [id], onDelete: Cascade)
   children documents[] @relation("parentChildDocuments")
 
-  tags tags[]
+  tags        tags[]
+  alter_names alter_names[]
 
   cards  cards[]
   events events[]
+}
+
+model alter_names {
+  id    String @id @default(uuid()) @db.Uuid
+  title String @default("New Document")
+
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  project_id String   @db.Uuid
+
+  document documents[]
 }
 
 model maps {
