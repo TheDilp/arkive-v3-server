@@ -543,6 +543,11 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
                   mode: "insensitive",
                 },
               },
+              select: {
+                id: true,
+                title: true,
+                parentId: true,
+              },
             }),
           ];
           const items = await prisma.$transaction(async () => {
