@@ -89,7 +89,7 @@ model alter_names {
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
-  document documents @relation(fields: [parentId], references: [id])
+  document documents @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId String    @db.Uuid
 
   @@unique([title, parentId])
