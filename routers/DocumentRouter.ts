@@ -63,8 +63,17 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         const data = JSON.parse(req.body) as { id: string };
         const doc = await prisma.documents.findUnique({
           where: { id: data.id },
-          include: {
+          select: {
+            id: true,
+            title: true,
+            content: true,
             tags: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+            alter_names: {
               select: {
                 id: true,
                 title: true,
