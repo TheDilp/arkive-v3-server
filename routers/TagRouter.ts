@@ -289,9 +289,10 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
     "/deletealtername",
     async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
+        const id = JSON.parse(req.body);
         await prisma.alter_names.delete({
           where: {
-            id: req.body,
+            id,
           },
         });
         rep.send(true);
