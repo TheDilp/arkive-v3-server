@@ -129,8 +129,7 @@ server.decorateRequest("user_id", null);
 server.register(fileUpload);
 
 server.register(cors, {
-  origin:
-    process.env.NODE_ENV === "production" ? "https://*.thearkive.app" : "*",
+  origin: process.env.NODE_ENV === "production" ? "https://thearkive.app" : "*",
 });
 server.register(otherRouter);
 
