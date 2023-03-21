@@ -96,12 +96,13 @@ model alter_names {
 }
 
 model maps {
-  id       String  @id @default(uuid()) @db.Uuid
-  title    String  @default("New Map")
-  folder   Boolean @default(false)
-  isPublic Boolean @default(false)
-  expanded Boolean @default(false)
-  sort     Int     @default(0)
+  id          String  @id @default(uuid()) @db.Uuid
+  title       String  @default("New Map")
+  folder      Boolean @default(false)
+  isPublic    Boolean @default(false)
+  expanded    Boolean @default(false)
+  sort        Int     @default(0)
+  clusterPins Boolean @default(false)
 
   image String?
   icon  String? @default("ph:map-trifold")
