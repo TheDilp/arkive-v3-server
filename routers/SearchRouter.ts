@@ -577,7 +577,6 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           });
           rep.send(items.flat());
         }
-
         if (data.type === "maps") {
           const items = await prisma.maps.findMany({
             take: data?.take,
@@ -642,7 +641,6 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           });
           rep.send(items);
         }
-
         if (data.type === "nodes") {
           rep.send(
             await prisma.nodes.findMany({
@@ -832,7 +830,6 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           );
           return;
         }
-
         if (data.type === "words") {
           const items = await prisma.words.findMany({
             take: data?.take,

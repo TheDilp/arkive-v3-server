@@ -123,6 +123,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
     async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as {
+          id: string;
           title: string;
           section: string;
           parentId: string;
@@ -130,6 +131,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         };
         const newSection = await prisma.sections.create({
           data: {
+            id: data.id,
             title: data.title,
             parentId: data.parentId,
             sort: data.sort,
