@@ -575,7 +575,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             const results = await Promise.all(searches);
             return results;
           });
-          rep.send(items);
+          rep.send(items.flat());
         }
 
         if (data.type === "maps") {
