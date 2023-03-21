@@ -20,4 +20,4 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm migrate:prod
+    - run: npm run migrate:prod
