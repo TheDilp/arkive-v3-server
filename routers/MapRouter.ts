@@ -16,6 +16,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
             id: true,
             title: true,
             project_id: true,
+            clusterPins: true,
             icon: true,
             image: true,
             sort: true,
