@@ -131,6 +131,9 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         const { tags, alter_names, ...rest } = data;
         const newDocument = await prisma.documents.create({
           data: {
+            alter_names: {
+              create: alter_names,
+            },
             tags: {
               connect: data?.tags?.map((tag: { id: string }) => ({
                 id: tag.id,
