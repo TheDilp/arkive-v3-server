@@ -141,6 +141,10 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
             },
             ...rest,
           },
+          include: {
+            alter_names: true,
+            tags: true,
+          },
         });
 
         rep.send(newDocument);
