@@ -51,6 +51,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
               ],
               project_id,
               folder: false,
+              template: false,
             },
             take: 5,
             select: {
@@ -329,7 +330,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         };
         const searches = [
           prisma.documents.findMany({
-            ...whereTagsClause,
+            where: { ...whereTagsClause, template: false, folder: false },
             take: 5,
             select: {
               id: true,
@@ -339,7 +340,8 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           }),
           prisma.maps.findMany({
-            ...whereTagsClause,
+            where: { ...whereTagsClause, folder: false },
+
             take: 5,
             select: {
               id: true,
@@ -364,7 +366,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           }),
           prisma.boards.findMany({
-            ...whereTagsClause,
+            where: { ...whereTagsClause, folder: false },
             take: 5,
             select: {
               id: true,
@@ -416,7 +418,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           }),
           prisma.screens.findMany({
-            ...whereTagsClause,
+            where: { ...whereTagsClause, folder: false },
             take: 5,
             select: {
               id: true,
@@ -447,7 +449,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           }),
           prisma.dictionaries.findMany({
-            ...whereTagsClause,
+            where: { ...whereTagsClause, folder: false },
             take: 5,
             select: {
               id: true,
@@ -455,7 +457,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           }),
           prisma.calendars.findMany({
-            ...whereTagsClause,
+            where: { ...whereTagsClause, folder: false },
             take: 5,
             select: {
               id: true,
