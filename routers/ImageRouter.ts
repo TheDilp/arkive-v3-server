@@ -13,7 +13,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
-        const key = `assets/images/${req.params.project_id}/`;
+        const key = `assets/${req.params.project_id}/images`;
         const data = await s3Client.send(
           new ListObjectsCommand({
             Bucket: process.env.DO_SPACES_NAME,
@@ -38,7 +38,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
-        const key = `assets/maps/${req.params.project_id}/`;
+        const key = `assets/${req.params.project_id}/maps`;
         const data = await s3Client.send(
           new ListObjectsCommand({
             Bucket: process.env.DO_SPACES_NAME,
@@ -60,26 +60,23 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
   // server.get(
   //   "/getallsettingsimages/:project_id",
   //   async (req: FastifyRequest<{ Params: { project_id: string } }>) => {
-  //     const imagesDir = `./assets/images/${req.params.project_id}`;
-  //     // check if folder already exists
-  //     if (!existsSync(imagesDir)) {
-  //       mkdirSync(imagesDir, {
-  //         recursive: true,
-  //       }); // creating folder
-  //     }
-  //     const mapsDir = `./assets/maps/${req.params.project_id}`;
-  //     // check if folder already exists
-  //     if (!existsSync(mapsDir)) {
-  //       mkdirSync(mapsDir, {
-  //         recursive: true,
-  //       }); // creating folder
-  //     }
-  //     const images = readdirSync(`./assets/images/${req.params.project_id}`);
-  //     const maps = readdirSync(`./assets/maps/${req.params.project_id}`);
-  //     return [
-  //       ...images.map((image) => ({ image, type: "image" })),
-  //       ...maps.map((map) => ({ image: map, type: "map" })),
-  //     ];
+  //     const imagesKey = `assets/${req.params.project_id}`;
+  //     const mapsKey = `assets/${req.params.project_id}/`;
+
+  //     const images = await s3Client.send(
+  //       new ListObjectsCommand({
+  //         Bucket: process.env.DO_SPACES_NAME,
+  //         Delimiter: "/",
+  //         Prefix: imagesKey,
+  //       })
+  //     );
+  //     const maps = await s3Client.send(
+  //       new ListObjectsCommand({
+  //         Bucket: process.env.DO_SPACES_NAME,
+  //         Delimiter: "/",
+  //         Prefix: mapsKey,
+  //       })
+  //     );
   //   }
   // );
   server.post(
@@ -96,7 +93,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
         const { type, project_id } = req.params;
 
         Object.entries(files).forEach(async ([key, file]) => {
-          const filePath = `assets/${type}/${project_id}/${key}`;
+          const filePath = `assets/${project_id}/${type}/${key}`;
           try {
             const webpImage = await sharp(file.data)
               .toFormat("webp")
@@ -116,13 +113,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
             await s3Client.send(new PutObjectCommand(params));
             return true;
           } catch (error) {
-            console.log(
-              "================ BEGIN IMAGE ROUTER ERROR ================"
-            );
             console.log(error);
-            console.log(
-              "================ END IMAGE ROUTER ERROR ================"
-            );
             return false;
           }
         });
