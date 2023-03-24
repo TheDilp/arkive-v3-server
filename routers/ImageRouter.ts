@@ -64,16 +64,25 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
-        const key = `assets/${req.params.project_id}/`;
+        const imagesKey = `assets/${req.params.project_id}/images`;
+        const mapsKey = `assets/${req.params.project_id}/maps`;
 
-        const data = await s3Client.send(
+        const images = await s3Client.send(
           new ListObjectsCommand({
             Bucket: process.env.DO_SPACES_NAME,
             Delimiter: "/",
-            Prefix: key,
+            Prefix: imagesKey,
           })
         );
-        rep.send(data?.Contents || []);
+        const maps = await s3Client.send(
+          new ListObjectsCommand({
+            Bucket: process.env.DO_SPACES_NAME,
+            Delimiter: "/",
+            Prefix: mapsKey,
+          })
+        );
+        const data = [...(images?.Contents || []), ...(maps?.Contents || [])];
+        rep.send(data || []);
         return;
       } catch (error) {
         rep.code(500);
