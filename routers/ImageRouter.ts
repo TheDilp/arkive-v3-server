@@ -64,8 +64,8 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
-        const imagesKey = `assets/${req.params.project_id}/images`;
-        const mapsKey = `assets/${req.params.project_id}/maps`;
+        const imagesKey = `assets/${req.params.project_id}/images/`;
+        const mapsKey = `assets/${req.params.project_id}/maps/`;
 
         const images = await s3Client.send(
           new ListObjectsCommand({
