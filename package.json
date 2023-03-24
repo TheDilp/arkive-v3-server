@@ -6,7 +6,8 @@
   "scripts": {
     "start": "prisma generate && node --max-old-space-size=200 ./dist/index.js",
     "build": "tsc",
-    "runlocal": "dotenv -e .env.dev -- nodemon index.ts",
+    "runlocal:dev": "dotenv -e .env.dev -- nodemon index.ts",
+    "runlocal:prod": "dotenv -e .env.prod -- nodemon index.ts",
     "migrate:dev": "dotenv -e .env.dev -- pnpm prisma migrate dev --name update dev db",
     "migrate:prod": "dotenv -e .env.prod -- pnpm prisma migrate deploy"
   },
