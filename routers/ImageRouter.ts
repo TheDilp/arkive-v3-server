@@ -13,7 +13,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
-        const key = `assets/${req.params.project_id}/images`;
+        const key = `assets/${req.params.project_id}/images/`;
         const data = await s3Client.send(
           new ListObjectsCommand({
             Bucket: process.env.DO_SPACES_NAME,
@@ -38,7 +38,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
-        const key = `assets/${req.params.project_id}/maps`;
+        const key = `assets/${req.params.project_id}/maps/`;
         const data = await s3Client.send(
           new ListObjectsCommand({
             Bucket: process.env.DO_SPACES_NAME,
