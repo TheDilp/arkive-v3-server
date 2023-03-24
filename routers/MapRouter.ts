@@ -153,6 +153,35 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
+    "/updatemap",
+    async (
+      req: FastifyRequest<{
+        Body: string;
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = removeNull(JSON.parse(req.body)) as any;
+        await prisma.maps.update({
+          data: {
+            ...data,
+            tags: {
+              connect: data?.tags?.map((tag: { id: string }) => ({
+                id: tag.id,
+              })),
+            },
+          },
+          where: { id: data.id },
+        });
+        rep.send(true);
+      } catch (error: any) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
+    }
+  );
+  server.post(
     "/updatemappin",
     async (
       req: FastifyRequest<{
@@ -196,28 +225,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
-  server.post(
-    "/updatemap",
-    async (
-      req: FastifyRequest<{
-        Body: string;
-      }>,
-      rep: FastifyReply
-    ) => {
-      try {
-        const data = removeNull(JSON.parse(req.body)) as any;
-        await prisma.maps.update({
-          data,
-          where: { id: data.id },
-        });
-        rep.send(true);
-      } catch (error: any) {
-        rep.code(500);
-        console.log(error);
-        rep.send(false);
-      }
-    }
-  );
+
   server.post(
     "/sortmaps",
     async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
