@@ -57,28 +57,32 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
 
-  // server.get(
-  //   "/getallsettingsimages/:project_id",
-  //   async (req: FastifyRequest<{ Params: { project_id: string } }>) => {
-  //     const imagesKey = `assets/${req.params.project_id}`;
-  //     const mapsKey = `assets/${req.params.project_id}/`;
+  server.get(
+    "/getallsettingsimages/:project_id",
+    async (
+      req: FastifyRequest<{ Params: { project_id: string } }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const key = `assets/${req.params.project_id}/`;
 
-  //     const images = await s3Client.send(
-  //       new ListObjectsCommand({
-  //         Bucket: process.env.DO_SPACES_NAME,
-  //         Delimiter: "/",
-  //         Prefix: imagesKey,
-  //       })
-  //     );
-  //     const maps = await s3Client.send(
-  //       new ListObjectsCommand({
-  //         Bucket: process.env.DO_SPACES_NAME,
-  //         Delimiter: "/",
-  //         Prefix: mapsKey,
-  //       })
-  //     );
-  //   }
-  // );
+        const data = await s3Client.send(
+          new ListObjectsCommand({
+            Bucket: process.env.DO_SPACES_NAME,
+            Delimiter: "/",
+            Prefix: key,
+          })
+        );
+        rep.send(data?.Contents || []);
+        return;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
+      }
+    }
+  );
   server.post(
     "/uploadimage/:type/:project_id",
     async (
