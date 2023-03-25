@@ -210,43 +210,42 @@ model edges {
   id    String  @id @default(uuid()) @db.Uuid
   label String?
 
-  curveStyle  String @default("straight")
-  lineStyle   String @default("solid")
-  lineColor   String @default("#595959")
-  lineCap     String @default("butt")
-  lineFill    String @default("solid")
-  lineOpacity Int    @default(1)
-  width       Int    @default(1)
+  curveStyle  String?
+  lineStyle   String?
+  lineColor   String?
+  lineFill    String?
+  lineOpacity Int?
+  width       Int?
 
-  controlPointDistances Int   @default(-100)
-  controlPointWeights   Float @default(0.5)
+  controlPointDistances Int?
+  controlPointWeights   Float?
 
-  taxiDirection String @default("auto")
-  taxiTurn      Int    @default(50)
+  taxiDirection String?
+  taxiTurn      Int?
 
-  arrowScale Int @default(1)
+  arrowScale Int?
 
-  targetArrowShape String @default("triangle")
-  targetArrowFill  String @default("filled")
-  targetArrowColor String @default("#595959")
+  targetArrowShape String?
+  targetArrowFill  String?
+  targetArrowColor String?
 
-  sourceArrowShape String @default("none")
-  sourceArrowFill  String @default("filled")
-  sourceArrowColor String @default("#595959")
+  sourceArrowShape String?
+  sourceArrowFill  String?
+  sourceArrowColor String?
 
-  midTargetArrowShape String @default("none")
-  midTargetArrowFill  String @default("filled")
-  midTargetArrowColor String @default("#595959")
+  midTargetArrowShape String?
+  midTargetArrowFill  String?
+  midTargetArrowColor String?
 
-  midSourceArrowShape String @default("none")
-  midSourceArrowFill  String @default("filled")
-  midSourceArrowColor String @default("#595959")
+  midSourceArrowShape String?
+  midSourceArrowFill  String?
+  midSourceArrowColor String?
 
-  fontSize   Int    @default(16)
-  fontColor  String @default("#ffffff")
-  fontFamily String @default("Lato")
+  fontSize   Int?
+  fontColor  String?
+  fontFamily String?
 
-  zIndex Int @default(1)
+  zIndex Int?
 
   board     boards @relation(fields: [parentId], references: [id], onDelete: Cascade)
   source    nodes  @relation("edges_source", fields: [source_id], references: [id], onDelete: Cascade)
