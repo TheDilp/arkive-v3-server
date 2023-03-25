@@ -1,11 +1,14 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { S3, PutObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  ListObjectsCommand,
+} from "@aws-sdk/client-s3";
 
 import sharp from "sharp";
 import { s3Client } from "../client";
 
 export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
-  console.log("IMAGE ROUTER");
   server.get(
     "/getallimages/:project_id",
     async (
@@ -133,6 +136,31 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
         });
         rep.send(true);
         return;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
+      }
+    }
+  );
+
+  server.delete(
+    "/deleteimage",
+    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      try {
+        const data = JSON.parse(req.body) as {
+          image: string;
+          project_id: string;
+          type: "images" | "maps";
+        };
+
+        await s3Client.send(
+          new DeleteObjectCommand({
+            Bucket: process.env.DO_SPACES_NAME,
+            Key: `assets/${data.project_id}/${data.type}/${data.image}`,
+          })
+        );
       } catch (error) {
         rep.code(500);
         console.log(error);

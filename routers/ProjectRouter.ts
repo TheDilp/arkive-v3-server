@@ -92,7 +92,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
-
   server.post(
     "/createproject",
     async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
@@ -127,6 +126,76 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           data,
         });
         rep.send(updatedProject);
+        return;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
+      }
+    }
+  );
+  server.get(
+    "/exportproject/:id",
+    async (
+      req: FastifyRequest<{ Params: { id: string } }>,
+      rep: FastifyReply
+    ) => {
+      // export the project and all of its related items
+      try {
+        const project = await prisma.projects.findUnique({
+          where: {
+            id: req.params.id,
+          },
+          include: {
+            documents: {
+              include: {
+                alter_names: true,
+              },
+            },
+            maps: {
+              include: {
+                map_layers: true,
+                map_pins: true,
+              },
+            },
+            boards: {
+              include: {
+                nodes: true,
+                edges: true,
+              },
+            },
+            calendars: {
+              include: {
+                months: true,
+                events: true,
+                eras: true,
+              },
+            },
+            screens: {
+              include: {
+                sections: {
+                  include: {
+                    cards: true,
+                  },
+                },
+              },
+            },
+            timelines: true,
+            dictionaries: {
+              include: {
+                words: true,
+              },
+            },
+            random_tables: {
+              include: {
+                random_table_options: true,
+              },
+            },
+            swatches: true,
+          },
+        });
+        rep.send(project);
         return;
       } catch (error) {
         rep.code(500);
