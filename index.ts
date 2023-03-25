@@ -132,7 +132,7 @@ server.register(fileUpload);
 server.register(cors, {
   origin: process.env.NODE_ENV === "production" ? "https://thearkive.app" : "*",
 });
-server.register(compress);
+// server.register(compress);
 server.register(otherRouter);
 
 server.register((instance, _, done) => {
