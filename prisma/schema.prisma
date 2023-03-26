@@ -177,24 +177,24 @@ model nodes {
   id    String  @id @default(uuid()) @db.Uuid
   label String?
 
-  type   String @default("rectangle")
-  width  Int    @default(50)
-  height Int    @default(50)
-  x      Float  @default(0)
-  y      Float  @default(0)
+  type   String?
+  width  Int?
+  height Int?
+  x      Float?
+  y      Float?
 
-  fontSize   Int    @default(16)
-  fontColor  String @default("#ffffff")
-  fontFamily String @default("Lato")
-  textVAlign String @default("center")
-  textHAlign String @default("center")
+  fontSize   Int?
+  fontColor  String?
+  fontFamily String?
+  textVAlign String?
+  textHAlign String?
 
-  backgroundColor   String @default("#595959")
-  backgroundOpacity Float  @default(1)
+  backgroundColor   String?
+  backgroundOpacity Float?
 
-  locked   Boolean @default(false)
-  template Boolean @default(false)
-  zIndex   Int     @default(1)
+  locked   Boolean?
+  template Boolean?
+  zIndex   Int?
 
   board        boards     @relation(fields: [parentId], references: [id], onDelete: Cascade)
   document     documents? @relation(fields: [doc_id], references: [id])

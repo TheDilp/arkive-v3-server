@@ -442,14 +442,14 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
-        const newDocument = await prisma.edges.update({
+        await prisma.edges.update({
           where: {
             id: data.id,
           },
           data: removeNull(JSON.parse(req.body)) as any,
         });
 
-        rep.send(newDocument);
+        rep.send(true);
       } catch (error) {
         rep.code(500);
         console.log(error);
