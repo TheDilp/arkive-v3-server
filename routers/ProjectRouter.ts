@@ -1,6 +1,7 @@
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
-import prisma from "../client";
+import prisma, { s3Client } from "../client";
 
 export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
@@ -210,6 +211,13 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
     async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
         const data = JSON.parse(req.body) as { id: string };
+
+        await s3Client.send(
+          new DeleteObjectCommand({
+            Bucket: process.env.DO_SPACES_NAME,
+            Key: `assets/${data.id}/`,
+          })
+        );
         await prisma.projects.delete({
           where: {
             id: data.id,
@@ -279,7 +287,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
-
   server.delete(
     "/deleteswatch",
     async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
