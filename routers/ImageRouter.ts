@@ -84,7 +84,6 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
             Prefix: mapsKey,
           })
         );
-        console.log(images?.Contents, maps?.Contents);
         const data = [...(images?.Contents || []), ...(maps?.Contents || [])];
         rep.send(data || []);
         return;
