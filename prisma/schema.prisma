@@ -403,8 +403,8 @@ model events {
 
   document documents? @relation(fields: [documentsId], references: [id])
 
-  backgroundColor String @default("#075985")
-  textColor       String @default("#ffffff")
+  backgroundColor String?
+  textColor       String?
 
   calendar calendars? @relation(fields: [calendarsId], references: [id], onDelete: Cascade)
   year     Int

@@ -161,6 +161,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
             Key: `assets/${data.project_id}/${data.type}/${data.image}`,
           })
         );
+        rep.send(true);
       } catch (error) {
         rep.code(500);
         console.log(error);
