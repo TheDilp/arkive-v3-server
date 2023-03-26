@@ -162,6 +162,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
           })
         );
         rep.send(true);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
