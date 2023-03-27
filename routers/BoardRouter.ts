@@ -67,6 +67,7 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
               include: {
                 document: {
                   select: {
+                    id: true,
                     image: true,
                   },
                 },
@@ -118,7 +119,6 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-
         rep.send(newBoard);
       } catch (error) {
         rep.code(500);
@@ -137,14 +137,14 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
-        const newDocument = await prisma.boards.update({
+        await prisma.boards.update({
           data,
           where: {
             id: data.id,
           },
         });
 
-        rep.send(newDocument);
+        rep.send(true);
       } catch (error) {
         rep.code(500);
         console.log(error);
@@ -387,14 +387,14 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
-        const updatedNode = await prisma.nodes.update({
+        await prisma.nodes.update({
           where: {
             id: data.id,
           },
           data,
         });
 
-        rep.send(updatedNode);
+        rep.send(true);
       } catch (error) {
         rep.code(500);
         console.log(error);
@@ -413,7 +413,7 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = removeNull(JSON.parse(req.body)) as any;
-        const newEdge = await prisma.edges.create({
+        await prisma.edges.create({
           data: {
             ...data,
             tags: {
@@ -424,7 +424,7 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
 
-        rep.send(newEdge);
+        rep.send(true);
       } catch (error) {
         rep.code(500);
         console.log(error);
