@@ -68,6 +68,7 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
                 document: {
                   select: {
                     id: true,
+                    title: true,
                     image: true,
                   },
                 },
