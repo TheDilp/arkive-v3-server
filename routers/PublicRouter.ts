@@ -198,9 +198,9 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
                 headers: {
                   "Content-type": "application/json",
                 },
-                data: JSON.stringify({
+                data: {
                   embeds: [{ title: doc.title, description: messageText }],
-                }),
+                },
               })
               .catch((err: string) => console.log(err));
           } else rep.send(false);
