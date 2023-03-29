@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../client";
+import { extractDocumentText } from "../utils/transform";
 
 export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
   server.post(
@@ -159,6 +160,68 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         rep.send(user);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
+    }
+  );
+
+  server.post(
+    "/sendpublicitem",
+    async (req: FastifyRequest<{ Body: string }>, rep) => {
+      try {
+        const data = JSON.parse(req.body) as {
+          item_id: string;
+          item_type: "documents" | "maps" | "boards";
+          project_id: string;
+        };
+        let item = null;
+        if (data.item_type === "documents") {
+          const doc = await prisma.documents.findUnique({
+            where: { id: data.item_id },
+            select: {
+              title: true,
+              content: true,
+            },
+          });
+          if (doc) {
+            const messageText = extractDocumentText(doc.content);
+            if (!messageText) return rep.send(false);
+            await fetch(
+              "https://discord.com/api/webhooks/1090605555330076684/95dfzGJlM8JGSuax7PFm4aghknkKftpdQfq7ohqm-GKiMPZ2r8uJ3P_Hpw_tiokB9DNk",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  embeds: [{ title: doc.title, description: messageText }],
+                }),
+                headers: {
+                  "Content-type": "application/json",
+                },
+              }
+            ).catch((err) => console.log(err));
+          }
+        } else if (data.item_type === "maps") {
+          item = await prisma.maps.findUnique({
+            where: { id: data.item_id },
+            select: {
+              title: true,
+            },
+          });
+        } else if (data.item_type === "boards") {
+          item = await prisma.boards.findUnique({
+            where: { id: data.item_id },
+            select: {
+              title: true,
+            },
+          });
+        }
+
+        if (item) {
+          rep.send(item);
+        } else rep.send(false);
+        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
