@@ -263,7 +263,13 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                   "Content-type": "application/json",
                 },
                 data: {
-                  embeds: [{ title: doc.title, description: messageText }],
+                  embeds: [
+                    {
+                      title: doc.title,
+                      url: `https://thearkive.app/view/documents/${data.id}`,
+                      description: messageText,
+                    },
+                  ],
                 },
               })
               .catch((err: string) => console.log(err));
