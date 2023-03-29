@@ -273,6 +273,8 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 },
               })
               .catch((err: string) => console.log(err));
+            rep.send(true);
+            return;
           } else rep.send(false);
         } else if (data.item_type === "maps") {
           item = await prisma.maps.findUnique({
