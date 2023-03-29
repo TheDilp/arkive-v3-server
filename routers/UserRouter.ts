@@ -15,6 +15,13 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
             auth_id: req.params.user_id,
           },
           include: {
+            webhooks: {
+              select: {
+                id: true,
+                title: true,
+                url: true,
+              },
+            },
             members: {
               select: {
                 project_id: true,
