@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../client";
 import { extractDocumentText } from "../utils/transform";
-
+import fetch from "node-fetch";
 export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
   server.post(
     "/getpublicdocument",
@@ -173,20 +173,21 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
     async (req: FastifyRequest<{ Body: string }>, rep) => {
       try {
         const data = JSON.parse(req.body) as {
-          item_id: string;
+          id: string;
           item_type: "documents" | "maps" | "boards";
           project_id: string;
         };
         let item = null;
         if (data.item_type === "documents") {
           const doc = await prisma.documents.findUnique({
-            where: { id: data.item_id },
+            where: { id: data.id },
             select: {
+              isPublic: true,
               title: true,
               content: true,
             },
           });
-          if (doc) {
+          if (doc && doc.isPublic) {
             const messageText = extractDocumentText(doc.content);
             if (!messageText) return rep.send(false);
             await fetch(
@@ -201,17 +202,17 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
                 },
               }
             ).catch((err) => console.log(err));
-          }
+          } else rep.send(false);
         } else if (data.item_type === "maps") {
           item = await prisma.maps.findUnique({
-            where: { id: data.item_id },
+            where: { id: data.id },
             select: {
               title: true,
             },
           });
         } else if (data.item_type === "boards") {
           item = await prisma.boards.findUnique({
-            where: { id: data.item_id },
+            where: { id: data.id },
             select: {
               title: true,
             },
