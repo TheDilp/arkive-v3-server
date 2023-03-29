@@ -24,14 +24,15 @@
     "fastify-plugin": "^4.5.0",
     "firebase-admin": "^11.5.0",
     "lodash.set": "^4.3.2",
-    "node-fetch": "^3.3.1",
     "sharp": "^0.31.3",
+    "tiny-json-http": "^7.5.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/lodash.set": "^4.3.7",
     "@types/node": "^18.11.16",
     "@types/sharp": "^0.31.1",
+    "@types/tiny-json-http": "^7.3.1",
     "dotenv": "^16.0.3",
     "dotenv-cli": "^7.0.0",
     "nodemon": "^2.0.20",

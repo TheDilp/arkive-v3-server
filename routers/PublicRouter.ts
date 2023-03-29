@@ -1,7 +1,8 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../client";
 import { extractDocumentText } from "../utils/transform";
-import fetch from "node-fetch";
+import tiny from "tiny-json-http";
+
 export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
   server.post(
     "/getpublicdocument",
@@ -190,18 +191,18 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
           if (doc && doc.isPublic) {
             const messageText = extractDocumentText(doc.content);
             if (!messageText) return rep.send(false);
-            await fetch(
-              "https://discord.com/api/webhooks/1090605555330076684/95dfzGJlM8JGSuax7PFm4aghknkKftpdQfq7ohqm-GKiMPZ2r8uJ3P_Hpw_tiokB9DNk",
-              {
-                method: "POST",
-                body: JSON.stringify({
-                  embeds: [{ title: doc.title, description: messageText }],
-                }),
+            await tiny
+              .post({
+                url: "https://discord.com/api/webhooks/1090605555330076684/95dfzGJlM8JGSuax7PFm4aghknkKftpdQfq7ohqm-GKiMPZ2r8uJ3P_Hpw_tiokB9DNk",
+
                 headers: {
                   "Content-type": "application/json",
                 },
-              }
-            ).catch((err) => console.log(err));
+                data: JSON.stringify({
+                  embeds: [{ title: doc.title, description: messageText }],
+                }),
+              })
+              .catch((err: string) => console.log(err));
           } else rep.send(false);
         } else if (data.item_type === "maps") {
           item = await prisma.maps.findUnique({
