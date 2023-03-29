@@ -113,6 +113,32 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+  server.post(
+    "/addwebhook",
+    async (req: FastifyRequest<{ Body: string }>, rep) => {
+      try {
+        const data = JSON.parse(req.body) as {
+          user_id: string;
+          title: string;
+          url: string;
+        };
+        const newWebhook = await prisma.webhooks.create({
+          data: {
+            title: data.title,
+            url: data.url,
+            user_id: data.user_id,
+          },
+        });
+        rep.send(newWebhook);
+        return;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
+      }
+    }
+  );
   server.delete(
     "/deleteuser",
     async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
