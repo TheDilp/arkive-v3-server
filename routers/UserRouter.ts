@@ -114,7 +114,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/addwebhook",
+    "/createwebhook",
     async (req: FastifyRequest<{ Body: string }>, rep) => {
       try {
         const data = JSON.parse(req.body) as {
