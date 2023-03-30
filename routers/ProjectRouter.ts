@@ -300,8 +300,8 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                   ],
                 },
               })
-              .catch((err: string) => {
-                console.log(err);
+              .catch(() => {
+                console.log(publicMap, data);
                 rep.code(500);
                 rep.send(false);
               });
