@@ -266,6 +266,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                       title: doc.title,
                       url: `https://thearkive.app/view/documents/${data.id}`,
                       description: messageText,
+                      thumbnail: {
+                        url: "https://api.iconify.design/ph/files-thin.svg?color=white",
+                      },
                     },
                   ],
                 },
@@ -296,6 +299,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                       title: publicMap.title,
                       url: `https://thearkive.app/view/maps/${data.id}`,
                       image: { url: publicMap?.image?.replaceAll(" ", "%20") },
+                      thumbnail: {
+                        url: "https://api.iconify.design/ph/map-trifold.svg?color=white",
+                      },
                     },
                   ],
                 },
@@ -312,8 +318,35 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             where: { id: data.id },
             select: {
               title: true,
+              isPublic: true,
             },
           });
+          if (publicBoard && publicBoard.isPublic) {
+            await tiny
+              .post({
+                url: data.webhook_url,
+                headers: {
+                  "Content-type": "application/json",
+                },
+                data: {
+                  embeds: [
+                    {
+                      title: publicBoard.title,
+                      url: `https://thearkive.app/view/boards/${data.id}`,
+                      thumbnail: {
+                        url: "https://api.iconify.design/ph/graph.svg?color=white",
+                      },
+                    },
+                  ],
+                },
+              })
+              .catch(() => {
+                rep.code(500);
+                rep.send(false);
+              });
+            rep.send(true);
+            return;
+          }
         }
 
         return;
