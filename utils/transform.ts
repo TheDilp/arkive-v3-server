@@ -4,6 +4,10 @@ import {
   ParagraphType,
 } from "../types/dataTypes";
 
+export function formatImage(image: string) {
+  return image.replaceAll(" ", "%20");
+}
+
 export function removeNull(obj: JSON) {
   return Object.fromEntries(
     Object.entries(obj).filter(([k, v]) => {
@@ -117,15 +121,5 @@ export function extractDocumentText(content: any) {
     }
   });
 
-  console.log(
-    text
-      .join("")
-      .replaceAll('"', "'")
-      .concat(text.slice(-1)[0] === "." ? "" : "...")
-  );
-
-  return text
-    .join("")
-    .replaceAll('"', "'")
-    .concat(text.slice(-1)[0] === "." ? "" : "...");
+  return text.join("").replaceAll('"', "'");
 }

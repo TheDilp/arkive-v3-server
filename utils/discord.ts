@@ -1,5 +1,6 @@
 import { FastifyReply } from "fastify";
 import tiny from "tiny-json-http";
+import { formatImage } from "./transform";
 
 function getDiscordItemThumbnail(type: "documents" | "maps" | "boards") {
   if (type === "documents")
@@ -43,9 +44,8 @@ export async function sendPublicItem(
         url: getDiscordItemThumbnail(itemType),
       },
     };
-    if (image) data.image = { url: image };
+    if (image) data.image = { url: formatImage(image) };
     if (content) data.description = content;
-
     await tiny.post({
       url: webhookUrl,
       headers: {
@@ -59,7 +59,6 @@ export async function sendPublicItem(
   } catch (error) {
     rep.code(500);
     rep.send(false);
-    console.log(error);
     return;
   }
 }

@@ -254,6 +254,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           });
           if (doc && doc.isPublic) {
+            console.log(doc);
             const messageText = extractDocumentText(doc.content);
             sendPublicItem(
               data.id,
