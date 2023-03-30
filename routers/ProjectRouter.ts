@@ -242,7 +242,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           project_id: string;
           webhook_url: string;
         };
-        let item = null;
         if (data.item_type === "documents") {
           const doc = await prisma.documents.findUnique({
             where: { id: data.id },
@@ -277,14 +276,38 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             return;
           } else rep.send(false);
         } else if (data.item_type === "maps") {
-          item = await prisma.maps.findUnique({
+          const publicMap = await prisma.maps.findUnique({
             where: { id: data.id },
             select: {
               title: true,
+              isPublic: true,
+              image: true,
             },
           });
+          if (publicMap && publicMap.isPublic) {
+            await tiny
+              .post({
+                url: data.webhook_url,
+
+                headers: {
+                  "Content-type": "application/json",
+                },
+                data: {
+                  embeds: [
+                    {
+                      title: publicMap.title,
+                      url: `https://thearkive.app/view/maps/${data.id}`,
+                      image: publicMap.image,
+                    },
+                  ],
+                },
+              })
+              .catch((err: string) => console.log(err));
+            rep.send(true);
+            return;
+          }
         } else if (data.item_type === "boards") {
-          item = await prisma.boards.findUnique({
+          const publicBoard = await prisma.boards.findUnique({
             where: { id: data.id },
             select: {
               title: true,
@@ -292,9 +315,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           });
         }
 
-        if (item) {
-          rep.send(item);
-        } else rep.send(false);
         return;
       } catch (error) {
         rep.code(500);
