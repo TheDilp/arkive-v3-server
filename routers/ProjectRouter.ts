@@ -257,7 +257,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             await tiny
               .post({
                 url: data.webhook_url,
-
                 headers: {
                   "Content-type": "application/json",
                 },
@@ -288,7 +287,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             await tiny
               .post({
                 url: data.webhook_url,
-
                 headers: {
                   "Content-type": "application/json",
                 },
@@ -302,7 +300,11 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                   ],
                 },
               })
-              .catch((err: string) => console.log(err));
+              .catch((err: string) => {
+                console.log(err);
+                rep.code(500);
+                rep.send(false);
+              });
             rep.send(true);
             return;
           }
