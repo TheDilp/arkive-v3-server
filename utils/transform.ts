@@ -74,10 +74,11 @@ export function extractParagraphContent(paragraph: ParagraphType) {
       .map((obj) => {
         if ("text" in obj) return obj.text;
         // if ("attrs" in obj && "alt" in obj.attrs) return "";
-        if ("attrs" in obj && "label" in obj.attrs)
+        if ("attrs" in obj && "label" in obj.attrs) {
           return extractMentionContent(obj as MentionAtomType);
+        }
       })
-      .join(" ");
+      .join("");
     return `${text}`;
   }
   return "";
@@ -115,6 +116,13 @@ export function extractDocumentText(content: any) {
       }
     }
   });
+
+  console.log(
+    text
+      .join("")
+      .replaceAll('"', "'")
+      .concat(text.slice(-1)[0] === "." ? "" : "...")
+  );
 
   return text
     .join("")
