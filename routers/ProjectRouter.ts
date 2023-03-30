@@ -295,19 +295,18 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                     {
                       title: publicMap.title,
                       url: `https://thearkive.app/view/maps/${data.id}`,
-                      image: publicMap.image,
+                      image: { url: publicMap.image },
                     },
                   ],
                 },
               })
               .catch(() => {
-                console.log(publicMap, data);
                 rep.code(500);
                 rep.send(false);
               });
             rep.send(true);
             return;
-          }
+          } else rep.send(false);
         } else if (data.item_type === "boards") {
           const publicBoard = await prisma.boards.findUnique({
             where: { id: data.id },
