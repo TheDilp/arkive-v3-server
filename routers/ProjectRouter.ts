@@ -301,6 +301,19 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 },
               })
               .catch(() => {
+                console.log(
+                  {
+                    embeds: [
+                      {
+                        title: publicMap.title,
+                        url: `https://thearkive.app/view/maps/${data.id}`,
+                        image: { url: publicMap.image },
+                      },
+                    ],
+                  },
+                  publicMap,
+                  data
+                );
                 rep.code(500);
                 rep.send(false);
               });
