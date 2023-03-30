@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import tiny from "tiny-json-http";
 
 import prisma from "../client";
+import { sendPublicItem } from "../utils/discord";
 import { emptyS3Directory } from "../utils/storage";
 import { extractDocumentText } from "../utils/transform";
 
@@ -248,32 +249,23 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             select: {
               isPublic: true,
               title: true,
+              image: true,
               content: true,
             },
           });
           if (doc && doc.isPublic) {
             const messageText = extractDocumentText(doc.content);
             if (!messageText) return rep.send(false);
-            await tiny
-              .post({
-                url: data.webhook_url,
-                headers: {
-                  "Content-type": "application/json",
-                },
-                data: {
-                  embeds: [
-                    {
-                      title: doc.title,
-                      url: `https://thearkive.app/view/documents/${data.id}`,
-                      description: messageText,
-                      thumbnail: {
-                        url: "https://api.iconify.design/ph/files-thin.svg?color=white",
-                      },
-                    },
-                  ],
-                },
-              })
-              .catch((err: string) => console.log(err));
+            sendPublicItem(
+              data.id,
+              doc.title,
+              "documents",
+              data.webhook_url,
+              rep,
+              doc?.image,
+              messageText
+            );
+
             rep.send(true);
             return;
           } else rep.send(false);
@@ -287,30 +279,14 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           });
           if (publicMap && publicMap.isPublic) {
-            await tiny
-              .post({
-                url: data.webhook_url,
-                headers: {
-                  "Content-type": "application/json",
-                },
-                data: {
-                  embeds: [
-                    {
-                      title: publicMap.title,
-                      url: `https://thearkive.app/view/maps/${data.id}`,
-                      image: { url: publicMap?.image?.replaceAll(" ", "%20") },
-                      thumbnail: {
-                        url: "https://api.iconify.design/ph/map-trifold.svg?color=white",
-                      },
-                    },
-                  ],
-                },
-              })
-              .catch(() => {
-                rep.code(500);
-                rep.send(false);
-              });
-            rep.send(true);
+            sendPublicItem(
+              data.id,
+              publicMap.title,
+              "maps",
+              data.webhook_url,
+              rep,
+              publicMap?.image
+            );
             return;
           } else rep.send(false);
         } else if (data.item_type === "boards") {
@@ -322,33 +298,19 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           });
           if (publicBoard && publicBoard.isPublic) {
-            await tiny
-              .post({
-                url: data.webhook_url,
-                headers: {
-                  "Content-type": "application/json",
-                },
-                data: {
-                  embeds: [
-                    {
-                      title: publicBoard.title,
-                      url: `https://thearkive.app/view/boards/${data.id}`,
-                      thumbnail: {
-                        url: "https://api.iconify.design/ph/graph.svg?color=white",
-                      },
-                    },
-                  ],
-                },
-              })
-              .catch(() => {
-                rep.code(500);
-                rep.send(false);
-              });
-            rep.send(true);
-            return;
+            sendPublicItem(
+              data.id,
+              publicBoard.title,
+              "boards",
+              data.webhook_url,
+              rep
+            );
           }
+        } else {
+          rep.code(500);
+          rep.send(false);
+          return;
         }
-
         return;
       } catch (error) {
         rep.code(500);
