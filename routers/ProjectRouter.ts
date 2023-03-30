@@ -255,7 +255,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           });
           if (doc && doc.isPublic) {
             const messageText = extractDocumentText(doc.content);
-            if (!messageText) return rep.send(false);
             sendPublicItem(
               data.id,
               doc.title,
@@ -263,12 +262,15 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
               data.webhook_url,
               rep,
               doc?.image,
-              messageText
+              messageText || ""
             );
 
             rep.send(true);
             return;
-          } else rep.send(false);
+          } else {
+            rep.code(500);
+            rep.send(false);
+          }
         } else if (data.item_type === "maps") {
           const publicMap = await prisma.maps.findUnique({
             where: { id: data.id },
