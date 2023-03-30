@@ -295,25 +295,12 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                     {
                       title: publicMap.title,
                       url: `https://thearkive.app/view/maps/${data.id}`,
-                      image: { url: publicMap.image },
+                      image: { url: publicMap?.image?.replaceAll(" ", "%20") },
                     },
                   ],
                 },
               })
               .catch(() => {
-                console.log(
-                  {
-                    embeds: [
-                      {
-                        title: publicMap.title,
-                        url: `https://thearkive.app/view/maps/${data.id}`,
-                        image: { url: publicMap.image },
-                      },
-                    ],
-                  },
-                  publicMap,
-                  data
-                );
                 rep.code(500);
                 rep.send(false);
               });
