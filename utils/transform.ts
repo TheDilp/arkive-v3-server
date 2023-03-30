@@ -121,5 +121,5 @@ export function extractDocumentText(content: any) {
     }
   });
 
-  return text.join("").replaceAll('"', "'");
+  return text.join("").slice(0, 249).replaceAll('"', "'").concat("...");
 }
