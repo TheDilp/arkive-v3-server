@@ -29,8 +29,11 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
   ),
     server.post(
       "/getsinglescreen",
-      async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-        const data = JSON.parse(req.body) as { id: string };
+      async (
+        req: FastifyRequest<{ Body: { id: string } }>,
+        rep: FastifyReply
+      ) => {
+        const data = req.body;
         try {
           const screens = await prisma.screens.findUnique({
             where: {
@@ -70,12 +73,14 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
     ),
     server.post(
       "/createscreen",
-      async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      async (
+        req: FastifyRequest<{
+          Body: Pick<screens, "title" | "sectionSize" | "project_id">;
+        }>,
+        rep: FastifyReply
+      ) => {
         try {
-          const data = JSON.parse(req.body) as Pick<
-            screens,
-            "title" | "sectionSize" | "project_id"
-          >;
+          const data = req.body;
 
           const newScreen = await prisma.screens.create({
             data: {
@@ -94,10 +99,14 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
     ),
     server.post(
       "/sortscreens",
-      async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      async (
+        req: FastifyRequest<{
+          Body: { id: string; parentId: string; sort: number }[];
+        }>,
+        rep: FastifyReply
+      ) => {
         try {
-          const indexes: { id: string; parentId: string; sort: number }[] =
-            JSON.parse(req.body);
+          const indexes = req.body;
           const updates = indexes.map((idx) =>
             prisma.screens.update({
               data: {
@@ -120,15 +129,20 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
     );
   server.post(
     "/createsection",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      try {
-        const data = JSON.parse(req.body) as {
+    async (
+      req: FastifyRequest<{
+        Body: {
           id: string;
           title: string;
           section: string;
           parentId: string;
           sort: number;
         };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = req.body;
         const newSection = await prisma.sections.create({
           data: {
             id: data.id,
@@ -147,12 +161,17 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
   ),
     server.post(
       "/updatesection",
-      async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-        const data = JSON.parse(req.body) as {
-          id: string;
-          title: string;
-          size: string;
-        };
+      async (
+        req: FastifyRequest<{
+          Body: {
+            id: string;
+            title: string;
+            size: string;
+          };
+        }>,
+        rep: FastifyReply
+      ) => {
+        const data = req.body;
         try {
           await prisma.sections.update({
             where: {
@@ -170,13 +189,18 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
     );
   server.post(
     "/updatecard",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      try {
-        const data = JSON.parse(req.body) as {
+    async (
+      req: FastifyRequest<{
+        Body: {
           id: string;
           sort: number;
           expanded: boolean;
         };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = req.body;
         await prisma.cards.update({
           where: {
             id: data.id,
@@ -193,13 +217,18 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
   ),
     server.post(
       "/createcard",
-      async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-        try {
-          const data = JSON.parse(req.body) as {
+      async (
+        req: FastifyRequest<{
+          Body: {
             id: string;
             parentId: string;
             documentsId: string;
           }[];
+        }>,
+        rep: FastifyReply
+      ) => {
+        try {
+          const data = req.body;
           const newCards = await prisma.cards.createMany({
             data,
           });
@@ -213,10 +242,14 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
     ),
     server.post(
       "/sortsections",
-      async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+      async (
+        req: FastifyRequest<{
+          Body: { id: string; parentId: string; sort: number }[];
+        }>,
+        rep: FastifyReply
+      ) => {
         try {
-          const indexes: { id: string; parentId: string; sort: number }[] =
-            JSON.parse(req.body);
+          const indexes = req.body;
           const updates = indexes.map((idx) =>
             prisma.sections.update({
               data: {
@@ -239,10 +272,14 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
     );
   server.post(
     "/sortcards",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{
+        Body: { id: string; parentId: string; sort: number }[];
+      }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const indexes: { id: string; parentId: string; sort: number }[] =
-          JSON.parse(req.body);
+        const indexes = req.body;
         const updates = indexes.map((idx) =>
           prisma.cards.update({
             data: {
@@ -265,16 +302,21 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/updatescreen",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      const data = JSON.parse(req.body) as {
-        id: string;
-        title: string;
-        icon: string;
-        folder: boolean;
-        isPublic: boolean;
-        expanded: boolean;
-        sort: number;
-      };
+    async (
+      req: FastifyRequest<{
+        Body: {
+          id: string;
+          title: string;
+          icon: string;
+          folder: boolean;
+          isPublic: boolean;
+          expanded: boolean;
+          sort: number;
+        };
+      }>,
+      rep: FastifyReply
+    ) => {
+      const data = req.body;
       try {
         await prisma.screens.update({
           where: {
@@ -292,8 +334,11 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.delete(
     "/deletescreen",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      const data = JSON.parse(req.body) as { id: string };
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
+      const data = req.body;
       try {
         await prisma.screens.delete({
           where: {
@@ -310,8 +355,8 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.delete(
     "/deletemanysections",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      const ids = JSON.parse(req.body) as string[];
+    async (req: FastifyRequest<{ Body: string[] }>, rep: FastifyReply) => {
+      const ids = req.body;
       try {
         await prisma.sections.deleteMany({
           where: {
@@ -330,8 +375,11 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.delete(
     "/deletecard",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      const data = JSON.parse(req.body) as { id: string };
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
+      const data = req.body;
       try {
         await prisma.cards.delete({
           where: {

@@ -4,9 +4,12 @@ import prisma from "../client";
 export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
   server.post(
     "/getpublicdocument",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         const doc = await prisma.documents.findUnique({
           where: { id: data.id, isPublic: true },
           include: {
@@ -28,9 +31,12 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/getpublicmap",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         const map = await prisma.maps.findUnique({
           where: { id: data.id, isPublic: true },
           include: {
@@ -62,9 +68,12 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/getpublicboard",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         const board = await prisma.boards.findUnique({
           where: { id: data.id, isPublic: true },
           include: {
@@ -88,9 +97,12 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/getpubliccalendar",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         const word = await prisma.calendars.findUnique({
           where: { id: data.id },
           include: {
@@ -121,9 +133,12 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/getpublicword",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         const word = await prisma.words.findUnique({
           where: { id: data.id },
           include: {

@@ -29,9 +29,12 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/getsingletimeline",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         const timeline = await prisma.timelines.findUnique({
           where: {
             id: data.id,
@@ -71,12 +74,12 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
     "/createtimeline",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         const newTimeline = await prisma.timelines.create({
           data: {
             ...data,
@@ -100,12 +103,12 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
     "/updatetimeline",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         const updatedTimeline = await prisma.timelines.update({
           where: {
             id: data.id,
@@ -131,12 +134,12 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
     "/deletetimeline",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: { id: string };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         await prisma.timelines.delete({
           where: { id: data.id },
         });

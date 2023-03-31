@@ -13,15 +13,14 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           project_id: string;
           type: "tags" | "namecontent" | "category";
         };
-        Body: string;
+        Body: {
+          query: string | string[];
+        };
       }>,
       rep: FastifyReply
     ) => {
       const { project_id, type } = req.params;
-      const { query, data } = JSON.parse(req.body) as {
-        query: string | string[];
-        data?: AvailableTypes;
-      };
+      const { query } = req.body;
 
       if (type === "namecontent") {
         // lower(content->>'content'::text) like lower(${`%${query}%`}) or
@@ -519,14 +518,19 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
 
   server.post(
     "/search",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      try {
-        const data = JSON.parse(req.body) as {
+    async (
+      req: FastifyRequest<{
+        Body: {
           query: string;
           project_id: string;
           type: AvailableTypes;
           take?: number;
         };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = req.body;
         if (data.type === "documents") {
           const searches = [
             prisma.documents.findMany({

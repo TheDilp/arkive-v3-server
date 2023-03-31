@@ -33,9 +33,12 @@ export const randomTableRouter = (
   );
   server.post(
     "/getsinglerandomtable",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         const doc = await prisma.random_tables.findUnique({
           where: { id: data.id },
           include: {
@@ -54,12 +57,12 @@ export const randomTableRouter = (
     "/createrandomtable",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         const newTable = await prisma.random_tables.create({
           data,
         });
@@ -76,12 +79,12 @@ export const randomTableRouter = (
     "/updaterandomtable",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         await prisma.random_tables.update({
           where: {
             id: data.id,
@@ -99,10 +102,14 @@ export const randomTableRouter = (
   );
   server.post(
     "/sortrandomtables",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{
+        Body: { id: string; parent: string; sort: number }[];
+      }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const indexes: { id: string; parent: string; sort: number }[] =
-          JSON.parse(req.body);
+        const indexes = req.body;
         const updates = indexes.map((idx) =>
           prisma.random_tables.update({
             data: {
@@ -129,12 +136,12 @@ export const randomTableRouter = (
     "/createrandomtableoption",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         const newOption = await prisma.random_table_options.create({
           data,
         });
@@ -150,12 +157,12 @@ export const randomTableRouter = (
     "/updaterandomtableoption",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         await prisma.random_table_options.update({
           where: {
             id: data.id,
@@ -175,12 +182,12 @@ export const randomTableRouter = (
     "/deleterandomtable",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: { id: string };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
 
         await prisma.random_tables.delete({
           where: {
@@ -199,12 +206,12 @@ export const randomTableRouter = (
     "/deleterandomtableoption",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: string[];
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const ids = JSON.parse(req.body) as string[];
+        const ids = req.body;
         if (ids)
           await prisma.random_table_options.deleteMany({
             where: {

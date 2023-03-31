@@ -32,15 +32,20 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/createtag",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      try {
-        const { id, title, project_id, ...rest } = JSON.parse(req.body) as {
+    async (
+      req: FastifyRequest<{
+        Body: {
           project_id: string;
           title: string;
           textColor: string;
           bgColor: string;
           [key: string]: any;
         };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const { id, title, project_id, ...rest } = req.body;
         await prisma.tags.create({
           data: {
             id,
@@ -61,12 +66,17 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/updatetag",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      const { id, title, ...rest } = JSON.parse(req.body) as {
-        id: string;
-        title: string;
-        [key: string]: any;
-      };
+    async (
+      req: FastifyRequest<{
+        Body: {
+          id: string;
+          title: string;
+          [key: string]: any;
+        };
+      }>,
+      rep: FastifyReply
+    ) => {
+      const { id, title, ...rest } = req.body;
       try {
         await prisma.tags.update({
           where: {
@@ -89,9 +99,12 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.delete(
     "/deletetags",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { ids: string[] } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const { ids } = JSON.parse(req.body) as { ids: string[] };
+        const { ids } = req.body;
 
         await prisma.tags.deleteMany({
           where: {
@@ -233,14 +246,19 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/createaltername",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      try {
-        const { id, title, project_id, parentId } = JSON.parse(req.body) as {
+    async (
+      req: FastifyRequest<{
+        Body: {
           id: string;
           title: string;
           project_id: string;
           parentId: string;
         };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const { id, title, project_id, parentId } = req.body;
         await prisma.alter_names.create({
           data: {
             id,
@@ -261,11 +279,16 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/updatealtername",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      const { id, title } = JSON.parse(req.body) as {
-        id: string;
-        title: string;
-      };
+    async (
+      req: FastifyRequest<{
+        Body: {
+          id: string;
+          title: string;
+        };
+      }>,
+      rep: FastifyReply
+    ) => {
+      const { id, title } = req.body;
       try {
         await prisma.alter_names.update({
           where: {
@@ -289,7 +312,7 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
     "/deletealtername",
     async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
       try {
-        const id = JSON.parse(req.body);
+        const id = req.body;
         await prisma.alter_names.delete({
           where: {
             id,

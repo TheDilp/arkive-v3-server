@@ -131,7 +131,6 @@ server.register(fileUpload);
 server.register(cors, {
   origin: process.env.NODE_ENV === "production" ? "https://thearkive.app" : "*",
 });
-// server.register(compress);
 server.register(otherRouter);
 
 server.register((instance, _, done) => {
@@ -150,10 +149,10 @@ server.register((instance, _, done) => {
   instance.register(documentRouter);
   instance.register(mapRouter);
   instance.register(boardRouter);
-  instance.register(screenRouter);
-  instance.register(dictionaryRouter);
   instance.register(calendarRouter);
   instance.register(timelineRouter);
+  instance.register(screenRouter);
+  instance.register(dictionaryRouter);
   instance.register(randomTableRouter);
   instance.register(imageRouter);
 

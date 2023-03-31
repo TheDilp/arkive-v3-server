@@ -146,13 +146,18 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
 
   server.delete(
     "/deleteimage",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      try {
-        const data = JSON.parse(req.body) as {
+    async (
+      req: FastifyRequest<{
+        Body: {
           image: string;
           project_id: string;
           type: "images" | "maps";
         };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = req.body;
 
         await s3Client.send(
           new DeleteObjectCommand({

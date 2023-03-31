@@ -33,9 +33,12 @@ export const dictionaryRouter = (
   );
   server.post(
     "/getsingledictionary",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         const dictionary = await prisma.dictionaries.findUnique({
           where: {
             id: data.id,
@@ -66,12 +69,12 @@ export const dictionaryRouter = (
     "/createdictionary",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         const newDictionary = await prisma.dictionaries.create({
           data: {
             ...data,
@@ -95,12 +98,12 @@ export const dictionaryRouter = (
     "/updatedictionary",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         const newDictionary = await prisma.dictionaries.update({
           data,
           where: {
@@ -118,10 +121,14 @@ export const dictionaryRouter = (
   );
   server.post(
     "/sortdictionaries",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{
+        Body: { id: string; parent: string; sort: number }[];
+      }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const indexes: { id: string; parent: string; sort: number }[] =
-          JSON.parse(req.body);
+        const indexes = req.body;
         const updates = indexes.map((idx) =>
           prisma.dictionaries.update({
             data: {
@@ -144,12 +151,12 @@ export const dictionaryRouter = (
     "/deletedictionary",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: { id: string };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         await prisma.dictionaries.delete({
           where: { id: data.id },
         });
@@ -168,12 +175,12 @@ export const dictionaryRouter = (
     "/createword",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         await prisma.words.create({
           data,
         });
@@ -188,9 +195,12 @@ export const dictionaryRouter = (
   );
   server.post(
     "/getsingleword",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         const word = await prisma.words.findUnique({
           where: { id: data.id },
           include: {
@@ -213,12 +223,12 @@ export const dictionaryRouter = (
     "/updateword",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         await prisma.words.update({
           where: {
             id: data.id,
@@ -243,7 +253,7 @@ export const dictionaryRouter = (
       rep: FastifyReply
     ) => {
       try {
-        const id = JSON.parse(req.body) as string;
+        const id = req.body;
         await prisma.words.delete({
           where: {
             id,

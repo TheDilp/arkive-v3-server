@@ -39,14 +39,19 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/createuser",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      try {
-        const data = JSON.parse(req.body) as {
+    async (
+      req: FastifyRequest<{
+        Body: {
           id: string;
           nickname: string;
           email: string;
           auth_id: string;
         };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = req.body;
         await prisma.user.create({
           data,
         });
@@ -60,13 +65,18 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/updateuser",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      try {
-        const data = JSON.parse(req.body) as {
+    async (
+      req: FastifyRequest<{
+        Body: {
           id: string;
           nickname: string;
           email: string;
         };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = req.body;
         await prisma.user.update({
           where: {
             id: data.id,
@@ -84,12 +94,17 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/addtoproject",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      try {
-        const data = JSON.parse(req.body) as {
+    async (
+      req: FastifyRequest<{
+        Body: {
           email: string;
           project_id: string;
         };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = req.body;
         const newMember = await prisma.user.findUnique({
           where: {
             email: data.email,
@@ -115,13 +130,18 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/createwebhook",
-    async (req: FastifyRequest<{ Body: string }>, rep) => {
-      try {
-        const data = JSON.parse(req.body) as {
+    async (
+      req: FastifyRequest<{
+        Body: {
           user_id: string;
           title: string;
           url: string;
         };
+      }>,
+      rep
+    ) => {
+      try {
+        const data = req.body;
         const newWebhook = await prisma.webhooks.create({
           data: {
             title: data.title,
@@ -141,11 +161,16 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.delete(
     "/deleteuser",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      try {
-        const data = JSON.parse(req.body) as {
+    async (
+      req: FastifyRequest<{
+        Body: {
           id: string;
         };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = req.body;
         if (data.id === req.auth_id)
           await prisma.user.delete({
             where: {
