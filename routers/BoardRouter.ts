@@ -49,9 +49,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/getsingleboard",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         const board = await prisma.boards.findUnique({
           where: {
             id: data.id,
@@ -104,12 +107,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     "/createboard",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         const newBoard = await prisma.boards.create({
           data: {
             ...data,
@@ -132,12 +135,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     "/updateboard",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         await prisma.boards.update({
           data,
           where: {
@@ -155,10 +158,14 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/sortboards",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{
+        Body: { id: string; parent: string; sort: number }[];
+      }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const indexes: { id: string; parent: string; sort: number }[] =
-          JSON.parse(req.body);
+        const indexes = req.body;
         const updates = indexes.map((idx) =>
           prisma.boards.update({
             data: {
@@ -181,12 +188,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     "/deleteboard",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: { id: string };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         await prisma.boards.delete({
           where: { id: data.id },
         });
@@ -202,13 +209,13 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     "/createnode",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
         Params: { id: string };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
 
         const newNode = await prisma.nodes.create({
           data: {
@@ -233,12 +240,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     "/deletemanynodes",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: string[];
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const ids: string[] = JSON.parse(req.body);
+        const ids = req.body;
         await prisma.edges.deleteMany({
           where: {
             OR: [
@@ -274,12 +281,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     "/deletemanyedges",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: string[];
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const ids: string[] = JSON.parse(req.body);
+        const ids = req.body;
         await prisma.edges.deleteMany({
           where: {
             id: {
@@ -300,12 +307,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     "/updatemanynodes",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: { ids: string[]; data: any };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const body: { ids: string[]; data: any } = JSON.parse(req.body);
+        const body = req.body;
         await prisma.nodes.updateMany({
           where: {
             id: {
@@ -326,14 +333,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     "/updatemanynodesposition",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: { id: string; x: number; y: number }[];
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const body: { id: string; x: number; y: number }[] = JSON.parse(
-          req.body
-        );
+        const body = req.body;
         const updates = body.map((node) =>
           prisma.nodes.update({
             where: { id: node.id },
@@ -356,12 +361,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     "/updatemanyedges",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: { ids: string[]; data: any };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const body: { ids: string[]; data: any } = JSON.parse(req.body);
+        const body = req.body;
         await prisma.edges.updateMany({
           where: {
             id: {
@@ -382,12 +387,12 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     "/updatenode",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         await prisma.nodes.update({
           where: {
             id: data.id,
@@ -407,13 +412,13 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     "/createedge",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
         Params: { id: string };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         await prisma.edges.create({
           data: {
             ...data,
@@ -437,17 +442,17 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     "/updateedge",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         await prisma.edges.update({
           where: {
             id: data.id,
           },
-          data: removeNull(JSON.parse(req.body)) as any,
+          data,
         });
 
         rep.send(true);

@@ -55,9 +55,12 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
 
   server.post(
     "/getsinglemap",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         const map = await prisma.maps.findUnique({
           where: {
             id: data.id,
@@ -86,12 +89,12 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     "/createmap",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         const newMap = await prisma.maps.create({
           data: {
             ...data,
@@ -121,7 +124,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const newMapPin = await prisma.map_pins.create({
-          data: JSON.parse(req.body) as any,
+          data: req.body as any,
         });
 
         rep.send(newMapPin);
@@ -136,13 +139,13 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     "/createmaplayer",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
         const newMapLayer = await prisma.map_layers.create({
-          data: JSON.parse(req.body) as any,
+          data: req.body as any,
         });
         rep.send(newMapLayer);
       } catch (error) {
@@ -156,12 +159,12 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     "/updatemap",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         await prisma.maps.update({
           data: {
             ...data,
@@ -185,12 +188,12 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     "/updatemappin",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         await prisma.map_pins.update({
           data,
           where: { id: data.id },
@@ -207,12 +210,12 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     "/updatemaplayer",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         await prisma.map_layers.update({
           data,
           where: { id: data.id },
@@ -228,10 +231,14 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
 
   server.post(
     "/sortmaps",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{
+        Body: { id: string; parent: string; sort: number }[];
+      }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const indexes: { id: string; parent: string; sort: number }[] =
-          JSON.parse(req.body);
+        const indexes = req.body;
         const updates = indexes.map((idx) =>
           prisma.maps.update({
             data: {
@@ -255,12 +262,12 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     "/deletemap",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: { id: string };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         await prisma.maps.delete({
           where: { id: data.id },
         });
@@ -276,12 +283,12 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     "/deletemaplayer",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: { id: string };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         await prisma.map_layers.delete({
           where: {
             id: data.id,
@@ -299,12 +306,12 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
     "/deletemappin",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: { id: string };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         await prisma.map_pins.delete({
           where: {
             id: data.id,
