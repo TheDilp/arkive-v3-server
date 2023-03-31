@@ -362,9 +362,9 @@ model calendars {
   folder   Boolean @default(false)
   isPublic Boolean @default(false)
 
-  startYear Int  @default(0)
-  hours     Int?
-  minutes   Int?
+  offset  Int  @default(0)
+  hours   Int?
+  minutes Int?
 
   eras   eras[]
   months months[]
