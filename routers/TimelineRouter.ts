@@ -44,7 +44,7 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
               select: {
                 id: true,
                 title: true,
-                startYear: true,
+                offset: true,
                 events: {
                   include: {
                     month: {
