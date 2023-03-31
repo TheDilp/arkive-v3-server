@@ -7,59 +7,59 @@ import { emptyS3Directory } from "../utils/storage";
 import { extractDocumentText } from "../utils/transform";
 
 export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
-  server.get(
-    "/getallprojects",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      try {
-        const data = await prisma.projects.findMany({
-          where: {
-            OR: [
-              {
-                owner: {
-                  auth_id: req.auth_id,
-                },
+  server.get("/getallprojects", async (req, rep: FastifyReply) => {
+    try {
+      const data = await prisma.projects.findMany({
+        where: {
+          OR: [
+            {
+              owner: {
+                auth_id: req.auth_id,
               },
-              {
-                members: {
-                  some: {
-                    member: {
-                      auth_id: req.auth_id,
-                    },
+            },
+            {
+              members: {
+                some: {
+                  member: {
+                    auth_id: req.auth_id,
                   },
                 },
               },
-            ],
-          },
-          select: {
-            id: true,
-            title: true,
-            image: true,
-            ownerId: true,
-            members: {
-              select: {
-                user_id: true,
-              },
+            },
+          ],
+        },
+        select: {
+          id: true,
+          title: true,
+          image: true,
+          ownerId: true,
+          members: {
+            select: {
+              user_id: true,
             },
           },
-          orderBy: {
-            title: "asc",
-          },
-        });
-        rep.send(data);
-        return;
-      } catch (error) {
-        rep.code(500);
-        console.log(error);
-        rep.send(false);
-        return;
-      }
+        },
+        orderBy: {
+          title: "asc",
+        },
+      });
+      rep.send(data);
+      return;
+    } catch (error) {
+      rep.code(500);
+      console.log(error);
+      rep.send(false);
+      return;
     }
-  );
+  });
   server.post(
     "/getsingleproject",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         const singleProject = await prisma.projects.findUnique({
           where: {
             id: data.id,
@@ -96,32 +96,32 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
-  server.post(
-    "/createproject",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      if (req.auth_id) {
-        try {
-          const newProject = await prisma.projects.create({
-            data: {
-              ownerId: req.auth_id,
-            },
-          });
-          rep.send(newProject);
-          return;
-        } catch (error) {
-          rep.code(500);
-          console.log(error);
-          rep.send(false);
-          return;
-        }
+  server.post("/createproject", async (req, rep: FastifyReply) => {
+    if (req.auth_id) {
+      try {
+        const newProject = await prisma.projects.create({
+          data: {
+            ownerId: req.auth_id,
+          },
+        });
+        rep.send(newProject);
+        return;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
       }
     }
-  );
+  });
   server.post(
     "/updateproject",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as any;
+        const data = req.body;
         const updatedProject = await prisma.projects.update({
           where: {
             id: data.id,
@@ -211,9 +211,12 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.delete(
     "/deleteproject",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         await emptyS3Directory(data.id);
         await prisma.projects.delete({
           where: {
@@ -235,14 +238,19 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   // SEND TO DISCORD
   server.post(
     "/sendpublicitem",
-    async (req: FastifyRequest<{ Body: string }>, rep) => {
-      try {
-        const data = JSON.parse(req.body) as {
+    async (
+      req: FastifyRequest<{
+        Body: {
           id: string;
           item_type: "documents" | "maps" | "boards";
           project_id: string;
           webhook_url: string;
         };
+      }>,
+      rep
+    ) => {
+      try {
+        const data = req.body;
         if (data.item_type === "documents") {
           const doc = await prisma.documents.findUnique({
             where: { id: data.id },
@@ -326,15 +334,20 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   // SWATCHES
   server.post(
     "/createswatch",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{
+        Body: {
+          id: string;
+          title: string;
+          color: string;
+          project_id: string;
+        };
+      }>,
+      rep: FastifyReply
+    ) => {
       if (req.auth_id) {
         try {
-          const data = JSON.parse(req.body) as {
-            id: string;
-            title: string;
-            color: string;
-            project_id: string;
-          };
+          const data = req.body;
           const newSwatch = await prisma.swatches.create({
             data,
           });
@@ -351,13 +364,18 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/updateswatch",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{
+        Body: {
+          id: string;
+          title: string;
+        };
+      }>,
+      rep: FastifyReply
+    ) => {
       if (req.auth_id) {
         try {
-          const data = JSON.parse(req.body) as {
-            id: string;
-            title: string;
-          };
+          const data = req.body;
           await prisma.swatches.update({
             where: {
               id: data.id,
@@ -377,9 +395,12 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.delete(
     "/deleteswatch",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         await prisma.swatches.delete({
           where: {
             id: data.id,

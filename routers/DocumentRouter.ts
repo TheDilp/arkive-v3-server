@@ -1,3 +1,4 @@
+import { alter_names, documents, tags } from "@prisma/client";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import prisma from "../client";
@@ -57,9 +58,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/getsingledocument",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         const doc = await prisma.documents.findUnique({
           where: { id: data.id },
           select: {
@@ -92,8 +96,8 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/getmanydocuments",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      const ids = JSON.parse(req.body) as string[];
+    async (req: FastifyRequest<{ Body: string[] }>, rep: FastifyReply) => {
+      const ids = req.body;
       try {
         const documents = await prisma.documents.findMany({
           where: {
@@ -121,12 +125,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     "/createdocument",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: JSON;
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = removeNull(req.body) as any;
         const { tags, alter_names, ...rest } = data;
         const newDocument = await prisma.documents.create({
           data: {
@@ -158,13 +162,18 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/createfromtemplate",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
-      try {
-        const data = JSON.parse(req.body) as {
+    async (
+      req: FastifyRequest<{
+        Body: {
           title: string;
           template_id: string;
           project_id: string;
         };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = req.body;
         const templateContent = await prisma.documents.findUnique({
           where: { id: data.template_id },
           select: {
@@ -197,12 +206,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     "/updatedocument",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: { [key: string]: any };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = removeNull(JSON.parse(req.body)) as any;
+        const data = req.body;
         await prisma.documents.update({
           data: {
             ...data,
@@ -232,10 +241,14 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post(
     "/sortdocuments",
-    async (req: FastifyRequest<{ Body: string }>, rep: FastifyReply) => {
+    async (
+      req: FastifyRequest<{
+        Body: { id: string; parent: string; sort: number }[];
+      }>,
+      rep: FastifyReply
+    ) => {
       try {
-        const indexes: { id: string; parent: string; sort: number }[] =
-          JSON.parse(req.body);
+        const indexes = req.body;
         const updates = indexes.map((idx) =>
           prisma.documents.update({
             data: {
@@ -262,12 +275,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     "/deletedocument",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: { id: string };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const data = JSON.parse(req.body) as { id: string };
+        const data = req.body;
         await prisma.documents.delete({
           where: {
             id: data.id,
@@ -287,12 +300,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     "/deletemanydocuments",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: string[];
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const ids = JSON.parse(req.body) as string[];
+        const ids = req.body;
         if (ids)
           await prisma.documents.deleteMany({
             where: {
