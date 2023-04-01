@@ -362,7 +362,14 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
           where: {
             id: data.id,
           },
-          data,
+          data: {
+            ...data,
+            tags: {
+              connect: data?.tags?.map((tag: { id: string }) => ({
+                id: tag.id,
+              })),
+            },
+          },
         });
 
         rep.send(true);
