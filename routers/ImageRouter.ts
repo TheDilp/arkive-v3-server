@@ -122,7 +122,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
               Body: webpImage,
               ACL: "public-read",
               Metadata: {
-                "content-type": file?.mimetype,
+                "content-type": "image/webp",
               },
             };
 
