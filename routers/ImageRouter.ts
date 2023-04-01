@@ -121,9 +121,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
 
               Body: webpImage,
               ACL: "public-read",
-              Metadata: {
-                "content-type": "image/webp",
-              },
+              ContentType: "image/webp",
             };
 
             await s3Client.send(new PutObjectCommand(params));
