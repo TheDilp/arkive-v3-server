@@ -339,6 +339,14 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
               })),
             },
           },
+          include: {
+            tags: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
         });
         rep.send(newEvent);
       } catch (error) {
@@ -365,7 +373,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
           data: {
             ...data,
             tags: {
-              connect: data?.tags?.map((tag: { id: string }) => ({
+              set: data?.tags?.map((tag: { id: string }) => ({
                 id: tag.id,
               })),
             },
