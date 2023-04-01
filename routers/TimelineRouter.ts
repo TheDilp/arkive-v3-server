@@ -1,3 +1,4 @@
+import { calendars } from "@prisma/client";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../client";
 import { removeNull } from "../utils/transform";
@@ -13,6 +14,14 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
         const timelines = await prisma.timelines.findMany({
           where: {
             project_id: req.params.project_id,
+          },
+          include: {
+            calendars: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
           },
 
           orderBy: {
@@ -53,6 +62,12 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
                         title: true,
                       },
                     },
+                    tags: {
+                      select: {
+                        id: true,
+                        title: true,
+                      },
+                    },
                   },
                   orderBy: {
                     year: "asc",
@@ -84,8 +99,8 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
           data: {
             ...data,
             calendars: {
-              connect: data?.calendars?.map((id: string) => ({
-                id,
+              set: data?.calendars?.map((cal: calendars) => ({
+                id: cal.id,
               })),
             },
           },
@@ -109,6 +124,7 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = removeNull(req.body) as any;
+        console.log(data);
         const updatedTimeline = await prisma.timelines.update({
           where: {
             id: data.id,
@@ -116,8 +132,8 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
           data: {
             ...data,
             calendars: {
-              connect: data?.calendars?.map((id: string) => ({
-                id,
+              set: data?.calendars?.map((cal: calendars) => ({
+                id: cal.id,
               })),
             },
           },
