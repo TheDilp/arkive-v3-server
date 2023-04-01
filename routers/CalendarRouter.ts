@@ -330,7 +330,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = removeNull(req.body) as any;
-        await prisma.events.create({
+        const newEvent = await prisma.events.create({
           data: {
             ...data,
             tags: {
@@ -340,8 +340,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-
-        rep.send(true);
+        rep.send(newEvent);
       } catch (error) {
         rep.code(500);
         console.log(error);
