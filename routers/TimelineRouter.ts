@@ -124,7 +124,6 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = removeNull(req.body) as any;
-        console.log(data);
         const updatedTimeline = await prisma.timelines.update({
           where: {
             id: data.id,
