@@ -275,7 +275,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
               doc?.image,
               messageText || ""
             );
-
             rep.send(true);
             return;
           } else {
@@ -300,7 +299,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
               rep,
               publicMap?.image
             );
-            return;
+            rep.send(true);
           } else rep.send(false);
         } else if (data.item_type === "boards") {
           const publicBoard = await prisma.boards.findUnique({
@@ -318,6 +317,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
               data.webhook_url,
               rep
             );
+            rep.send(true);
           }
         } else if (data.item_type === "images") {
           if (data?.image) {
@@ -332,6 +332,8 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 formatImage(data.image),
                 ""
               );
+
+            rep.send(true);
           } else {
             rep.code(500);
             rep.send(false);
