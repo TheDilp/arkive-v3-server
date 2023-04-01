@@ -112,13 +112,48 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
               },
             },
             months: {
+              include: {
+                events: {
+                  where: {
+                    isPublic: true,
+                  },
+                },
+              },
               orderBy: {
                 sort: "asc",
               },
             },
-            events: {
-              where: {
-                isPublic: true,
+          },
+        });
+        rep.send(word);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
+    }
+  );
+
+  server.post(
+    "/getpublictimeline",
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = req.body;
+        const word = await prisma.timelines.findUnique({
+          where: { id: data.id },
+          include: {
+            calendars: {
+              select: {
+                id: true,
+                title: true,
+                events: {
+                  where: {
+                    isPublic: true,
+                  },
+                },
               },
             },
           },
