@@ -1,8 +1,9 @@
 import { FastifyReply } from "fastify";
 import tiny from "tiny-json-http";
 import { formatImage } from "./transform";
+import { AvailableDiscordTypes } from "../types/dataTypes";
 
-function getDiscordItemThumbnail(type: "documents" | "maps" | "boards") {
+function getDiscordItemThumbnail(type: AvailableDiscordTypes) {
   if (type === "documents")
     return "https://api.iconify.design/ph/file-text.svg?color=white";
   if (type === "maps")
@@ -12,19 +13,26 @@ function getDiscordItemThumbnail(type: "documents" | "maps" | "boards") {
   return "";
 }
 
-function getDiscordItemTitle(
-  type: "documents" | "maps" | "boards",
-  title: string
-) {
+function getDiscordItemTitle(type: AvailableDiscordTypes, title: string) {
   if (type === "documents" || type === "maps") return title;
   if (type === "boards") return `${title} (Graph)`;
   return "";
 }
 
+function getDiscordItemURL(
+  type: AvailableDiscordTypes,
+  id?: string,
+  image?: string | null
+) {
+  if (type === "images" && image) return image;
+  else if (type === "images" && !image) return "";
+  else return `https://thearkive.app/view/${type}/${id}`;
+}
+
 export async function sendPublicItem(
   id: string,
   title: string,
-  itemType: "documents" | "maps" | "boards",
+  itemType: AvailableDiscordTypes,
   webhookUrl: string,
   rep: FastifyReply,
   image?: string | null,
@@ -39,7 +47,7 @@ export async function sendPublicItem(
       description?: string;
     } = {
       title: getDiscordItemTitle(itemType, title),
-      url: `https://thearkive.app/view/${itemType}/${id}`,
+      url: getDiscordItemURL(itemType, id, image),
       thumbnail: {
         url: getDiscordItemThumbnail(itemType),
       },

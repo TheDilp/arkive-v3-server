@@ -5,6 +5,8 @@ import prisma from "../client";
 import { sendPublicItem } from "../utils/discord";
 import { emptyS3Directory } from "../utils/storage";
 import { extractDocumentText } from "../utils/transform";
+import { AvailableDiscordTypes, AvailableTypes } from "../types/dataTypes";
+import { formatImage } from "../utils/transform";
 
 export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get("/getallprojects", async (req, rep: FastifyReply) => {
@@ -242,9 +244,10 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       req: FastifyRequest<{
         Body: {
           id: string;
-          item_type: "documents" | "maps" | "boards";
+          item_type: AvailableDiscordTypes;
           project_id: string;
           webhook_url: string;
+          image?: string;
         };
       }>,
       rep
@@ -262,7 +265,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           });
           if (doc && doc.isPublic) {
-            console.log(doc);
             const messageText = extractDocumentText(doc.content);
             sendPublicItem(
               data.id,
@@ -316,6 +318,24 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
               data.webhook_url,
               rep
             );
+          }
+        } else if (data.item_type === "images") {
+          if (data?.image) {
+            const imageName = data.image.split("/").pop();
+            if (imageName)
+              sendPublicItem(
+                data.id,
+                imageName,
+                "images",
+                data.webhook_url,
+                rep,
+                formatImage(data.image),
+                ""
+              );
+          } else {
+            rep.code(500);
+            rep.send(false);
+            return false;
           }
         } else {
           rep.code(500);

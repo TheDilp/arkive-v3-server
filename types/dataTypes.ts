@@ -11,7 +11,7 @@ export type AvailableTypes =
   | "timelines"
   | "events"
   | "words";
-
+export type AvailableDiscordTypes = "documents" | "maps" | "boards" | "images";
 export type TextType = {
   type: "text";
   text: string;
