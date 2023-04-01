@@ -5,7 +5,7 @@ import prisma from "../client";
 import { sendPublicItem } from "../utils/discord";
 import { emptyS3Directory } from "../utils/storage";
 import { extractDocumentText } from "../utils/transform";
-import { AvailableDiscordTypes, AvailableTypes } from "../types/dataTypes";
+import { AvailableDiscordTypes } from "../types/dataTypes";
 import { formatImage } from "../utils/transform";
 
 export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
