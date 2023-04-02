@@ -3,6 +3,8 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import prisma from "../client";
 import { removeNull } from "../utils/transform";
+import mdToPdf from "md-to-pdf";
+import { writeFileSync } from "fs";
 
 export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
@@ -321,6 +323,24 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         console.log(error);
         rep.send(false);
         return;
+      }
+    }
+  );
+
+  server.post(
+    "/exportpdf",
+    async (
+      req: FastifyRequest<{ Body: { content: string; title: string } }>,
+      rep
+    ) => {
+      try {
+        const content = req.body.content;
+        const pdf = await mdToPdf({ content });
+        rep.send(pdf);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
       }
     }
   );
