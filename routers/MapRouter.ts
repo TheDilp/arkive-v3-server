@@ -169,7 +169,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
           data: {
             ...data,
             tags: {
-              connect: data?.tags?.map((tag: { id: string }) => ({
+              set: data?.tags?.map((tag: { id: string }) => ({
                 id: tag.id,
               })),
             },
@@ -228,7 +228,6 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
-
   server.post(
     "/sortmaps",
     async (

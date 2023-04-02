@@ -142,7 +142,14 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
       try {
         const data = removeNull(req.body) as any;
         await prisma.boards.update({
-          data,
+          data: {
+            ...data,
+            tags: {
+              set: data?.tags?.map((tag: { id: string }) => ({
+                id: tag.id,
+              })),
+            },
+          },
           where: {
             id: data.id,
           },
@@ -313,13 +320,21 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const body = req.body;
+        const data = removeNull(body.data) as any;
         await prisma.nodes.updateMany({
           where: {
             id: {
               in: body.ids,
             },
           },
-          data: removeNull(body.data) as any,
+          data: {
+            ...data,
+            tags: {
+              set: data?.tags?.map((tag: { id: string }) => ({
+                id: tag.id,
+              })),
+            },
+          },
         });
         rep.send(true);
       } catch (error) {
@@ -367,13 +382,21 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const body = req.body;
+        const data = removeNull(body.data) as any;
         await prisma.edges.updateMany({
           where: {
             id: {
               in: body.ids,
             },
           },
-          data: removeNull(body.data) as any,
+          data: {
+            ...data,
+            tags: {
+              set: data?.tags?.map((tag: { id: string }) => ({
+                id: tag.id,
+              })),
+            },
+          },
         });
         rep.send(true);
       } catch (error) {
@@ -397,7 +420,14 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           where: {
             id: data.id,
           },
-          data,
+          data: {
+            ...data,
+            tags: {
+              set: data?.tags?.map((tag: { id: string }) => ({
+                id: tag.id,
+              })),
+            },
+          },
         });
 
         rep.send(true);
@@ -452,7 +482,14 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           where: {
             id: data.id,
           },
-          data,
+          data: {
+            ...data,
+            tags: {
+              set: data?.tags?.map((tag: { id: string }) => ({
+                id: tag.id,
+              })),
+            },
+          },
         });
 
         rep.send(true);

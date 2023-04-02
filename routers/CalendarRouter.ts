@@ -150,7 +150,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
           data: {
             ...data,
             tags: {
-              connect: data?.tags?.map((tag: { id: string }) => ({
+              set: data?.tags?.map((tag: { id: string }) => ({
                 id: tag.id,
               })),
             },

@@ -216,12 +216,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
           data: {
             ...data,
             tags: {
-              connect: data?.tags?.map((tag: { id: string }) => ({
+              set: data?.tags?.map((tag: { id: string }) => ({
                 id: tag.id,
               })),
             },
             alter_names: {
-              connect: data?.alter_names?.map((tag: { id: string }) => ({
+              set: data?.alter_names?.map((tag: { id: string }) => ({
                 id: tag.id,
               })),
             },
