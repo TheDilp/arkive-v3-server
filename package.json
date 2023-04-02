@@ -24,7 +24,6 @@
     "fastify-plugin": "^4.5.0",
     "firebase-admin": "^11.5.0",
     "lodash.set": "^4.3.2",
-    "md-to-pdf": "^5.2.3",
     "sharp": "^0.31.3",
     "tiny-json-http": "^7.5.0",
     "uuid": "^9.0.0"
