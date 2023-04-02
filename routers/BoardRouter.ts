@@ -33,7 +33,6 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
                 title: true,
               },
             },
-            expanded: true,
           },
           orderBy: {
             sort: "asc",

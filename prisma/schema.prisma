@@ -59,7 +59,6 @@ model documents {
   title      String  @default("New Document")
   content    Json?   @db.JsonB
   icon       String? @default("ph:files-thin")
-  expanded   Boolean @default(false)
   folder     Boolean @default(false)
   isPublic   Boolean @default(false)
   sort       Int     @default(0)
@@ -101,7 +100,6 @@ model maps {
   title       String  @default("New Map")
   folder      Boolean @default(false)
   isPublic    Boolean @default(false)
-  expanded    Boolean @default(false)
   sort        Int     @default(0)
   clusterPins Boolean @default(false)
 
@@ -155,7 +153,6 @@ model boards {
   title    String  @default("New Board")
   folder   Boolean @default(false)
   isPublic Boolean @default(false)
-  expanded Boolean @default(false)
   sort     Int     @default(0)
 
   icon String? @default("ph:graph-light")
@@ -272,7 +269,6 @@ model screens {
   icon     String  @default("fluent:board-24-regular")
   folder   Boolean @default(false)
   isPublic Boolean @default(false)
-  expanded Boolean @default(false)
   sort     Int     @default(0)
 
   sectionSize String     @default("md")
@@ -281,11 +277,10 @@ model screens {
 }
 
 model sections {
-  id       String  @id @default(uuid()) @db.Uuid
+  id       String @id @default(uuid()) @db.Uuid
   title    String
-  sort     Int     @default(0)
-  expanded Boolean @default(true)
-  cardSize String  @default("md")
+  sort     Int    @default(0)
+  cardSize String @default("md")
 
   screens  screens? @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId String?  @db.Uuid
@@ -294,9 +289,8 @@ model sections {
 }
 
 model cards {
-  id       String  @id @default(uuid()) @db.Uuid
-  sort     Int     @default(0)
-  expanded Boolean @default(true)
+  id   String @id @default(uuid()) @db.Uuid
+  sort Int    @default(0)
 
   document    documents @relation(fields: [documentsId], references: [id], onDelete: Cascade)
   documentsId String    @db.Uuid
@@ -318,7 +312,6 @@ model dictionaries {
 
   icon     String  @default("ph:book-bookmark-light")
   sort     Int     @default(0)
-  expanded Boolean @default(true)
   folder   Boolean @default(false)
   isPublic Boolean @default(false)
 
@@ -358,7 +351,6 @@ model calendars {
 
   icon     String  @default("ph:calendar-blank-light")
   sort     Int     @default(0)
-  expanded Boolean @default(true)
   folder   Boolean @default(false)
   isPublic Boolean @default(false)
 
@@ -458,7 +450,6 @@ model random_tables {
   icon                 String                 @default("game-icons:perspective-dice-six-faces-random")
   folder               Boolean                @default(false)
   isPublic             Boolean                @default(false)
-  expanded             Boolean                @default(false)
   sort                 Int                    @default(0)
   random_table_options random_table_options[]
 }

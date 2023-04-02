@@ -194,7 +194,6 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         Body: {
           id: string;
           sort: number;
-          expanded: boolean;
         };
       }>,
       rep: FastifyReply
@@ -310,7 +309,6 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           icon: string;
           folder: boolean;
           isPublic: boolean;
-          expanded: boolean;
           sort: number;
         };
       }>,
