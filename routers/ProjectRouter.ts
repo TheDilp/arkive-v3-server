@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import tiny from "tiny-json-http";
 
 import prisma from "../client";
-import { sendPublicItem } from "../utils/discord";
+import { getRandomIntInclusive, sendPublicItem } from "../utils/discord";
 import { emptyS3Directory } from "../utils/storage";
 import { extractDocumentText } from "../utils/transform";
 import { AvailableDiscordTypes } from "../types/dataTypes";
@@ -316,6 +316,58 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
               "boards",
               data.webhook_url,
               rep
+            );
+            rep.send(true);
+          }
+        } else if (data.item_type === "random_tables") {
+          const publicTable = await prisma.random_tables.findUnique({
+            where: { id: data.id },
+            select: {
+              random_table_options: {
+                select: {
+                  title: true,
+                  description: true,
+                },
+              },
+              title: true,
+              isPublic: true,
+            },
+          });
+          if (publicTable) {
+            const selectedOptionIdx = getRandomIntInclusive(
+              1,
+              publicTable.random_table_options.length || 1
+            );
+            const selectedOption =
+              publicTable.random_table_options[selectedOptionIdx - 1];
+            sendPublicItem(
+              data.id,
+              selectedOption.title,
+              "random_tables",
+              data.webhook_url,
+              rep,
+              null,
+              selectedOption.description || ""
+            );
+            rep.send(true);
+          }
+        } else if (data.item_type === "random_table_options") {
+          const tableOption = await prisma.random_table_options.findUnique({
+            where: { id: data.id },
+            select: {
+              title: true,
+              description: true,
+            },
+          });
+          if (tableOption) {
+            sendPublicItem(
+              data.id,
+              tableOption.title,
+              "random_table_options",
+              data.webhook_url,
+              rep,
+              null,
+              tableOption.description || ""
             );
             rep.send(true);
           }

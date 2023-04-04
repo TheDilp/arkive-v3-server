@@ -11,7 +11,13 @@ export type AvailableTypes =
   | "timelines"
   | "events"
   | "words";
-export type AvailableDiscordTypes = "documents" | "maps" | "boards" | "images";
+export type AvailableDiscordTypes =
+  | "documents"
+  | "maps"
+  | "boards"
+  | "random_tables"
+  | "random_table_options"
+  | "images";
 export type TextType = {
   type: "text";
   text: string;
