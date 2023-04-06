@@ -7,53 +7,65 @@ import { emptyS3Directory } from "../utils/storage";
 import { extractDocumentText } from "../utils/transform";
 import { AvailableDiscordTypes } from "../types/dataTypes";
 import { formatImage } from "../utils/transform";
+import { clerkPreHandler } from "../utils/authPreHandler";
+import { getAuth } from "@clerk/fastify";
 
 export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
-  server.get("/getallprojects", async (req, rep: FastifyReply) => {
-    try {
-      const data = await prisma.projects.findMany({
-        where: {
-          OR: [
-            {
-              owner: {
-                auth_id: req.auth_id,
-              },
-            },
-            {
-              members: {
-                some: {
-                  member: {
-                    auth_id: req.auth_id,
+  server.get(
+    "/getallprojects",
+    { preHandler: clerkPreHandler },
+    async (req, rep: FastifyReply) => {
+      try {
+        const { userId } = getAuth(req);
+        if (userId) {
+          const data = await prisma.projects.findMany({
+            where: {
+              OR: [
+                {
+                  owner: {
+                    auth_id: userId,
                   },
+                },
+                {
+                  members: {
+                    some: {
+                      member: {
+                        auth_id: userId,
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+            select: {
+              id: true,
+              title: true,
+              image: true,
+              ownerId: true,
+              members: {
+                select: {
+                  user_id: true,
                 },
               },
             },
-          ],
-        },
-        select: {
-          id: true,
-          title: true,
-          image: true,
-          ownerId: true,
-          members: {
-            select: {
-              user_id: true,
+            orderBy: {
+              title: "asc",
             },
-          },
-        },
-        orderBy: {
-          title: "asc",
-        },
-      });
-      rep.send(data);
-      return;
-    } catch (error) {
-      rep.code(500);
-      console.log(error);
-      rep.send(false);
-      return;
+          });
+          rep.send(data);
+          return;
+        } else {
+          rep.send(false);
+          return;
+        }
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
+      }
     }
-  });
+  );
   server.post(
     "/getsingleproject",
     async (

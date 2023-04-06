@@ -21,6 +21,7 @@ import { searchRouter } from "./routers/SearchRouter";
 import { tagRouter } from "./routers/TagRouter";
 import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
+import { clerkPlugin } from "@clerk/fastify";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -54,6 +55,7 @@ const firebase = admin.initializeApp({
 });
 
 const server = fastify();
+server.register(clerkPlugin);
 prisma.$use(async (params, next) => {
   try {
     if (params.action === "create" && params?.model) {
@@ -133,31 +135,19 @@ server.register(cors, {
 });
 server.register(otherRouter);
 
-server.register((instance, _, done) => {
-  instance.addHook("preParsing", async (request) => {
-    const token = await firebase
-      .auth()
-      .verifyIdToken(request.headers.authorization?.split(" ")[1] as string);
-
-    request.auth_id = token.uid;
-  });
-
-  instance.register(userRouter);
-  instance.register(projectRouter);
-  instance.register(searchRouter);
-  instance.register(tagRouter);
-  instance.register(documentRouter);
-  instance.register(mapRouter);
-  instance.register(boardRouter);
-  instance.register(calendarRouter);
-  instance.register(timelineRouter);
-  instance.register(screenRouter);
-  instance.register(dictionaryRouter);
-  instance.register(randomTableRouter);
-  instance.register(imageRouter);
-
-  done();
-});
+server.register(userRouter);
+server.register(projectRouter);
+server.register(searchRouter);
+server.register(tagRouter);
+server.register(documentRouter);
+server.register(mapRouter);
+server.register(boardRouter);
+server.register(calendarRouter);
+server.register(timelineRouter);
+server.register(screenRouter);
+server.register(dictionaryRouter);
+server.register(randomTableRouter);
+server.register(imageRouter);
 
 server.register(publicRouter);
 if (process.env.VITE_BE_PORT) {
