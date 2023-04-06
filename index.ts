@@ -2,8 +2,8 @@ import cors from "@fastify/cors";
 
 import fastify from "fastify";
 
+import { clerkPlugin } from "@clerk/fastify";
 import fileUpload from "fastify-file-upload";
-import * as admin from "firebase-admin";
 import set from "lodash.set";
 import prisma from "./client";
 import { boardRouter } from "./routers/BoardRouter";
@@ -21,7 +21,6 @@ import { searchRouter } from "./routers/SearchRouter";
 import { tagRouter } from "./routers/TagRouter";
 import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
-import { clerkPlugin } from "@clerk/fastify";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -45,14 +44,6 @@ const subIncrementItems = [
   "months",
   "random_table_options",
 ];
-
-const firebase = admin.initializeApp({
-  credential: admin.credential.cert({
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    privateKey: process.env.FIREBASE_PKEY?.replace(/\\n/g, "\n"),
-    clientEmail: process.env.FIREBASE_CLIENTEMAIL,
-  }),
-});
 
 const server = fastify();
 server.register(clerkPlugin);
