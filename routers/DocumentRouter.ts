@@ -1,9 +1,13 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { Deepstream } from "@deepstream/server";
 
 import prisma from "../client";
 import { removeNull } from "../utils/transform";
 
 export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
+  const syncServer = new Deepstream({});
+  syncServer.start();
+
   server.get(
     "/getalldocuments/:project_id",
     async (
