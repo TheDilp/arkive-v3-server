@@ -212,7 +212,7 @@ model edges {
   lineStyle   String?
   lineColor   String?
   lineFill    String?
-  lineOpacity Int?
+  lineOpacity Float?
   width       Int?
 
   controlPointDistances Int?
