@@ -125,6 +125,7 @@ server.register(cors, {
   origin: process.env.NODE_ENV === "production" ? "https://thearkive.app" : "*",
 });
 server.register(otherRouter);
+
 server.register(async (instance, _, done) => {
   instance.addHook("preHandler", async (request, reply) => {
     const { userId, sessionId } = getAuth(request);
