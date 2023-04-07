@@ -1,5 +1,4 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { Deepstream } from "@deepstream/server";
 
 import prisma from "../client";
 import { removeNull } from "../utils/transform";

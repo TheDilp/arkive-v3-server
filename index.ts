@@ -5,7 +5,6 @@ import fastify from "fastify";
 import { clerkPlugin, getAuth } from "@clerk/fastify";
 import fileUpload from "fastify-file-upload";
 import set from "lodash.set";
-import websocket from "@fastify/websocket";
 import prisma from "./client";
 import { boardRouter } from "./routers/BoardRouter";
 import { calendarRouter } from "./routers/CalendarRouter";
@@ -49,7 +48,6 @@ const subIncrementItems = [
 const server = fastify();
 
 server.register(clerkPlugin);
-server.register(websocket);
 
 prisma.$use(async (params, next) => {
   try {
