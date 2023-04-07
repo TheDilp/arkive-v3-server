@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
+import { getAuth } from "@clerk/fastify";
 import prisma from "../client";
 
 export const userRouter = (server: FastifyInstance, _: any, done: any) => {
@@ -77,10 +78,16 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = req.body;
+        const { userId } = getAuth(req);
+        if (!userId) {
+          rep.code(403);
+          rep.send("NOT AUTHORIZED");
+          return;
+        }
         await prisma.user.update({
           where: {
             id: data.id,
-            auth_id: req.auth_id,
+            auth_id: userId,
           },
           data,
         });
@@ -170,14 +177,54 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
+        const { userId } = getAuth(req);
+        if (!userId) {
+          rep.code(403);
+          rep.send("NOT AUTHORIZED");
+          return;
+        }
         const data = req.body;
-        if (data.id === req.auth_id)
+        if (data.id === userId)
           await prisma.user.delete({
             where: {
               id: data.id,
-              auth_id: req.auth_id,
+              auth_id: userId,
             },
           });
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
+    }
+  );
+  server.delete(
+    "/deletewebhook",
+    async (
+      req: FastifyRequest<{
+        Body: {
+          id: string;
+          user_id: string;
+        };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = req.body;
+        const { userId } = getAuth(req);
+        if (!userId) {
+          rep.code(403);
+          rep.send("NOT AUTHORIZED");
+          return;
+        }
+        const { id, user_id } = data;
+        await prisma.webhooks.delete({
+          where: {
+            id,
+            user_id,
+          },
+        });
         rep.send(true);
       } catch (error) {
         rep.code(500);

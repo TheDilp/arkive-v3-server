@@ -2,7 +2,7 @@ import cors from "@fastify/cors";
 
 import fastify from "fastify";
 
-import { clerkPlugin } from "@clerk/fastify";
+import { clerkPlugin, getAuth } from "@clerk/fastify";
 import fileUpload from "fastify-file-upload";
 import set from "lodash.set";
 import prisma from "./client";
@@ -22,11 +22,11 @@ import { tagRouter } from "./routers/TagRouter";
 import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
 
-declare module "fastify" {
-  interface FastifyRequest {
-    auth_id: string;
-  }
-}
+// declare module "fastify" {
+// interface FastifyRequest {
+// auth_id: string;
+// }
+// }
 
 const mainIncrementItems = [
   "documents",
@@ -126,21 +126,36 @@ server.register(cors, {
 });
 server.register(otherRouter);
 
-server.register(userRouter);
-server.register(projectRouter);
-server.register(searchRouter);
-server.register(tagRouter);
-server.register(documentRouter);
-server.register(mapRouter);
-server.register(boardRouter);
-server.register(calendarRouter);
-server.register(timelineRouter);
-server.register(screenRouter);
-server.register(dictionaryRouter);
-server.register(randomTableRouter);
-server.register(imageRouter);
+server.register(async (instance, _, done) => {
+  instance.addHook("preHandler", async (request, reply) => {
+    const { userId, sessionId } = getAuth(request);
+    if (!sessionId) {
+      reply.status(401);
+      reply.send({ error: "User could not be verified" });
+    }
+    if (!userId) {
+      reply.code(403);
+      throw new Error("NOT AUTHORIZED");
+    }
+  });
+  instance.register(userRouter);
+  instance.register(projectRouter);
+  instance.register(searchRouter);
+  instance.register(tagRouter);
+  instance.register(documentRouter);
+  instance.register(mapRouter);
+  instance.register(boardRouter);
+  instance.register(calendarRouter);
+  instance.register(timelineRouter);
+  instance.register(screenRouter);
+  instance.register(dictionaryRouter);
+  instance.register(randomTableRouter);
+  instance.register(imageRouter);
+  done();
+});
 
 server.register(publicRouter);
+
 if (process.env.VITE_BE_PORT) {
   server.listen(
     { port: parseInt(process.env.VITE_BE_PORT, 10) as number, host: "0.0.0.0" },

@@ -1,5 +1,4 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import tiny from "tiny-json-http";
 
 import prisma from "../client";
 import { getRandomIntInclusive, sendPublicItem } from "../utils/discord";
@@ -7,65 +6,60 @@ import { emptyS3Directory } from "../utils/storage";
 import { extractDocumentText } from "../utils/transform";
 import { AvailableDiscordTypes } from "../types/dataTypes";
 import { formatImage } from "../utils/transform";
-import { clerkPreHandler } from "../utils/authPreHandler";
 import { getAuth } from "@clerk/fastify";
 
 export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
-  server.get(
-    "/getallprojects",
-    { preHandler: clerkPreHandler },
-    async (req, rep: FastifyReply) => {
-      try {
-        const { userId } = getAuth(req);
-        if (userId) {
-          const data = await prisma.projects.findMany({
-            where: {
-              OR: [
-                {
-                  owner: {
+  server.get("/getallprojects", async (req, rep: FastifyReply) => {
+    try {
+      const { userId } = getAuth(req);
+      if (!userId) {
+        rep.code(403);
+        rep.send("NOT AUTHORIZED");
+        return;
+      }
+      const data = await prisma.projects.findMany({
+        where: {
+          OR: [
+            {
+              owner: {
+                auth_id: userId,
+              },
+            },
+            {
+              members: {
+                some: {
+                  member: {
                     auth_id: userId,
                   },
                 },
-                {
-                  members: {
-                    some: {
-                      member: {
-                        auth_id: userId,
-                      },
-                    },
-                  },
-                },
-              ],
-            },
-            select: {
-              id: true,
-              title: true,
-              image: true,
-              ownerId: true,
-              members: {
-                select: {
-                  user_id: true,
-                },
               },
             },
-            orderBy: {
-              title: "asc",
+          ],
+        },
+        select: {
+          id: true,
+          title: true,
+          image: true,
+          ownerId: true,
+          members: {
+            select: {
+              user_id: true,
             },
-          });
-          rep.send(data);
-          return;
-        } else {
-          rep.send(false);
-          return;
-        }
-      } catch (error) {
-        rep.code(500);
-        console.log(error);
-        rep.send(false);
-        return;
-      }
+          },
+        },
+        orderBy: {
+          title: "asc",
+        },
+      });
+      rep.send(data);
+      return;
+    } catch (error) {
+      rep.code(500);
+      console.log(error);
+      rep.send(false);
+      return;
     }
-  );
+  });
   server.post(
     "/getsingleproject",
     async (
@@ -111,21 +105,25 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post("/createproject", async (req, rep: FastifyReply) => {
-    if (req.auth_id) {
-      try {
-        const newProject = await prisma.projects.create({
-          data: {
-            ownerId: req.auth_id,
-          },
-        });
-        rep.send(newProject);
-        return;
-      } catch (error) {
-        rep.code(500);
-        console.log(error);
-        rep.send(false);
+    try {
+      const { userId } = getAuth(req);
+      if (!userId) {
+        rep.code(403);
+        rep.send("NOT AUTHORIZED");
         return;
       }
+      const newProject = await prisma.projects.create({
+        data: {
+          ownerId: userId,
+        },
+      });
+      rep.send(newProject);
+      return;
+    } catch (error) {
+      rep.code(500);
+      console.log(error);
+      rep.send(false);
+      return;
     }
   });
   server.post(
@@ -135,16 +133,21 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
+        const { userId } = getAuth(req);
+        if (!userId) {
+          rep.code(403);
+          rep.send("NOT AUTHORIZED");
+          return;
+        }
         const data = req.body;
         const updatedProject = await prisma.projects.update({
           where: {
             id: data.id,
-            ownerId: req.auth_id,
+            ownerId: userId,
           },
           data,
         });
         rep.send(updatedProject);
-        return;
       } catch (error) {
         rep.code(500);
         console.log(error);
@@ -230,12 +233,18 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
+        const { userId } = getAuth(req);
+        if (!userId) {
+          rep.code(403);
+          rep.send("NOT AUTHORIZED");
+          return;
+        }
         const data = req.body;
         await emptyS3Directory(data.id);
         await prisma.projects.delete({
           where: {
             id: data.id,
-            ownerId: req.auth_id,
+            ownerId: userId,
           },
         });
         rep.send(true);
@@ -431,20 +440,25 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }>,
       rep: FastifyReply
     ) => {
-      if (req.auth_id) {
-        try {
-          const data = req.body;
-          const newSwatch = await prisma.swatches.create({
-            data,
-          });
-          rep.send(newSwatch);
-          return;
-        } catch (error) {
-          rep.code(500);
-          console.log(error);
-          rep.send(false);
+      try {
+        const { userId } = getAuth(req);
+        if (!userId) {
+          rep.code(403);
+          rep.send("NOT AUTHORIZED");
           return;
         }
+
+        const data = req.body;
+        const newSwatch = await prisma.swatches.create({
+          data,
+        });
+        rep.send(newSwatch);
+        return;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
       }
     }
   );
@@ -459,23 +473,27 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }>,
       rep: FastifyReply
     ) => {
-      if (req.auth_id) {
-        try {
-          const data = req.body;
-          await prisma.swatches.update({
-            where: {
-              id: data.id,
-            },
-            data,
-          });
-          rep.send(true);
-          return;
-        } catch (error) {
-          rep.code(500);
-          console.log(error);
-          rep.send(false);
+      try {
+        const { userId } = getAuth(req);
+        if (!userId) {
+          rep.code(403);
+          rep.send("NOT AUTHORIZED");
           return;
         }
+        const data = req.body;
+        await prisma.swatches.update({
+          where: {
+            id: data.id,
+          },
+          data,
+        });
+        rep.send(true);
+        return;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
       }
     }
   );
@@ -486,12 +504,18 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
+        const { userId } = getAuth(req);
+        if (!userId) {
+          rep.code(403);
+          rep.send("NOT AUTHORIZED");
+          return;
+        }
         const data = req.body;
         await prisma.swatches.delete({
           where: {
             id: data.id,
             project: {
-              ownerId: req.auth_id,
+              ownerId: userId,
             },
           },
         });
