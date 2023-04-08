@@ -843,10 +843,20 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
               dictionary: {
                 project_id: data.project_id,
               },
-              translation: {
-                contains: data.query,
-                mode: "insensitive",
-              },
+              OR: [
+                {
+                  title: {
+                    contains: data.query,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  translation: {
+                    contains: data.query,
+                    mode: "insensitive",
+                  },
+                },
+              ],
             },
             select: {
               id: true,
