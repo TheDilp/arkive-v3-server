@@ -124,7 +124,7 @@ prisma.$use(async (params, next) => {
 server.register(fileUpload);
 
 server.register(cors, {
-  origin: process.env.NODE_ENV === "production" ? "https://thearkive.app" : "*",
+  origin: process.env.NODE_ENV === "production" ? process.env.ALLOWED_URL : "*",
 });
 server.register(otherRouter);
 
