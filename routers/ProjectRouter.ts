@@ -1,35 +1,31 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import prisma from "../client";
+import { AvailableDiscordTypes } from "../types/dataTypes";
+import { checkIfLocal } from "../utils/auth";
 import { getRandomIntInclusive, sendPublicItem } from "../utils/discord";
 import { emptyS3Directory } from "../utils/storage";
-import { extractDocumentText } from "../utils/transform";
-import { AvailableDiscordTypes } from "../types/dataTypes";
-import { formatImage } from "../utils/transform";
-import { getAuth } from "@clerk/fastify";
+import { extractDocumentText, formatImage } from "../utils/transform";
 
 export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get("/getallprojects", async (req, rep: FastifyReply) => {
     try {
-      const { userId } = getAuth(req);
-      if (!userId) {
-        rep.code(403);
-        rep.send("NOT AUTHORIZED");
-        return;
-      }
+      const user_id = checkIfLocal(req, rep);
+
+      if (user_id === null) return;
       const data = await prisma.projects.findMany({
         where: {
           OR: [
             {
               owner: {
-                auth_id: userId,
+                auth_id: user_id,
               },
             },
             {
               members: {
                 some: {
                   member: {
-                    auth_id: userId,
+                    auth_id: user_id,
                   },
                 },
               },
@@ -106,15 +102,13 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   );
   server.post("/createproject", async (req, rep: FastifyReply) => {
     try {
-      const { userId } = getAuth(req);
-      if (!userId) {
-        rep.code(403);
-        rep.send("NOT AUTHORIZED");
-        return;
-      }
+      const user_id = checkIfLocal(req, rep);
+
+      if (user_id === null) return;
+
       const newProject = await prisma.projects.create({
         data: {
-          ownerId: userId,
+          ownerId: user_id,
         },
       });
       rep.send(newProject);
@@ -133,17 +127,15 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
-        const { userId } = getAuth(req);
-        if (!userId) {
-          rep.code(403);
-          rep.send("NOT AUTHORIZED");
-          return;
-        }
+        const user_id = checkIfLocal(req, rep);
+
+        if (user_id === null) return;
+
         const data = req.body;
         const updatedProject = await prisma.projects.update({
           where: {
             id: data.id,
-            ownerId: userId,
+            ownerId: user_id,
           },
           data,
         });
@@ -233,18 +225,15 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
-        const { userId } = getAuth(req);
-        if (!userId) {
-          rep.code(403);
-          rep.send("NOT AUTHORIZED");
-          return;
-        }
+        const user_id = checkIfLocal(req, rep);
+        if (user_id === null) return;
+
         const data = req.body;
         await emptyS3Directory(data.id);
         await prisma.projects.delete({
           where: {
             id: data.id,
-            ownerId: userId,
+            ownerId: user_id,
           },
         });
         rep.send(true);
@@ -441,12 +430,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
-        const { userId } = getAuth(req);
-        if (!userId) {
-          rep.code(403);
-          rep.send("NOT AUTHORIZED");
-          return;
-        }
+        const user_id = checkIfLocal(req, rep);
+
+        if (user_id === null) return;
 
         const data = req.body;
         const newSwatch = await prisma.swatches.create({
@@ -474,12 +460,10 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
-        const { userId } = getAuth(req);
-        if (!userId) {
-          rep.code(403);
-          rep.send("NOT AUTHORIZED");
-          return;
-        }
+        const user_id = checkIfLocal(req, rep);
+
+        if (user_id === null) return;
+
         const data = req.body;
         await prisma.swatches.update({
           where: {
@@ -504,18 +488,16 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
-        const { userId } = getAuth(req);
-        if (!userId) {
-          rep.code(403);
-          rep.send("NOT AUTHORIZED");
-          return;
-        }
+        const user_id = checkIfLocal(req, rep);
+
+        if (user_id === null) return;
+
         const data = req.body;
         await prisma.swatches.delete({
           where: {
             id: data.id,
             project: {
-              ownerId: userId,
+              ownerId: user_id,
             },
           },
         });

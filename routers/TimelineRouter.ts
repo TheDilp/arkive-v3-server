@@ -68,6 +68,12 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
                         title: true,
                       },
                     },
+                    document: {
+                      select: {
+                        content: true,
+                        icon: true,
+                      },
+                    },
                   },
                   orderBy: [
                     { year: "asc" },

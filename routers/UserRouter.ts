@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
-import { getAuth } from "@clerk/fastify";
 import prisma from "../client";
+import { checkIfLocal } from "../utils/auth";
 
 export const userRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
@@ -78,16 +78,14 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = req.body;
-        const { userId } = getAuth(req);
-        if (!userId) {
-          rep.code(403);
-          rep.send("NOT AUTHORIZED");
-          return;
-        }
+        const user_id = checkIfLocal(req, rep);
+
+        if (user_id === null) return;
+
         await prisma.user.update({
           where: {
             id: data.id,
-            auth_id: userId,
+            auth_id: user_id,
           },
           data,
         });
@@ -177,18 +175,16 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
-        const { userId } = getAuth(req);
-        if (!userId) {
-          rep.code(403);
-          rep.send("NOT AUTHORIZED");
-          return;
-        }
+        const user_id = checkIfLocal(req, rep);
+
+        if (user_id === null) return;
+
         const data = req.body;
-        if (data.id === userId)
+        if (data.id === user_id)
           await prisma.user.delete({
             where: {
               id: data.id,
-              auth_id: userId,
+              auth_id: user_id,
             },
           });
         rep.send(true);
@@ -212,12 +208,10 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = req.body;
-        const { userId } = getAuth(req);
-        if (!userId) {
-          rep.code(403);
-          rep.send("NOT AUTHORIZED");
-          return;
-        }
+        const u_id = checkIfLocal(req, rep);
+
+        if (u_id === null) return;
+
         const { id, user_id } = data;
         await prisma.webhooks.delete({
           where: {

@@ -11,3 +11,20 @@ export async function clerkPreHandler(
     reply.send({ error: "User could not be verified" });
   }
 }
+
+export function checkIfLocal(req: FastifyRequest, rep: FastifyReply) {
+  if (req.isLocal) {
+    return "ADMIN";
+  }
+  if (!req.isLocal) {
+    const { userId } = getAuth(req);
+    if (!userId) {
+      rep.code(403);
+      rep.send("NOT AUTHORIZED");
+      return null;
+    } else {
+      return userId;
+    }
+  }
+  return null;
+}

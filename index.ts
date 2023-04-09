@@ -22,11 +22,11 @@ import { tagRouter } from "./routers/TagRouter";
 import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
 
-// declare module "fastify" {
-// interface FastifyRequest {
-// auth_id: string;
-// }
-// }
+declare module "fastify" {
+  interface FastifyRequest {
+    isLocal: boolean;
+  }
+}
 
 const mainIncrementItems = [
   "documents",
@@ -44,10 +44,11 @@ const subIncrementItems = [
   "months",
   "random_table_options",
 ];
+const isLocal = !!process.env.LOCAL;
 
 const server = fastify();
 
-server.register(clerkPlugin);
+if (!isLocal) server.register(clerkPlugin);
 
 prisma.$use(async (params, next) => {
   try {
@@ -120,7 +121,6 @@ prisma.$use(async (params, next) => {
   return result;
 });
 
-server.decorateRequest("user_id", null);
 server.register(fileUpload);
 
 server.register(cors, {
@@ -130,14 +130,17 @@ server.register(otherRouter);
 
 server.register(async (instance, _, done) => {
   instance.addHook("preHandler", async (request, reply) => {
-    const { userId, sessionId } = getAuth(request);
-    if (!sessionId) {
-      reply.status(401);
-      reply.send({ error: "User could not be verified" });
-    }
-    if (!userId) {
-      reply.code(403);
-      throw new Error("NOT AUTHORIZED");
+    request.isLocal = isLocal;
+    if (!isLocal) {
+      const { userId, sessionId } = getAuth(request);
+      if (!sessionId) {
+        reply.status(401);
+        reply.send({ error: "User could not be verified" });
+      }
+      if (!userId) {
+        reply.code(403);
+        throw new Error("NOT AUTHORIZED");
+      }
     }
   });
   instance.register(userRouter);
@@ -157,7 +160,6 @@ server.register(async (instance, _, done) => {
 });
 
 server.register(publicRouter);
-
 if (process.env.VITE_BE_PORT) {
   server.listen(
     { port: parseInt(process.env.VITE_BE_PORT, 10) as number, host: "0.0.0.0" },
@@ -165,6 +167,22 @@ if (process.env.VITE_BE_PORT) {
       if (err) {
         console.error(err);
         process.exit(1);
+      }
+      if (!!process.env.LOCAL) {
+        const adminUser = await prisma.user.findUnique({
+          where: {
+            auth_id: "ADMIN",
+          },
+        });
+        if (!adminUser) {
+          await prisma.user.create({
+            data: {
+              nickname: "ADMIN",
+              auth_id: "ADMIN",
+              email: "admin",
+            },
+          });
+        }
       }
 
       console.log(`Server listening at ${address}`);
