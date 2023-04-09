@@ -126,6 +126,7 @@ server.register(fileUpload);
 server.register(cors, {
   origin: process.env.NODE_ENV === "production" ? process.env.ALLOWED_URL : "*",
 });
+console.log("ALLOWED_URL", process.env.ALLOWED_URL);
 server.register(otherRouter);
 
 server.register(async (instance, _, done) => {
