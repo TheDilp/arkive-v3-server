@@ -48,6 +48,10 @@ const isLocal = !!process.env.LOCAL;
 
 const server = fastify();
 
+server.register(cors, {
+  origin: process.env.NODE_ENV === "production" ? process.env.ALLOWED_URL : "*",
+});
+
 if (!isLocal) server.register(clerkPlugin);
 
 prisma.$use(async (params, next) => {
@@ -123,9 +127,6 @@ prisma.$use(async (params, next) => {
 
 server.register(fileUpload);
 
-server.register(cors, {
-  origin: process.env.NODE_ENV === "production" ? process.env.ALLOWED_URL : "*",
-});
 console.log("ALLOWED_URL", process.env.ALLOWED_URL);
 console.log("MODE", process.env.NODE_ENV);
 server.register(otherRouter);
