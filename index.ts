@@ -49,7 +49,7 @@ const isLocal = !!process.env.LOCAL;
 const server = fastify();
 
 server.register(cors, {
-  origin: "*",
+  origin: process.env.ALLOWED_URL,
 });
 
 if (!isLocal) server.register(clerkPlugin);
