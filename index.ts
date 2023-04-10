@@ -49,7 +49,17 @@ const isLocal = !!process.env.LOCAL;
 const server = fastify();
 
 server.register(cors, {
-  origin: process.env.ALLOWED_URL,
+  origin: (origin, cb) => {
+    const hostname = new URL(origin).hostname;
+    console.log(hostname);
+    if (hostname === "thearkive.app") {
+      //  Request from localhost will pass
+      cb(null, true);
+      return;
+    }
+    // Generate an error on other origins, disabling access
+    cb(new Error("Not allowed"), false);
+  },
 });
 
 if (!isLocal) server.register(clerkPlugin);
