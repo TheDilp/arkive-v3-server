@@ -78,8 +78,10 @@ model documents {
   tags        tags[]
   alter_names alter_names[]
 
-  cards  cards[]
-  events events[]
+  cards   cards[]
+  events  events[]
+  field   field?   @relation(fields: [fieldId], references: [id])
+  fieldId String?  @db.Uuid
 }
 
 model alter_names {
@@ -116,6 +118,8 @@ model maps {
   parent   maps?   @relation("parentChildMaps", fields: [parentId], references: [id], onDelete: Cascade)
   children maps[]  @relation("parentChildMaps")
   tags     tags[]
+  field    field?  @relation(fields: [fieldId], references: [id])
+  fieldId  String? @db.Uuid
 }
 
 model map_pins {
@@ -137,6 +141,8 @@ model map_pins {
 
   map_link String? @db.Uuid
   doc_id   String? @db.Uuid
+  field    field?  @relation(fields: [fieldId], references: [id])
+  fieldId  String? @db.Uuid
 }
 
 model map_layers {
@@ -169,6 +175,8 @@ model boards {
   nodes      nodes[]
   edges      edges[]
   tags       tags[]
+  field      field?   @relation(fields: [fieldId], references: [id])
+  fieldId    String?  @db.Uuid
 }
 
 model nodes {
@@ -202,6 +210,8 @@ model nodes {
   edges_source edges[]    @relation("edges_source")
   edges_target edges[]    @relation("edges_target")
   tags         tags[]
+  field        field?     @relation(fields: [fieldId], references: [id])
+  fieldId      String?    @db.Uuid
 }
 
 model edges {
@@ -334,6 +344,8 @@ model words {
 
   dictionary dictionaries @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId   String       @db.Uuid
+  field      field?       @relation(fields: [fieldId], references: [id])
+  fieldId    String?      @db.Uuid
 
   @@unique([title, translation, parentId])
 }
@@ -412,6 +424,8 @@ model events {
   calendarsId String? @db.Uuid
   documentsId String? @db.Uuid
   monthsId    String  @db.Uuid
+  field       field?  @relation(fields: [fieldId], references: [id])
+  fieldId     String? @db.Uuid
 }
 
 model timelines {
@@ -483,6 +497,8 @@ model tags {
   dictionaries dictionaries[]
   calendars    calendars[]
   events       events[]
+  field        field?         @relation(fields: [fieldId], references: [id])
+  fieldId      String?        @db.Uuid
 
   @@unique([title, project_id])
 }
@@ -507,4 +523,25 @@ model webhooks {
   user_id String @db.Uuid
 
   @@unique([id, user_id])
+}
+
+model database {
+  id    String @id @default(uuid()) @db.Uuid
+  title String
+}
+
+model field {
+  id      String   @id @default(uuid()) @db.Uuid
+  title   String
+  type    String
+  options String[]
+
+  documents documents[]
+  maps      maps[]
+  map_pins  map_pins[]
+  boards    boards[]
+  nodes     nodes[]
+  tags      tags[]
+  words     words[]
+  events    events[]
 }

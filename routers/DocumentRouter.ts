@@ -269,6 +269,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+
+  server.post(
+    "/autolink",
+    async (req: FastifyRequest, rep: FastifyReply) => {}
+  );
+
   server.delete(
     "/deletedocument",
     async (

@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-
+import type { WebhookEvent } from "@clerk/clerk-sdk-node";
 import prisma from "../client";
 import { checkIfLocal } from "../utils/auth";
 
@@ -42,20 +42,21 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
     "/createuser",
     async (
       req: FastifyRequest<{
-        Body: {
-          id: string;
-          nickname: string;
-          email: string;
-          auth_id: string;
-        };
+        Body: WebhookEvent;
       }>,
       rep: FastifyReply
     ) => {
       try {
         const data = req.body;
-        await prisma.user.create({
-          data,
-        });
+        if (data.type === "user.created") {
+          await prisma.user.create({
+            data: {
+              auth_id: data.data.id,
+              email: data.data.email_addresses[0].email_address,
+              nickname: data.data.username,
+            },
+          });
+        }
         rep.send(true);
       } catch (error) {
         rep.code(500);
