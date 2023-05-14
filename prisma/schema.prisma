@@ -15,10 +15,9 @@ model User {
   email    String  @unique
   image    String?
 
-  webhooks   webhooks[]
-  projectsId String?    @db.Uuid
-  createrOf  projects[] @relation("project_owner")
-  members    members[]
+  webhooks  webhooks[]
+  createrOf projects[] @relation("project_owner")
+  members   members[]
 }
 
 model members {

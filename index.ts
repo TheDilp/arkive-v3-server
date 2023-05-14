@@ -179,22 +179,6 @@ if (process.env.VITE_BE_PORT) {
         console.error(err);
         process.exit(1);
       }
-      if (!!process.env.LOCAL) {
-        const adminUser = await prisma.user.findUnique({
-          where: {
-            auth_id: "ADMIN",
-          },
-        });
-        if (!adminUser) {
-          await prisma.user.create({
-            data: {
-              nickname: "ADMIN",
-              auth_id: "ADMIN",
-              email: "admin",
-            },
-          });
-        }
-      }
 
       console.log(`Server listening at ${address}`);
       console.log("==============================");
