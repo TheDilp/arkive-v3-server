@@ -22,11 +22,11 @@ import { tagRouter } from "./routers/TagRouter";
 import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
 
-declare module "fastify" {
-  interface FastifyRequest {
-    isLocal: boolean;
-  }
-}
+// declare module "fastify" {
+//   interface FastifyRequest {
+//     isLocal: boolean;
+//   }
+// }
 
 const mainIncrementItems = [
   "documents",
@@ -44,7 +44,6 @@ const subIncrementItems = [
   "months",
   "random_table_options",
 ];
-const isLocal = !!process.env.LOCAL;
 
 const server = fastify();
 
@@ -144,17 +143,14 @@ server.register(otherRouter);
 
 server.register(async (instance, _, done) => {
   instance.addHook("preHandler", async (request, reply) => {
-    request.isLocal = isLocal;
-    if (!isLocal) {
-      const { userId, sessionId } = getAuth(request);
-      if (!sessionId) {
-        reply.status(401);
-        reply.send({ error: "User could not be verified" });
-      }
-      if (!userId) {
-        reply.code(403);
-        throw new Error("NOT AUTHORIZED");
-      }
+    const { userId, sessionId } = getAuth(request);
+    if (!sessionId) {
+      reply.status(401);
+      reply.send({ error: "User could not be verified" });
+    }
+    if (!userId) {
+      reply.code(403);
+      throw new Error("NOT AUTHORIZED");
     }
   });
   instance.register(userRouter);

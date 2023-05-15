@@ -13,18 +13,13 @@ export async function clerkPreHandler(
 }
 
 export function checkIfLocal(req: FastifyRequest, rep: FastifyReply) {
-  if (req.isLocal) {
-    return "ADMIN";
-  }
-  if (!req.isLocal) {
-    const { userId } = getAuth(req);
-    if (!userId) {
-      rep.code(403);
-      rep.send("NOT AUTHORIZED");
-      return null;
-    } else {
-      return userId;
-    }
+  const { userId } = getAuth(req);
+  if (!userId) {
+    rep.code(403);
+    rep.send("NOT AUTHORIZED");
+    return null;
+  } else {
+    return userId;
   }
   return null;
 }
