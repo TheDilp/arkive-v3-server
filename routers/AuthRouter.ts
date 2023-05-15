@@ -8,7 +8,7 @@ export const authRouter = (server: FastifyInstance, _: any, done: any) => {
     "/createuser",
     async (
       req: FastifyRequest<{
-        Body: string;
+        Body: any;
       }>,
       rep: FastifyReply
     ) => {
@@ -16,7 +16,8 @@ export const authRouter = (server: FastifyInstance, _: any, done: any) => {
         const svixId = req.headers["svix-id"] as string;
         const svixIdTimeStamp = req.headers["svix-timestamp"] as string;
         const svixSignature = req.headers["svix-signature"] as string;
-
+        console.log(typeof req.body);
+        const payloadString = JSON.stringify(req.body);
         if (!svixId || !svixIdTimeStamp || !svixSignature) {
           console.log("svixId", svixId);
           console.log("svixIdTimeStamp", svixIdTimeStamp);
@@ -34,7 +35,7 @@ export const authRouter = (server: FastifyInstance, _: any, done: any) => {
 
         if (CREATE_USER_SECRET) {
           const wh = new Webhook(CREATE_USER_SECRET);
-          const data = wh.verify(req.body, svixHeaders) as WebhookEvent;
+          const data = wh.verify(payloadString, svixHeaders) as WebhookEvent;
 
           if (data.type === "user.created") {
             await prisma.user.create({
