@@ -50,6 +50,10 @@ const server = fastify();
 
 server.register(cors, {
   origin: (origin, cb) => {
+    if (process.env.NODE_ENV === "development") {
+      cb(null, true);
+      return;
+    }
     const hostname = new URL(origin).hostname;
     if (hostname === process.env.ALLOWED_URL) {
       //  Request from localhost will pass
