@@ -21,12 +21,12 @@ model User {
 }
 
 model members {
-  id      String   @id @default(uuid()) @db.Uuid
-  project projects @relation(fields: [project_id], references: [id])
-  member  User     @relation(fields: [user_id], references: [id])
-
-  project_id String @db.Uuid
-  user_id    String @db.Uuid
+  id         String   @id @default(uuid()) @db.Uuid
+  project    projects @relation(fields: [project_id], references: [id])
+  member     User     @relation(fields: [user_id], references: [id])
+  role       String   @default("viewer")
+  project_id String   @db.Uuid
+  user_id    String   @db.Uuid
 
   @@unique([project_id, user_id])
 }
@@ -39,6 +39,8 @@ model projects {
   ownerId String
   owner   User   @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
 
+  members members[]
+
   documents     documents[]
   maps          maps[]
   boards        boards[]
@@ -46,7 +48,6 @@ model projects {
   dictionaries  dictionaries[]
   calendars     calendars[]
   random_tables random_tables[]
-  members       members[]
   tags          tags[]
   swatches      swatches[]
   timelines     timelines[]
@@ -525,8 +526,9 @@ model webhooks {
 }
 
 model database {
-  id    String @id @default(uuid()) @db.Uuid
-  title String
+  id               String  @id @default(uuid()) @db.Uuid
+  title            String
+  title_field_name String? @default("Title")
 }
 
 model field {

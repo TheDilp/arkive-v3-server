@@ -16,7 +16,6 @@ export const authRouter = (server: FastifyInstance, _: any, done: any) => {
         const svixId = req.headers["svix-id"] as string;
         const svixIdTimeStamp = req.headers["svix-timestamp"] as string;
         const svixSignature = req.headers["svix-signature"] as string;
-        console.log(typeof req.body);
         const payloadString = JSON.stringify(req.body);
         if (!svixId || !svixIdTimeStamp || !svixSignature) {
           console.log("svixId", svixId);
