@@ -53,7 +53,9 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
             data: {
               auth_id: data.data.id,
               email: data.data.email_addresses[0].email_address,
-              nickname: data.data.username,
+              nickname:
+                data.data?.username ||
+                `${data.data?.first_name || ""} ${data.data?.last_name || ""}`,
             },
           });
         }
