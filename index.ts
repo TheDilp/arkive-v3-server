@@ -21,6 +21,7 @@ import { searchRouter } from "./routers/SearchRouter";
 import { tagRouter } from "./routers/TagRouter";
 import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
+import { authRouter } from "./routers/AuthRouter";
 
 // declare module "fastify" {
 //   interface FastifyRequest {
@@ -140,7 +141,7 @@ prisma.$use(async (params, next) => {
 server.register(fileUpload);
 
 server.register(otherRouter);
-
+server.register(authRouter);
 server.register(async (instance, _, done) => {
   instance.addHook("preHandler", async (request, reply) => {
     const { userId, sessionId } = getAuth(request);
