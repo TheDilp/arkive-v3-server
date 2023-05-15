@@ -144,6 +144,7 @@ server.register(otherRouter);
 server.register(async (instance, _, done) => {
   instance.addHook("preHandler", async (request, reply) => {
     const { userId, sessionId } = getAuth(request);
+    console.log(request, userId, sessionId);
     if (!sessionId) {
       reply.status(401);
       reply.send({ error: "User could not be verified" });
