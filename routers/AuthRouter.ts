@@ -14,11 +14,10 @@ export const authRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const CREATE_USER_SECRET = process.env.CREATE_USER_SECRET;
+        console.log(CREATE_USER_SECRET);
         if (CREATE_USER_SECRET) {
           const wh = new Webhook(CREATE_USER_SECRET);
-          console.log(req.body, req.headers);
           const data = wh.verify(req.body, req.headers as any) as WebhookEvent;
-          console.log(data);
 
           if (data.type === "user.created") {
             await prisma.user.create({
