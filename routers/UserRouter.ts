@@ -144,49 +144,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
-  server.post(
-    "/createnotification",
-    async (
-      req: FastifyRequest<{
-        Body: {
-          user_id: string[];
-          title: string;
-          content: string;
-        };
-      }>,
-      rep
-    ) => {
-      try {
-        const data = req.body;
-        const notifications = [];
-        for (let i = 0; i < data.user_id.length; i++) {
-          notifications.push(
-            prisma.notifications.create({
-              data: {
-                title: data.title,
-                content: data.content,
-                user_notifications: {
-                  create: {
-                    userId: data.user_id[i],
-                  },
-                },
-              },
-            })
-          );
-        }
-        prisma.$transaction(notifications);
 
-        // server.io.emit("new_notification", newNotification);
-        rep.send(true);
-        return;
-      } catch (error) {
-        rep.code(500);
-        console.log(error);
-        rep.send(false);
-        return;
-      }
-    }
-  );
   server.post(
     "/updatepermission",
     async (
@@ -200,7 +158,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = req.body;
-        const permissions = await prisma.permissions.update({
+        await prisma.permissions.update({
           data: {
             [data.permission.name]: data.permission.value,
           },

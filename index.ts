@@ -22,7 +22,6 @@ import { tagRouter } from "./routers/TagRouter";
 import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
 import { authRouter } from "./routers/AuthRouter";
-import websockets from "fastify-socket.io";
 
 // declare module "fastify" {
 //   interface FastifyRequest {
@@ -67,12 +66,7 @@ server.register(cors, {
 });
 
 server.register(clerkPlugin);
-server.register(websockets, {
-  cors: {
-    origin:
-      process.env.NODE_ENV === "development" ? "*" : process.env.ALLOWED_URL,
-  },
-});
+
 prisma.$use(async (params, next) => {
   try {
     if (params.action === "create" && params?.model) {
