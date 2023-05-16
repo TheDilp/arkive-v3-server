@@ -9,7 +9,7 @@ export const notificationRouter = (
 ) => {
   server.get("/notifications", { websocket: true }, (connection) => {
     console.log("TEST");
-    connection.socket.on("message", (message) => {
+    connection.on("message", (message) => {
       connection.socket.send(message);
     });
     eventEmitter.on("new_notification", (event) => {

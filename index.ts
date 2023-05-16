@@ -141,6 +141,7 @@ prisma.$use(async (params, next) => {
 });
 
 server.register(fileUpload);
+server.register(notificationRouter);
 
 server.register(otherRouter);
 server.register(authRouter);
@@ -169,7 +170,6 @@ server.register(async (instance, _, done) => {
   instance.register(dictionaryRouter);
   instance.register(randomTableRouter);
   instance.register(imageRouter);
-  instance.register(notificationRouter);
 
   done();
 });
