@@ -1,6 +1,8 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../client";
 import { checkIfLocal } from "../utils/auth";
+import { eventEmitter } from "../utils/events";
+import { on } from "events";
 
 export const userRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
@@ -138,6 +140,43 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+  server.post(
+    "/createnotification",
+    async (
+      req: FastifyRequest<{
+        Body: {
+          user_id: string;
+          title: string;
+          content: string;
+        };
+      }>,
+      rep
+    ) => {
+      try {
+        const data = req.body;
+        const newNotification = await prisma.notifications.create({
+          data: {
+            title: data.title,
+            content: data.content,
+            user_notifications: {
+              create: {
+                userId: data.user_id,
+              },
+            },
+          },
+        });
+        eventEmitter.emit("new_notification", newNotification);
+        rep.send(newNotification);
+        return;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
+      }
+    }
+  );
+
   server.delete(
     "/deleteuser",
     async (

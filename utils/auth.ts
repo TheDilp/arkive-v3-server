@@ -21,5 +21,4 @@ export function checkIfLocal(req: FastifyRequest, rep: FastifyReply) {
   } else {
     return userId;
   }
-  return null;
 }
