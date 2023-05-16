@@ -23,6 +23,7 @@ import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
 import { authRouter } from "./routers/AuthRouter";
 import { FastifySSEPlugin } from "fastify-sse-v2";
+import { notificationRouter } from "./routers/NotificationRouter";
 
 // declare module "fastify" {
 //   interface FastifyRequest {
@@ -143,6 +144,7 @@ server.register(fileUpload);
 
 server.register(otherRouter);
 server.register(authRouter);
+server.register(notificationRouter);
 server.register(async (instance, _, done) => {
   instance.addHook("preHandler", async (request, reply) => {
     const { userId, sessionId } = getAuth(request);
