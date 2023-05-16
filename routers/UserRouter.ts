@@ -101,6 +101,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
               },
             },
           });
+          rep.send(true);
         } else {
           rep.code(500);
           rep.send("NO USER FOUND");

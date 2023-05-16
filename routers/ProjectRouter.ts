@@ -71,6 +71,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           include: {
             members: {
               select: {
+                permissions: true,
                 member: {
                   select: {
                     id: true,
