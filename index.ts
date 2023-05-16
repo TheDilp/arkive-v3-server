@@ -22,7 +22,7 @@ import { tagRouter } from "./routers/TagRouter";
 import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
 import { authRouter } from "./routers/AuthRouter";
-import websockets from "@fastify/websocket";
+import websockets from "fastify-socket.io";
 import { notificationRouter } from "./routers/NotificationRouter";
 
 // declare module "fastify" {
