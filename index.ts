@@ -144,7 +144,6 @@ server.register(fileUpload);
 
 server.register(otherRouter);
 server.register(authRouter);
-server.register(notificationRouter);
 server.register(async (instance, _, done) => {
   instance.addHook("preHandler", async (request, reply) => {
     const { userId, sessionId } = getAuth(request);
@@ -170,6 +169,8 @@ server.register(async (instance, _, done) => {
   instance.register(dictionaryRouter);
   instance.register(randomTableRouter);
   instance.register(imageRouter);
+  instance.register(notificationRouter);
+
   done();
 });
 
