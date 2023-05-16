@@ -68,7 +68,12 @@ server.register(cors, {
 });
 
 server.register(clerkPlugin);
-server.register(websockets);
+server.register(websockets, {
+  cors: {
+    origin:
+      process.env.NODE_ENV === "development" ? "*" : process.env.ALLOWED_URL,
+  },
+});
 prisma.$use(async (params, next) => {
   try {
     if (params.action === "create" && params?.model) {

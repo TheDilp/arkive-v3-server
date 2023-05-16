@@ -1,5 +1,4 @@
 import { FastifyInstance, FastifyReply } from "fastify";
-import { on } from "events";
 import { eventEmitter } from "../utils/events";
 
 export const notificationRouter = (
