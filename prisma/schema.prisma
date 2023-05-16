@@ -49,7 +49,7 @@ model permissions {
   random_tables String? @default("None")
   timelines     String? @default("None")
   tags          String? @default("None")
-  alter_name    String? @default("None")
+  alter_names   String? @default("None")
 
   @@unique([project_id, user_id])
 }
@@ -74,7 +74,7 @@ model projects {
   tags          tags[]
   swatches      swatches[]
   timelines     timelines[]
-  alter_name    alter_names[]
+  alter_names   alter_names[]
   permissions   permissions[]
 }
 
