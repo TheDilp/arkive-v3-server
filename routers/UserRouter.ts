@@ -187,6 +187,35 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+  server.post(
+    "/updatepermission",
+    async (
+      req: FastifyRequest<{
+        Body: {
+          id: string;
+          permission: { name: string; value: "Editor" | "Viewer" | "None" };
+        };
+      }>,
+      rep
+    ) => {
+      try {
+        const data = req.body;
+        const permissions = await prisma.permissions.update({
+          data: {
+            [data.permission.name]: data.permission.value,
+          },
+          where: {
+            id: data.id,
+          },
+        });
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
+    }
+  );
 
   server.delete(
     "/deleteuser",
