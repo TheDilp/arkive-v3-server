@@ -7,17 +7,10 @@ export const notificationRouter = (
   _: any,
   done: any
 ) => {
-  server.get("/notifications", (req, res) => {
-    res.sse(
-      (async function* () {
-        for await (const [event] of on(eventEmitter, "new_notification")) {
-          yield {
-            event: event.name,
-            data: JSON.stringify(event),
-          };
-        }
-      })()
-    );
+  server.get("/notifications", { websocket: true }, (connection) => {
+    eventEmitter.on("new_notification", (event) => {
+      connection.socket.send(JSON.stringify(event));
+    });
   });
   done();
 };

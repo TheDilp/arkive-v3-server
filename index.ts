@@ -22,7 +22,7 @@ import { tagRouter } from "./routers/TagRouter";
 import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
 import { authRouter } from "./routers/AuthRouter";
-import { FastifySSEPlugin } from "fastify-sse-v2";
+import websockets from "@fastify/websocket";
 import { notificationRouter } from "./routers/NotificationRouter";
 
 // declare module "fastify" {
@@ -68,7 +68,7 @@ server.register(cors, {
 });
 
 server.register(clerkPlugin);
-server.register(FastifySSEPlugin);
+server.register(websockets);
 prisma.$use(async (params, next) => {
   try {
     if (params.action === "create" && params?.model) {
