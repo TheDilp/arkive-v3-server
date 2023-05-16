@@ -23,7 +23,6 @@ import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
 import { authRouter } from "./routers/AuthRouter";
 import websockets from "fastify-socket.io";
-import { notificationRouter } from "./routers/NotificationRouter";
 
 // declare module "fastify" {
 //   interface FastifyRequest {
@@ -146,8 +145,6 @@ prisma.$use(async (params, next) => {
 });
 
 server.register(fileUpload);
-server.register(notificationRouter);
-
 server.register(otherRouter);
 server.register(authRouter);
 server.register(async (instance, _, done) => {

@@ -1,8 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../client";
 import { checkIfLocal } from "../utils/auth";
-import { eventEmitter } from "../utils/events";
-import { on } from "events";
 
 export const userRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
@@ -165,8 +163,8 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
         });
-        eventEmitter.emit("new_notification", newNotification);
-        rep.send(newNotification);
+        server.io.emit("new_notification", newNotification);
+        rep.send(true);
         return;
       } catch (error) {
         rep.code(500);
