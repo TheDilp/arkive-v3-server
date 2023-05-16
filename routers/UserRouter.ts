@@ -94,6 +94,11 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
             data: {
               project_id: data.project_id,
               user_id: newMember.id,
+              permissions: {
+                create: {
+                  project_id: data.project_id,
+                },
+              },
             },
           });
         } else {
@@ -143,7 +148,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
     async (
       req: FastifyRequest<{
         Body: {
-          user_id: string;
+          user_id: string[];
           title: string;
           content: string;
         };
@@ -152,18 +157,25 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = req.body;
-        const newNotification = await prisma.notifications.create({
-          data: {
-            title: data.title,
-            content: data.content,
-            user_notifications: {
-              create: {
-                userId: data.user_id,
+        const notifications = [];
+        for (let i = 0; i < data.user_id.length; i++) {
+          notifications.push(
+            prisma.notifications.create({
+              data: {
+                title: data.title,
+                content: data.content,
+                user_notifications: {
+                  create: {
+                    userId: data.user_id[i],
+                  },
+                },
               },
-            },
-          },
-        });
-        server.io.emit("new_notification", newNotification);
+            })
+          );
+        }
+        prisma.$transaction(notifications);
+
+        // server.io.emit("new_notification", newNotification);
         rep.send(true);
         return;
       } catch (error) {

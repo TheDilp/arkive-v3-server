@@ -23,12 +23,33 @@ model User {
 }
 
 model members {
+  id          String        @id @default(uuid()) @db.Uuid
+  project     projects      @relation(fields: [project_id], references: [id])
+  member      User          @relation(fields: [user_id], references: [id])
+  project_id  String        @db.Uuid
+  user_id     String        @db.Uuid
+  permissions permissions[]
+
+  @@unique([project_id, user_id])
+}
+
+model permissions {
   id         String   @id @default(uuid()) @db.Uuid
   project    projects @relation(fields: [project_id], references: [id])
-  member     User     @relation(fields: [user_id], references: [id])
-  role       String   @default("viewer")
+  member     members  @relation(fields: [user_id], references: [id])
   project_id String   @db.Uuid
   user_id    String   @db.Uuid
+
+  documents     String? @default("None")
+  maps          String? @default("None")
+  boards        String? @default("None")
+  screens       String? @default("None")
+  dictionaries  String? @default("None")
+  calendars     String? @default("None")
+  random_tables String? @default("None")
+  timelines     String? @default("None")
+  tags          String? @default("None")
+  alter_name    String? @default("None")
 
   @@unique([project_id, user_id])
 }
@@ -54,6 +75,7 @@ model projects {
   swatches      swatches[]
   timelines     timelines[]
   alter_name    alter_names[]
+  permissions   permissions[]
 }
 
 model documents {
