@@ -550,9 +550,17 @@ model entities {
   description String?
   tags        tags[]
 
-  fields fields[]
+  fields           fields[]
+  entity_instances entity_instances[]
 
   @@unique([title, project_id])
+}
+
+model entity_instances {
+  id           String         @id @default(uuid()) @db.Uuid
+  entity       entities       @relation(fields: [entitiesId], references: [id])
+  entitiesId   String         @db.Uuid
+  field_values field_values[]
 }
 
 model fields {
@@ -570,4 +578,13 @@ model fields {
   events       events[]
   dictionaries dictionaries[]
   words        words[]
+  field_values field_values[]
+}
+
+model field_values {
+  id String @id @default(uuid()) @db.Uuid
+
+  field            fields             @relation(fields: [fieldsId], references: [id])
+  fieldsId         String             @db.Uuid
+  entity_instances entity_instances[]
 }
