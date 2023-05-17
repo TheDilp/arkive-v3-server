@@ -22,6 +22,7 @@ import { tagRouter } from "./routers/TagRouter";
 import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
 import { authRouter } from "./routers/AuthRouter";
+import { entitiesRouter } from "./routers/EntitiesRouter";
 
 // declare module "fastify" {
 //   interface FastifyRequest {
@@ -165,6 +166,7 @@ server.register(async (instance, _, done) => {
   instance.register(screenRouter);
   instance.register(dictionaryRouter);
   instance.register(randomTableRouter);
+  instance.register(entitiesRouter);
   instance.register(imageRouter);
 
   done();
