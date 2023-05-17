@@ -111,7 +111,7 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
           data: {
             ...data,
             calendars: {
-              set: data?.calendars?.map((cal: calendars) => ({
+              connect: data?.calendars?.map((cal: calendars) => ({
                 id: cal.id,
               })),
             },
