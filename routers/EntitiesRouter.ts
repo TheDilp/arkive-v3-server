@@ -2,6 +2,76 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { EntityFieldType } from "../types/dataTypes";
 import prisma from "../client";
 export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
+  server.get(
+    "/getallentities/:project_id",
+    async (
+      req: FastifyRequest<{ Params: { project_id: string } }>,
+      res: FastifyReply
+    ) => {
+      try {
+        const data = await prisma.entities.findMany({
+          where: {
+            project_id: req.params.project_id,
+          },
+          include: {
+            fields: {
+              include: {
+                documents: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
+                },
+                maps: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
+                },
+                map_pins: {
+                  select: {
+                    id: true,
+                    text: true,
+                  },
+                },
+                boards: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
+                },
+                nodes: {
+                  select: {
+                    id: true,
+                    label: true,
+                  },
+                },
+                dictionaries: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
+                },
+                words: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+        res.send(data);
+        return;
+      } catch (error) {
+        res.code(500);
+        console.log(error);
+        res.send(false);
+        return;
+      }
+    }
+  );
   server.post(
     "/getsingleentity",
     async (
