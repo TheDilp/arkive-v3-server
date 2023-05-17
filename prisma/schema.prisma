@@ -558,8 +558,8 @@ model entities {
 
 model entity_instances {
   id           String         @id @default(uuid()) @db.Uuid
-  entity       entities       @relation(fields: [entitiesId], references: [id])
-  entitiesId   String         @db.Uuid
+  entity       entities       @relation(fields: [entity_id], references: [id])
+  entity_id    String         @db.Uuid
   field_values field_values[]
 }
 
@@ -576,8 +576,9 @@ model fields {
 model field_values {
   id String @id @default(uuid()) @db.Uuid
 
-  field            fields             @relation(fields: [fieldsId], references: [id], onDelete: Cascade)
-  fieldsId         String             @db.Uuid
+  field            fields             @relation(fields: [field_id], references: [id], onDelete: Cascade)
+  field_id         String             @db.Uuid
+  value            String
   entity_instances entity_instances[]
 
   documents    documents[]
