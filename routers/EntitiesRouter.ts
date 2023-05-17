@@ -94,8 +94,13 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
         });
 
         if (entity) {
-          const fieldsToCreate = fields.map((field) =>
-            prisma.fields.create({
+          const fieldsToCreate = fields.map((field) => {
+            const relations = [];
+
+            if (field.document_id) {
+            }
+
+            return prisma.fields.create({
               data: {
                 title: field.title,
                 type: field.type,
@@ -104,44 +109,58 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
                     id: entity.id,
                   },
                 },
-                documents: {
-                  connect: {
-                    id: field.document_id,
-                  },
-                },
-                maps: {
-                  connect: {
-                    id: field.map_id,
-                  },
-                },
-                map_pins: {
-                  connect: {
-                    id: field.map_pin_id,
-                  },
-                },
-                boards: {
-                  connect: {
-                    id: field.board_id,
-                  },
-                },
-                nodes: {
-                  connect: {
-                    id: field.node_id,
-                  },
-                },
-                dictionaries: {
-                  connect: {
-                    id: field.dictionary_id,
-                  },
-                },
-                words: {
-                  connect: {
-                    id: field.word_id,
-                  },
-                },
+                documents: field?.document_id
+                  ? {
+                      connect: {
+                        id: field.document_id,
+                      },
+                    }
+                  : undefined,
+                maps: field?.map_id
+                  ? {
+                      connect: {
+                        id: field.map_id,
+                      },
+                    }
+                  : undefined,
+                map_pins: field?.map_pin_id
+                  ? {
+                      connect: {
+                        id: field.map_pin_id,
+                      },
+                    }
+                  : undefined,
+                boards: field?.board_id
+                  ? {
+                      connect: {
+                        id: field.board_id,
+                      },
+                    }
+                  : undefined,
+                nodes: field?.node_id
+                  ? {
+                      connect: {
+                        id: field.node_id,
+                      },
+                    }
+                  : undefined,
+                dictionaries: field?.dictionary_id
+                  ? {
+                      connect: {
+                        id: field.dictionary_id,
+                      },
+                    }
+                  : undefined,
+                words: field?.word_id
+                  ? {
+                      connect: {
+                        id: field.word_id,
+                      },
+                    }
+                  : undefined,
               },
-            })
-          );
+            });
+          });
 
           await prisma.$transaction(fieldsToCreate);
 
