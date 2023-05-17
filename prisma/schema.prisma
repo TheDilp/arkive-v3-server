@@ -102,9 +102,9 @@ model documents {
   tags        tags[]
   alter_names alter_names[]
 
-  cards  cards[]
-  events events[]
-  fields fields[]
+  cards        cards[]
+  events       events[]
+  field_values field_values[]
 }
 
 model alter_names {
@@ -137,11 +137,11 @@ model maps {
   map_pins   map_pins[]
   map_layers map_layers[]
 
-  parentId String?  @db.Uuid
-  parent   maps?    @relation("parentChildMaps", fields: [parentId], references: [id], onDelete: Cascade)
-  children maps[]   @relation("parentChildMaps")
-  tags     tags[]
-  fields   fields[]
+  parentId     String?        @db.Uuid
+  parent       maps?          @relation("parentChildMaps", fields: [parentId], references: [id], onDelete: Cascade)
+  children     maps[]         @relation("parentChildMaps")
+  tags         tags[]
+  field_values field_values[]
 }
 
 model map_pins {
@@ -161,9 +161,9 @@ model map_pins {
   isPublic        Boolean @default(false)
   tags            tags[]
 
-  map_link String?  @db.Uuid
-  doc_id   String?  @db.Uuid
-  fields   fields[]
+  map_link     String?        @db.Uuid
+  doc_id       String?        @db.Uuid
+  field_values field_values[]
 }
 
 model map_layers {
@@ -188,15 +188,15 @@ model boards {
   defaultNodeColor String @default("#595959")
   defaultEdgeColor String @default("#595959")
 
-  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
-  project_id String   @db.Uuid
-  parentId   String?  @db.Uuid
-  parent     boards?  @relation("parentChildBoards", fields: [parentId], references: [id], onDelete: Cascade)
-  children   boards[] @relation("parentChildBoards")
-  nodes      nodes[]
-  edges      edges[]
-  tags       tags[]
-  fields     fields[]
+  project      projects       @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  project_id   String         @db.Uuid
+  parentId     String?        @db.Uuid
+  parent       boards?        @relation("parentChildBoards", fields: [parentId], references: [id], onDelete: Cascade)
+  children     boards[]       @relation("parentChildBoards")
+  nodes        nodes[]
+  edges        edges[]
+  tags         tags[]
+  field_values field_values[]
 }
 
 model nodes {
@@ -222,15 +222,15 @@ model nodes {
   template Boolean?
   zIndex   Int?
 
-  board        boards     @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  document     documents? @relation(fields: [doc_id], references: [id])
-  doc_id       String?    @db.Uuid
+  board        boards         @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  document     documents?     @relation(fields: [doc_id], references: [id])
+  doc_id       String?        @db.Uuid
   image        String?
-  parentId     String     @db.Uuid
-  edges_source edges[]    @relation("edges_source")
-  edges_target edges[]    @relation("edges_target")
+  parentId     String         @db.Uuid
+  edges_source edges[]        @relation("edges_source")
+  edges_target edges[]        @relation("edges_target")
   tags         tags[]
-  fields       fields[]
+  field_values field_values[]
 }
 
 model edges {
@@ -348,9 +348,9 @@ model dictionaries {
   parent   dictionaries?  @relation("parentChildDictionaries", fields: [parentId], references: [id], onDelete: Cascade)
   children dictionaries[] @relation("parentChildDictionaries")
 
-  tags   tags[]
-  words  words[]
-  fields fields[]
+  tags         tags[]
+  words        words[]
+  field_values field_values[]
 
   @@unique([project_id, title])
 }
@@ -362,9 +362,9 @@ model words {
 
   translation String
 
-  dictionary dictionaries @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  parentId   String       @db.Uuid
-  fields     fields[]
+  dictionary   dictionaries   @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  parentId     String         @db.Uuid
+  field_values field_values[]
 
   @@unique([title, translation, parentId])
 }
@@ -440,10 +440,10 @@ model events {
 
   tags tags[]
 
-  calendarsId String?  @db.Uuid
-  documentsId String?  @db.Uuid
-  monthsId    String   @db.Uuid
-  fields      fields[]
+  calendarsId  String?        @db.Uuid
+  documentsId  String?        @db.Uuid
+  monthsId     String         @db.Uuid
+  field_values field_values[]
 }
 
 model timelines {
@@ -570,6 +570,16 @@ model fields {
   entity   entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
   entityId String   @db.Uuid
 
+  field_values field_values[]
+}
+
+model field_values {
+  id String @id @default(uuid()) @db.Uuid
+
+  field            fields             @relation(fields: [fieldsId], references: [id], onDelete: Cascade)
+  fieldsId         String             @db.Uuid
+  entity_instances entity_instances[]
+
   documents    documents[]
   maps         maps[]
   map_pins     map_pins[]
@@ -578,13 +588,4 @@ model fields {
   events       events[]
   dictionaries dictionaries[]
   words        words[]
-  field_values field_values[]
-}
-
-model field_values {
-  id String @id @default(uuid()) @db.Uuid
-
-  field            fields             @relation(fields: [fieldsId], references: [id])
-  fieldsId         String             @db.Uuid
-  entity_instances entity_instances[]
 }
