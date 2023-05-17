@@ -48,6 +48,7 @@ model permissions {
   timelines     String? @default("None")
   tags          String? @default("None")
   alter_names   String? @default("None")
+  entities      String? @default("None")
 
   @@unique([project_id, user_id])
 }
