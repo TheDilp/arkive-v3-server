@@ -551,6 +551,8 @@ model entities {
   tags        tags[]
 
   fields fields[]
+
+  @@unique([title, project_id])
 }
 
 model fields {
