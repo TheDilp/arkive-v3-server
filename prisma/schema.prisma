@@ -74,6 +74,7 @@ model projects {
   timelines     timelines[]
   alter_names   alter_names[]
   permissions   permissions[]
+  entities      entities[]
 }
 
 model documents {
@@ -102,6 +103,7 @@ model documents {
 
   cards  cards[]
   events events[]
+  fields fields[]
 }
 
 model alter_names {
@@ -134,10 +136,11 @@ model maps {
   map_pins   map_pins[]
   map_layers map_layers[]
 
-  parentId String? @db.Uuid
-  parent   maps?   @relation("parentChildMaps", fields: [parentId], references: [id], onDelete: Cascade)
-  children maps[]  @relation("parentChildMaps")
+  parentId String?  @db.Uuid
+  parent   maps?    @relation("parentChildMaps", fields: [parentId], references: [id], onDelete: Cascade)
+  children maps[]   @relation("parentChildMaps")
   tags     tags[]
+  fields   fields[]
 }
 
 model map_pins {
@@ -157,8 +160,9 @@ model map_pins {
   isPublic        Boolean @default(false)
   tags            tags[]
 
-  map_link String? @db.Uuid
-  doc_id   String? @db.Uuid
+  map_link String?  @db.Uuid
+  doc_id   String?  @db.Uuid
+  fields   fields[]
 }
 
 model map_layers {
@@ -191,6 +195,7 @@ model boards {
   nodes      nodes[]
   edges      edges[]
   tags       tags[]
+  fields     fields[]
 }
 
 model nodes {
@@ -224,6 +229,7 @@ model nodes {
   edges_source edges[]    @relation("edges_source")
   edges_target edges[]    @relation("edges_target")
   tags         tags[]
+  fields       fields[]
 }
 
 model edges {
@@ -341,8 +347,9 @@ model dictionaries {
   parent   dictionaries?  @relation("parentChildDictionaries", fields: [parentId], references: [id], onDelete: Cascade)
   children dictionaries[] @relation("parentChildDictionaries")
 
-  tags  tags[]
-  words words[]
+  tags   tags[]
+  words  words[]
+  fields fields[]
 
   @@unique([project_id, title])
 }
@@ -356,6 +363,7 @@ model words {
 
   dictionary dictionaries @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId   String       @db.Uuid
+  fields     fields[]
 
   @@unique([title, translation, parentId])
 }
@@ -431,9 +439,10 @@ model events {
 
   tags tags[]
 
-  calendarsId String? @db.Uuid
-  documentsId String? @db.Uuid
-  monthsId    String  @db.Uuid
+  calendarsId String?  @db.Uuid
+  documentsId String?  @db.Uuid
+  monthsId    String   @db.Uuid
+  fields      fields[]
 }
 
 model timelines {
@@ -505,6 +514,7 @@ model tags {
   dictionaries dictionaries[]
   calendars    calendars[]
   events       events[]
+  entities     entities[]
 
   @@unique([title, project_id])
 }
@@ -529,4 +539,32 @@ model webhooks {
   user_id String @db.Uuid
 
   @@unique([id, user_id])
+}
+
+model entities {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  project     projects @relation(fields: [project_id], references: [id])
+  project_id  String   @db.Uuid
+  description String?
+  tags        tags[]
+
+  fields fields[]
+}
+
+model fields {
+  id       String   @id @default(uuid()) @db.Uuid
+  title    String
+  type     String
+  entity   entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  entityId String   @db.Uuid
+
+  documents    documents[]
+  maps         maps[]
+  map_pins     map_pins[]
+  boards       boards[]
+  nodes        nodes[]
+  events       events[]
+  dictionaries dictionaries[]
+  words        words[]
 }

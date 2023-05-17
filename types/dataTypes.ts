@@ -67,3 +67,15 @@ export type DocumentContentType = {
   type: "doc";
   content?: (ParagraphType | HeadingType)[];
 };
+
+export type EntityFieldType = {
+  title: string;
+  type: string;
+  document_id?: string;
+  map_id?: string;
+  map_pin_id?: string;
+  board_id?: string;
+  node_id?: string;
+  dictionary_id?: string;
+  word_id?: string;
+};
