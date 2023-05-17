@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { EntityFieldType } from "../types/dataTypes";
 import prisma from "../client";
+import set from "lodash.set";
 export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
     "/getallentities/:project_id",
@@ -13,8 +14,34 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
           where: {
             project_id: req.params.project_id,
           },
+          select: {
+            id: true,
+            title: true,
+          },
+        });
+        res.send(data);
+        return;
+      } catch (error) {
+        res.code(500);
+        console.log(error);
+        res.send(false);
+        return;
+      }
+    }
+  );
+  server.get(
+    "/getallentityinstances/:project_id",
+    async (
+      req: FastifyRequest<{ Params: { entity_id: string } }>,
+      res: FastifyReply
+    ) => {
+      try {
+        const data = await prisma.entity_instances.findMany({
+          where: {
+            entity_id: req.params.entity_id,
+          },
           include: {
-            fields: {
+            field_values: {
               include: {
                 documents: {
                   select: {
@@ -84,52 +111,7 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
             id: req.body.id,
           },
           include: {
-            fields: {
-              include: {
-                documents: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-                maps: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-                map_pins: {
-                  select: {
-                    id: true,
-                    text: true,
-                  },
-                },
-                boards: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-                nodes: {
-                  select: {
-                    id: true,
-                    label: true,
-                  },
-                },
-                dictionaries: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-                words: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-              },
-            },
+            fields: true,
           },
         });
       } catch (error) {
@@ -179,55 +161,55 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
                     id: entity.id,
                   },
                 },
-                documents: field?.document_id
-                  ? {
-                      connect: {
-                        id: field.document_id,
-                      },
-                    }
-                  : undefined,
-                maps: field?.map_id
-                  ? {
-                      connect: {
-                        id: field.map_id,
-                      },
-                    }
-                  : undefined,
-                map_pins: field?.map_pin_id
-                  ? {
-                      connect: {
-                        id: field.map_pin_id,
-                      },
-                    }
-                  : undefined,
-                boards: field?.board_id
-                  ? {
-                      connect: {
-                        id: field.board_id,
-                      },
-                    }
-                  : undefined,
-                nodes: field?.node_id
-                  ? {
-                      connect: {
-                        id: field.node_id,
-                      },
-                    }
-                  : undefined,
-                dictionaries: field?.dictionary_id
-                  ? {
-                      connect: {
-                        id: field.dictionary_id,
-                      },
-                    }
-                  : undefined,
-                words: field?.word_id
-                  ? {
-                      connect: {
-                        id: field.word_id,
-                      },
-                    }
-                  : undefined,
+                // documents: field?.document_id
+                //   ? {
+                //       connect: {
+                //         id: field.document_id,
+                //       },
+                //     }
+                //   : undefined,
+                // maps: field?.map_id
+                //   ? {
+                //       connect: {
+                //         id: field.map_id,
+                //       },
+                //     }
+                //   : undefined,
+                // map_pins: field?.map_pin_id
+                //   ? {
+                //       connect: {
+                //         id: field.map_pin_id,
+                //       },
+                //     }
+                //   : undefined,
+                // boards: field?.board_id
+                //   ? {
+                //       connect: {
+                //         id: field.board_id,
+                //       },
+                //     }
+                //   : undefined,
+                // nodes: field?.node_id
+                //   ? {
+                //       connect: {
+                //         id: field.node_id,
+                //       },
+                //     }
+                //   : undefined,
+                // dictionaries: field?.dictionary_id
+                //   ? {
+                //       connect: {
+                //         id: field.dictionary_id,
+                //       },
+                //     }
+                //   : undefined,
+                // words: field?.word_id
+                //   ? {
+                //       connect: {
+                //         id: field.word_id,
+                //       },
+                //     }
+                //   : undefined,
               },
             });
           });
@@ -235,6 +217,108 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
           await prisma.$transaction(fieldsToCreate);
 
           rep.send(entity);
+        } else {
+          rep.code(500);
+          rep.send(false);
+        }
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
+    }
+  );
+  server.post(
+    "/createentityinstance",
+    async (
+      req: FastifyRequest<{
+        Body: {
+          entity_id: string;
+          field_values: {
+            field_id: string;
+            value?: string;
+            document_id?: string;
+            map_id?: string;
+            map_pin_id?: string;
+            board_id?: string;
+            node_id?: string;
+            event_id?: string;
+            dictionary_id?: string;
+            word_id?: string;
+          }[];
+        };
+      }>,
+      rep
+    ) => {
+      try {
+        const { entity_id, field_values } = req.body;
+
+        const entityInstance = await prisma.entity_instances.create({
+          data: {
+            entity: {
+              connect: {
+                id: entity_id,
+              },
+            },
+          },
+        });
+
+        if (entityInstance) {
+          const transactions = [];
+          for (let i = 0; i < field_values.length; i++) {
+            const baseField = {
+              data: {
+                field: {
+                  connect: {
+                    id: field_values[i].field_id,
+                  },
+                },
+              },
+            };
+            if (field_values?.[i]?.value)
+              set(baseField.data, "value", field_values[i].value);
+
+            if (field_values?.[i]?.document_id)
+              set(baseField.data, "documents", {
+                connect: { id: field_values[i].document_id },
+              });
+
+            if (field_values?.[i]?.map_id)
+              set(baseField.data, "maps", {
+                connect: { id: field_values[i].map_id },
+              });
+            if (field_values?.[i]?.map_pin_id)
+              set(baseField.data, "map_pins", {
+                connect: { id: field_values[i].map_pin_id },
+              });
+            if (field_values?.[i]?.board_id)
+              set(baseField.data, "boards", {
+                connect: { id: field_values[i].board_id },
+              });
+            if (field_values?.[i]?.node_id)
+              set(baseField.data, "nodes", {
+                connect: { id: field_values[i].node_id },
+              });
+            if (field_values?.[i]?.event_id)
+              set(baseField.data, "events", {
+                connect: { id: field_values[i].event_id },
+              });
+            if (field_values?.[i]?.dictionary_id)
+              set(baseField.data, "dictionaries", {
+                connect: { id: field_values[i].dictionary_id },
+              });
+            if (field_values?.[i]?.word_id)
+              set(baseField.data, "words", {
+                connect: { id: field_values[i].word_id },
+              });
+
+            transactions.push(
+              prisma.field_values.create({
+                data: baseField.data,
+              })
+            );
+          }
+          rep.send(entityInstance);
         } else {
           rep.code(500);
           rep.send(false);
