@@ -99,7 +99,11 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
               data: {
                 title: field.title,
                 type: field.type,
-                entityId: entity.id,
+                entity: {
+                  connect: {
+                    id: entity.id,
+                  },
+                },
                 documents: {
                   connect: {
                     id: field.document_id,
