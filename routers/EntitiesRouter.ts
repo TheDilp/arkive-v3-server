@@ -226,6 +226,11 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
                     id: field_values[i].field_id,
                   },
                 },
+                entity_instances: {
+                  connect: {
+                    id: entityInstance.id,
+                  },
+                },
               },
             };
             if (field_values?.[i]?.value) {
