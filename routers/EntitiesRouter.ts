@@ -276,6 +276,7 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
                 data: baseField.data,
               })
             );
+            await prisma.$transaction(transactions);
           }
           rep.send(entityInstance);
         } else {
