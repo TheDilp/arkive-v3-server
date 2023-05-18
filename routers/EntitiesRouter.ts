@@ -30,7 +30,7 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.get(
-    "/getallentityinstances/:project_id",
+    "/getallentityinstances/:entity_id",
     async (
       req: FastifyRequest<{ Params: { entity_id: string } }>,
       res: FastifyReply
@@ -114,6 +114,7 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
             fields: true,
           },
         });
+        rep.send(data);
       } catch (error) {
         rep.code(500);
         console.log(error);
