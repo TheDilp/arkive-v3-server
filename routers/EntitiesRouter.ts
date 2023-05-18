@@ -189,7 +189,7 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
           entity_id: string;
           field_values: {
             field_id: string;
-            value?: string;
+            value?: string | string[];
             document_id?: string;
             map_id?: string;
             map_pin_id?: string;
@@ -228,8 +228,14 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
                 },
               },
             };
-            if (field_values?.[i]?.value)
-              set(baseField.data, "value", field_values[i].value);
+            if (field_values?.[i]?.value) {
+              if (Array.isArray(field_values?.[i]?.value)) {
+                const val = (field_values[i].value as string[]).join(", ");
+                set(baseField.data, "value", val);
+              } else {
+                set(baseField.data, "value", field_values[i].value);
+              }
+            }
 
             if (field_values?.[i]?.document_id)
               set(baseField.data, "documents", {
