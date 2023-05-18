@@ -320,21 +320,23 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
       try {
         const body = req.body;
         const data = removeNull(body.data) as any;
-        await prisma.nodes.updateMany({
-          where: {
-            id: {
-              in: body.ids,
+        const transactions = body.ids.map((id) =>
+          prisma.nodes.update({
+            where: {
+              id,
             },
-          },
-          data: {
-            ...data,
-            tags: {
-              set: data?.tags?.map((tag: { id: string }) => ({
-                id: tag.id,
-              })),
+            data: {
+              ...data,
+              tags: {
+                set: data?.tags?.map((tag: { id: string }) => ({
+                  id: tag.id,
+                })),
+              },
             },
-          },
-        });
+          })
+        );
+
+        await prisma.$transaction(transactions);
         rep.send(true);
       } catch (error) {
         rep.code(500);
@@ -382,21 +384,23 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
       try {
         const body = req.body;
         const data = removeNull(body.data) as any;
-        await prisma.edges.updateMany({
-          where: {
-            id: {
-              in: body.ids,
+        const transactions = body.ids.map((id) =>
+          prisma.edges.update({
+            where: {
+              id,
             },
-          },
-          data: {
-            ...data,
-            tags: {
-              set: data?.tags?.map((tag: { id: string }) => ({
-                id: tag.id,
-              })),
+            data: {
+              ...data,
+              tags: {
+                set: data?.tags?.map((tag: { id: string }) => ({
+                  id: tag.id,
+                })),
+              },
             },
-          },
-        });
+          })
+        );
+
+        await prisma.$transaction(transactions);
         rep.send(true);
       } catch (error) {
         rep.code(500);
