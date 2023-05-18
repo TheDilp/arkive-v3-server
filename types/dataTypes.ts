@@ -71,6 +71,7 @@ export type DocumentContentType = {
 export type EntityFieldType = {
   title: string;
   type: string;
+  options?: string[];
   document_id?: string;
   map_id?: string;
   map_pin_id?: string;

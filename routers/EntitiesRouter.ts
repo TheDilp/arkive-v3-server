@@ -162,55 +162,7 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
                     id: entity.id,
                   },
                 },
-                // documents: field?.document_id
-                //   ? {
-                //       connect: {
-                //         id: field.document_id,
-                //       },
-                //     }
-                //   : undefined,
-                // maps: field?.map_id
-                //   ? {
-                //       connect: {
-                //         id: field.map_id,
-                //       },
-                //     }
-                //   : undefined,
-                // map_pins: field?.map_pin_id
-                //   ? {
-                //       connect: {
-                //         id: field.map_pin_id,
-                //       },
-                //     }
-                //   : undefined,
-                // boards: field?.board_id
-                //   ? {
-                //       connect: {
-                //         id: field.board_id,
-                //       },
-                //     }
-                //   : undefined,
-                // nodes: field?.node_id
-                //   ? {
-                //       connect: {
-                //         id: field.node_id,
-                //       },
-                //     }
-                //   : undefined,
-                // dictionaries: field?.dictionary_id
-                //   ? {
-                //       connect: {
-                //         id: field.dictionary_id,
-                //       },
-                //     }
-                //   : undefined,
-                // words: field?.word_id
-                //   ? {
-                //       connect: {
-                //         id: field.word_id,
-                //       },
-                //     }
-                //   : undefined,
+                options: field.options,
               },
             });
           });
