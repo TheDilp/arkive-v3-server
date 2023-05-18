@@ -570,6 +570,7 @@ model fields {
   entity    entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
   entity_id String   @db.Uuid
 
+  options      String[]
   field_values field_values[]
 }
 
