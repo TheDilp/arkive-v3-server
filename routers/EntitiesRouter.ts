@@ -233,7 +233,6 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
                 },
               },
             };
-            console.log(field_values);
             if (field_values?.[i]?.value) {
               if (Array.isArray(field_values?.[i]?.value)) {
                 const val = (field_values[i].value as string[]).join(", ");
@@ -282,9 +281,8 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
                 data: baseField.data,
               })
             );
-            console.log(transactions);
-            await prisma.$transaction(transactions);
           }
+          await prisma.$transaction(transactions);
           rep.send(entityInstance);
         } else {
           rep.code(500);
