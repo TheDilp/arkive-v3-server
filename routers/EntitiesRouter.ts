@@ -218,7 +218,7 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
 
         if (entityInstance) {
           const transactions = [];
-          for (let i = 0; i < field_values.length - 1; i++) {
+          for (let i = 0; i < field_values.length; i++) {
             const baseField = {
               data: {
                 field: {
