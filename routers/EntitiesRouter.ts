@@ -182,6 +182,81 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
+    "/getsingleentityinstance",
+    async (
+      req: FastifyRequest<{ Body: { id: string } }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = await prisma.entity_instances.findUnique({
+          where: {
+            id: req.body.id,
+          },
+          include: {
+            field_values: {
+              include: {
+                documents: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
+                },
+                maps: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
+                },
+                map_pins: {
+                  select: {
+                    id: true,
+                    text: true,
+                    parentId: true,
+                  },
+                },
+                boards: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
+                },
+                nodes: {
+                  select: {
+                    id: true,
+                    label: true,
+                  },
+                },
+                dictionaries: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
+                },
+                words: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
+                },
+                events: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+        rep.send(data);
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+      }
+    }
+  );
+  server.post(
     "/createentityinstance",
     async (
       req: FastifyRequest<{
