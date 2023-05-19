@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { EntityFieldType } from "../types/dataTypes";
 import prisma from "../client";
 import set from "lodash.set";
+
 export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
     "/getallentities/:project_id",
@@ -41,50 +42,47 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
             entity_id: req.params.entity_id,
           },
           include: {
-            field_values: {
-              include: {
-                documents: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-                maps: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-                map_pins: {
-                  select: {
-                    id: true,
-                    text: true,
-                  },
-                },
-                boards: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-                nodes: {
-                  select: {
-                    id: true,
-                    label: true,
-                  },
-                },
-                dictionaries: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-                words: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
+            field_values: true,
+            documents: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+            maps: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+            map_pins: {
+              select: {
+                id: true,
+                text: true,
+              },
+            },
+            boards: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+            nodes: {
+              select: {
+                id: true,
+                label: true,
+              },
+            },
+            dictionaries: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+            words: {
+              select: {
+                id: true,
+                title: true,
               },
             },
           },
@@ -148,8 +146,6 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
 
         if (entity) {
           const fieldsToCreate = fields.map((field) => {
-            const relations = [];
-
             if (field.document_id) {
             }
 
@@ -193,57 +189,54 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
             id: req.body.id,
           },
           include: {
-            field_values: {
-              include: {
-                documents: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-                maps: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-                map_pins: {
-                  select: {
-                    id: true,
-                    text: true,
-                    parentId: true,
-                  },
-                },
-                boards: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-                nodes: {
-                  select: {
-                    id: true,
-                    label: true,
-                  },
-                },
-                dictionaries: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-                words: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
-                events: {
-                  select: {
-                    id: true,
-                    title: true,
-                  },
-                },
+            field_values: true,
+            documents: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+            maps: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+            map_pins: {
+              select: {
+                id: true,
+                text: true,
+                parentId: true,
+              },
+            },
+            boards: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+            nodes: {
+              select: {
+                id: true,
+                label: true,
+              },
+            },
+            dictionaries: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+            words: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+            events: {
+              select: {
+                id: true,
+                title: true,
               },
             },
           },
@@ -265,14 +258,14 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
           field_values: {
             field_id: string;
             value?: string | string[];
-            document_id?: string;
-            map_id?: string;
-            map_pin_id?: string;
-            board_id?: string;
-            node_id?: string;
-            event_id?: string;
-            dictionary_id?: string;
-            word_id?: string;
+            document_id?: string[];
+            map_id?: string[];
+            map_pin_id?: string[];
+            board_id?: string[];
+            node_id?: string[];
+            event_id?: string[];
+            dictionary_id?: string[];
+            word_id?: string[];
           }[];
         };
       }>,
@@ -281,12 +274,82 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
       try {
         const { entity_id, field_values } = req.body;
 
+        const relations = field_values.map((val) => {
+          if (val?.document_id)
+            return {
+              documents: {
+                connect: val.document_id.map((id) => {
+                  id;
+                }),
+              },
+            };
+          if (val?.map_id)
+            return {
+              documents: {
+                connect: val.map_id.map((id) => {
+                  id;
+                }),
+              },
+            };
+          if (val?.map_pin_id)
+            return {
+              documents: {
+                connect: val.map_pin_id.map((id) => {
+                  id;
+                }),
+              },
+            };
+          if (val?.board_id)
+            return {
+              documents: {
+                connect: val.board_id.map((id) => {
+                  id;
+                }),
+              },
+            };
+          if (val?.node_id)
+            return {
+              documents: {
+                connect: val.node_id.map((id) => {
+                  id;
+                }),
+              },
+            };
+          if (val?.dictionary_id)
+            return {
+              documents: {
+                connect: val.dictionary_id.map((id) => {
+                  id;
+                }),
+              },
+            };
+          if (val?.word_id)
+            return {
+              documents: {
+                connect: val.word_id.map((id) => {
+                  id;
+                }),
+              },
+            };
+          if (val?.event_id)
+            return {
+              documents: {
+                connect: val.event_id.map((id) => {
+                  id;
+                }),
+              },
+            };
+        });
+
         const entityInstance = await prisma.entity_instances.create({
           data: {
             entity: {
               connect: {
                 id: entity_id,
               },
+            },
+            documents: {
+              connect: [{ id: "ABC" }],
             },
           },
         });
@@ -316,40 +379,6 @@ export const entitiesRouter = (server: FastifyInstance, _: any, done: any) => {
                 set(baseField.data, "value", field_values[i].value);
               }
             }
-
-            if (field_values?.[i]?.document_id)
-              set(baseField.data, "documents", {
-                connect: { id: field_values[i].document_id },
-              });
-
-            if (field_values?.[i]?.map_id)
-              set(baseField.data, "maps", {
-                connect: { id: field_values[i].map_id },
-              });
-            if (field_values?.[i]?.map_pin_id)
-              set(baseField.data, "map_pins", {
-                connect: { id: field_values[i].map_pin_id },
-              });
-            if (field_values?.[i]?.board_id)
-              set(baseField.data, "boards", {
-                connect: { id: field_values[i].board_id },
-              });
-            if (field_values?.[i]?.node_id)
-              set(baseField.data, "nodes", {
-                connect: { id: field_values[i].node_id },
-              });
-            if (field_values?.[i]?.event_id)
-              set(baseField.data, "events", {
-                connect: { id: field_values[i].event_id },
-              });
-            if (field_values?.[i]?.dictionary_id)
-              set(baseField.data, "dictionaries", {
-                connect: { id: field_values[i].dictionary_id },
-              });
-            if (field_values?.[i]?.word_id)
-              set(baseField.data, "words", {
-                connect: { id: field_values[i].word_id },
-              });
 
             transactions.push(
               prisma.field_values.create({
