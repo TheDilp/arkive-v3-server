@@ -105,6 +105,62 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 random_tables: true,
               },
             },
+            documents: {
+              select: {
+                id: true,
+                title: true,
+              },
+              take: -3,
+            },
+            maps: {
+              select: {
+                id: true,
+                title: true,
+              },
+              take: -3,
+            },
+            boards: {
+              select: {
+                id: true,
+                title: true,
+              },
+              take: -3,
+            },
+            calendars: {
+              select: {
+                id: true,
+                title: true,
+              },
+              take: -3,
+            },
+            timelines: {
+              select: {
+                id: true,
+                title: true,
+              },
+              take: -3,
+            },
+            screens: {
+              select: {
+                id: true,
+                title: true,
+              },
+              take: -3,
+            },
+            dictionaries: {
+              select: {
+                id: true,
+                title: true,
+              },
+              take: -3,
+            },
+            random_tables: {
+              select: {
+                id: true,
+                title: true,
+              },
+              take: -3,
+            },
           },
         });
         rep.send(data);
