@@ -22,8 +22,8 @@ model User {
 
 model members {
   id          String        @id @default(uuid()) @db.Uuid
-  project     projects      @relation(fields: [project_id], references: [id])
-  member      User          @relation(fields: [user_id], references: [id])
+  project     projects      @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  member      User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
   project_id  String        @db.Uuid
   user_id     String        @db.Uuid
   permissions permissions[]
