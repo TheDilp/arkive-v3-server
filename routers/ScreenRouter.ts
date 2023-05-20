@@ -75,7 +75,10 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       "/createscreen",
       async (
         req: FastifyRequest<{
-          Body: Pick<screens, "title" | "sectionSize" | "project_id">;
+          Body: Pick<
+            screens,
+            "title" | "sectionSize" | "project_id" | "folder"
+          >;
         }>,
         rep: FastifyReply
       ) => {
@@ -87,6 +90,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
               title: data.title,
               project_id: data.project_id,
               sectionSize: data.sectionSize,
+              folder: data.folder,
             },
           });
           rep.send(newScreen);
