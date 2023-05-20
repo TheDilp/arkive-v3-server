@@ -57,6 +57,62 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   });
   server.post(
+    "/getprojectdetails",
+    async (
+      req: FastifyRequest<{ Body: { project_id: string } }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const user_id = checkIfLocal(req, rep);
+
+        if (user_id === null) return;
+
+        const data = await prisma.projects.findUnique({
+          where: {
+            id: req.body.project_id,
+          },
+          select: {
+            id: true,
+            title: true,
+            image: true,
+            ownerId: true,
+            members: {
+              select: {
+                user_id: true,
+                member: {
+                  select: {
+                    auth_id: true,
+                    nickname: true,
+                    image: true,
+                  },
+                },
+              },
+            },
+            _count: {
+              select: {
+                documents: true,
+                maps: true,
+                boards: true,
+                calendars: true,
+                screens: true,
+                timelines: true,
+                dictionaries: true,
+                random_tables: true,
+              },
+            },
+          },
+        });
+        rep.send(data);
+        return;
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(false);
+        return;
+      }
+    }
+  );
+  server.post(
     "/getsingleproject",
     async (
       req: FastifyRequest<{ Body: { id: string } }>,
