@@ -77,7 +77,9 @@ model projects {
 }
 
 model documents {
-  id         String  @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+
   title      String  @default("New Document")
   content    Json?   @db.JsonB
   icon       String? @default("ph:files-thin")
@@ -118,7 +120,9 @@ model alter_names {
 }
 
 model maps {
-  id          String  @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+
   title       String  @default("New Map")
   folder      Boolean @default(false)
   isPublic    Boolean @default(false)
@@ -171,7 +175,9 @@ model map_layers {
 }
 
 model boards {
-  id       String  @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+
   title    String  @default("New Board")
   folder   Boolean @default(false)
   isPublic Boolean @default(false)
@@ -279,7 +285,9 @@ model edges {
 }
 
 model screens {
-  id         String   @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+
   title      String   @default("New Screen")
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
@@ -326,7 +334,9 @@ model cards {
 }
 
 model dictionaries {
-  id    String @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+
   title String
 
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
@@ -361,7 +371,9 @@ model words {
 }
 
 model calendars {
-  id    String @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+
   title String
 
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
@@ -438,7 +450,9 @@ model events {
 }
 
 model timelines {
-  id    String @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+
   title String
 
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
@@ -457,7 +471,9 @@ model timelines {
 }
 
 model random_tables {
-  id          String  @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+
   title       String
   description String?
 
