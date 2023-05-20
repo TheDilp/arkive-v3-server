@@ -6,6 +6,7 @@ import { clerkPlugin, getAuth } from "@clerk/fastify";
 import fileUpload from "fastify-file-upload";
 import set from "lodash.set";
 import prisma from "./client";
+import { authRouter } from "./routers/AuthRouter";
 import { boardRouter } from "./routers/BoardRouter";
 import { calendarRouter } from "./routers/CalendarRouter";
 import { dictionaryRouter } from "./routers/DictionaryRouter";
@@ -21,8 +22,6 @@ import { searchRouter } from "./routers/SearchRouter";
 import { tagRouter } from "./routers/TagRouter";
 import { timelineRouter } from "./routers/TimelineRouter";
 import { userRouter } from "./routers/UserRouter";
-import { authRouter } from "./routers/AuthRouter";
-import { entitiesRouter } from "./routers/EntitiesRouter";
 
 // declare module "fastify" {
 //   interface FastifyRequest {
@@ -166,7 +165,6 @@ server.register(async (instance, _, done) => {
   instance.register(screenRouter);
   instance.register(dictionaryRouter);
   instance.register(randomTableRouter);
-  instance.register(entitiesRouter);
   instance.register(imageRouter);
 
   done();
