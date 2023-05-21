@@ -3,18 +3,11 @@ import { s3Client } from "../client";
 export async function emptyS3Directory(dir: string) {
   const listParams = {
     Bucket: process.env.DO_SPACES_NAME,
-    Prefix: dir,
-  };
-  const listParams2 = {
-    Bucket: process.env.DO_SPACES_NAME,
     Prefix: `assets/${dir}`,
   };
 
   try {
     const listedObjects = await s3Client.listObjectsV2(listParams);
-    const listedObjects2 = await s3Client.listObjectsV2(listParams);
-    console.log("============ CLEAR STORAGE ============");
-    console.log(listedObjects, listedObjects2, dir, "assets");
     if (
       !listedObjects?.Contents ||
       (listedObjects?.Contents && listedObjects.Contents.length === 0)

@@ -114,6 +114,45 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
+    "/removefromproject",
+    async (
+      req: FastifyRequest<{
+        Body: {
+          email: string;
+          project_id: string;
+        };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = req.body;
+        const member = await prisma.user.findUnique({
+          where: {
+            email: data.email,
+          },
+        });
+        if (member) {
+          await prisma.members.delete({
+            where: {
+              project_id_user_id: {
+                project_id: data.project_id,
+                user_id: member.id,
+              },
+            },
+          });
+          rep.send(true);
+        } else {
+          rep.code(500);
+          rep.send("NO USER FOUND");
+        }
+      } catch (error) {
+        rep.code(500);
+        console.log(error);
+        rep.send(500);
+      }
+    }
+  );
+  server.post(
     "/createwebhook",
     async (
       req: FastifyRequest<{
