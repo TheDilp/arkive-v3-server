@@ -40,11 +40,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           members: {
             select: {
               user_id: true,
-              permissions: {
-                where: {
-                  user_id,
-                },
-              },
+              permissions: true,
             },
           },
         },
