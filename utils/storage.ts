@@ -10,28 +10,37 @@ export async function emptyS3Directory(dir: string) {
     Prefix: `assets/${dir}`,
   };
 
-  const listedObjects = await s3Client.listObjectsV2(listParams);
-  const listedObjects2 = await s3Client.listObjectsV2(listParams);
-  console.log(listedObjects, dir, listedObjects2);
-  if (
-    !listedObjects?.Contents ||
-    (listedObjects?.Contents && listedObjects.Contents.length === 0)
-  )
-    return;
+  try {
+    const listedObjects = await s3Client.listObjectsV2(listParams);
+    const listedObjects2 = await s3Client.listObjectsV2(listParams);
 
-  const deleteParams: {
-    Bucket: string;
-    Delete: { Objects: { Key: string }[] };
-  } = {
-    Bucket: process.env.DO_SPACES_NAME as string,
-    Delete: { Objects: [] },
-  };
+    if (
+      !listedObjects?.Contents ||
+      (listedObjects?.Contents && listedObjects.Contents.length === 0)
+    )
+      return;
 
-  listedObjects.Contents.forEach(({ Key }) => {
-    deleteParams.Delete.Objects.push({ Key: Key as string });
-  });
+    const deleteParams: {
+      Bucket: string;
+      Delete: { Objects: { Key: string }[] };
+    } = {
+      Bucket: process.env.DO_SPACES_NAME as string,
+      Delete: { Objects: [] },
+    };
 
-  await s3Client.deleteObjects(deleteParams);
+    listedObjects.Contents.forEach(({ Key }) => {
+      deleteParams.Delete.Objects.push({ Key: Key as string });
+    });
 
-  if (listedObjects.IsTruncated) await emptyS3Directory(dir);
+    try {
+      await s3Client.deleteObjects(deleteParams);
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+
+    if (listedObjects.IsTruncated) await emptyS3Directory(dir);
+  } catch (error) {
+    console.log(error);
+  }
 }
