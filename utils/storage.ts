@@ -13,7 +13,8 @@ export async function emptyS3Directory(dir: string) {
   try {
     const listedObjects = await s3Client.listObjectsV2(listParams);
     const listedObjects2 = await s3Client.listObjectsV2(listParams);
-
+    console.log("============ CLEAR STORAGE ============");
+    console.log(listedObjects, listedObjects2, dir, "assets");
     if (
       !listedObjects?.Contents ||
       (listedObjects?.Contents && listedObjects.Contents.length === 0)
