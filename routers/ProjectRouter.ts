@@ -40,6 +40,11 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           members: {
             select: {
               user_id: true,
+              permissions: {
+                where: {
+                  user_id,
+                },
+              },
             },
           },
         },
@@ -376,12 +381,12 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
 
         const data = req.body;
         await emptyS3Directory(data.id);
-        // await prisma.projects.delete({
-        //   where: {
-        //     id: data.id,
-        //     ownerId: user_id,
-        //   },
-        // });
+        await prisma.projects.delete({
+          where: {
+            id: data.id,
+            ownerId: user_id,
+          },
+        });
         rep.send(true);
         return;
       } catch (error) {
