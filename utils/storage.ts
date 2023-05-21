@@ -5,9 +5,14 @@ export async function emptyS3Directory(dir: string) {
     Bucket: process.env.DO_SPACES_NAME,
     Prefix: dir,
   };
+  const listParams2 = {
+    Bucket: process.env.DO_SPACES_NAME,
+    Prefix: `assets/${dir}`,
+  };
 
   const listedObjects = await s3Client.listObjectsV2(listParams);
-
+  const listedObjects2 = await s3Client.listObjectsV2(listParams);
+  console.log(listedObjects, dir, listedObjects2);
   if (
     !listedObjects?.Contents ||
     (listedObjects?.Contents && listedObjects.Contents.length === 0)
