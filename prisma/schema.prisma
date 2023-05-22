@@ -65,8 +65,8 @@ model projects {
   swatches      swatches[]
   timelines     timelines[]
   alter_names   alter_names[]
-  roles         roles[]
-  userId        String?         @db.Uuid
+
+  roles roles[]
 }
 
 model documents {
