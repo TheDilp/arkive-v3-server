@@ -16,38 +16,26 @@ model User {
   image    String?
   webhooks webhooks[]
 
-  roles     roles[]
   createrOf projects[] @relation("project_owner")
 
-  projects projects[] @relation("project_members")
-}
-
-model roles {
-  id          String  @id @default(uuid()) @db.Uuid
-  title       String
-  description String?
-
-  project     projects      @relation(fields: [project_id], references: [id])
-  project_id  String        @db.Uuid
+  projects    projects[]    @relation("project_members")
   permissions permissions[]
-  users       User[]
-
-  @@unique([project_id, title])
 }
 
 model permissions {
   id            String  @id @default(uuid()) @db.Uuid
-  role          roles   @relation(fields: [role_id], references: [id])
-  role_id       String  @db.Uuid
+  user          User    @relation(fields: [user_id], references: [id])
+  user_id       String  @db.Uuid
   resource_type String
   resource_id   String? @db.Uuid
   permission    String
 }
 
 model projects {
-  id    String  @id @default(uuid()) @db.Uuid
-  title String  @default("New Project")
-  image String?
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  title     String   @default("New Project")
+  image     String?
 
   ownerId String
   owner   User   @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
@@ -65,8 +53,6 @@ model projects {
   swatches      swatches[]
   timelines     timelines[]
   alter_names   alter_names[]
-
-  roles roles[]
 }
 
 model documents {
