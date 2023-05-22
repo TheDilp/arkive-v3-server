@@ -18,7 +18,6 @@ export function checkIfLocal(req: FastifyRequest, rep: FastifyReply) {
     rep.code(403);
     rep.send("NOT AUTHORIZED");
     return null;
-  } else {
-    return userId;
   }
+  return userId;
 }

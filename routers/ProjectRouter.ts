@@ -11,7 +11,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get("/getallprojects", async (req, rep: FastifyReply) => {
     try {
       const user_id = checkIfLocal(req, rep);
-
+      console.log(user_id);
       if (user_id === null) return;
       const data = await prisma.projects.findMany({
         where: {
