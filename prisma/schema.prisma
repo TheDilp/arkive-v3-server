@@ -19,16 +19,28 @@ model User {
   createrOf projects[] @relation("project_owner")
 
   projects    projects[]    @relation("project_members")
+  roles       roles[]
   permissions permissions[]
+}
+
+model roles {
+  id          String        @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+  users       User[]
+  permissions permissions[] @relation("role_permissions")
 }
 
 model permissions {
   id            String  @id @default(uuid()) @db.Uuid
-  user          User    @relation(fields: [user_id], references: [id])
-  user_id       String  @db.Uuid
   resource_type String
   resource_id   String? @db.Uuid
   permission    String
+
+  user    User?   @relation(fields: [user_id], references: [id])
+  user_id String? @db.Uuid
+  role    roles?  @relation("role_permissions", fields: [role_id], references: [id])
+  role_id String? @db.Uuid
 }
 
 model projects {
