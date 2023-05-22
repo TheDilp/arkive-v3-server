@@ -9,48 +9,40 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(uuid()) @db.Uuid
-  auth_id  String  @unique
+  id       String     @id @default(uuid()) @db.Uuid
+  auth_id  String     @unique
   nickname String
-  email    String  @unique
+  email    String     @unique
   image    String?
+  webhooks webhooks[]
 
-  webhooks  webhooks[]
+  roles     roles[]
   createrOf projects[] @relation("project_owner")
-  members   members[]
+
+  projects projects[] @relation("project_members")
 }
 
-model members {
-  id          String        @id @default(uuid()) @db.Uuid
-  project     projects      @relation(fields: [project_id], references: [id], onDelete: Cascade)
-  member      User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  project_id  String        @db.Uuid
-  user_id     String        @db.Uuid
-  permissions permissions[]
+model roles {
+  id          String  @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
 
-  @@unique([project_id, user_id])
-}
-
-model permissions {
-  id         String   @id @default(uuid()) @db.Uuid
-  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
-  member     members  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  project    projects @relation(fields: [project_id], references: [id])
   project_id String   @db.Uuid
-  user_id    String   @db.Uuid
+  // permissions permissions[]
+  users      User[]
 
-  documents     String? @default("None")
-  maps          String? @default("None")
-  boards        String? @default("None")
-  screens       String? @default("None")
-  dictionaries  String? @default("None")
-  calendars     String? @default("None")
-  random_tables String? @default("None")
-  timelines     String? @default("None")
-  tags          String? @default("None")
-  alter_names   String? @default("None")
-
-  @@unique([project_id, user_id])
+  @@unique([project_id, title])
 }
+
+// model permissions {
+//   id            String @id @default(uuid()) @db.Uuid
+//   role          roles  @relation(fields: [role_id], references: [id])
+//   role_id       String @db.Uuid
+//   resource_type String
+//   resource_id   String @db.Uuid
+//   permission    String
+// }
 
 model projects {
   id    String  @id @default(uuid()) @db.Uuid
@@ -60,7 +52,7 @@ model projects {
   ownerId String
   owner   User   @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
 
-  members members[]
+  members User[] @relation("project_members")
 
   documents     documents[]
   maps          maps[]
@@ -73,7 +65,8 @@ model projects {
   swatches      swatches[]
   timelines     timelines[]
   alter_names   alter_names[]
-  permissions   permissions[]
+  roles         roles[]
+  userId        String?         @db.Uuid
 }
 
 model documents {
