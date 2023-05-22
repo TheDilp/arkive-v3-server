@@ -22,11 +22,6 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
                 url: true,
               },
             },
-            members: {
-              select: {
-                project_id: true,
-              },
-            },
           },
         });
         rep.send(user);
@@ -84,28 +79,20 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = req.body;
-        const newMember = await prisma.user.findUnique({
+        await prisma.projects.update({
           where: {
-            email: data.email,
+            id: data.project_id,
           },
-        });
-        if (newMember) {
-          await prisma.members.create({
-            data: {
-              project_id: data.project_id,
-              user_id: newMember.id,
-              permissions: {
-                create: {
-                  project_id: data.project_id,
-                },
+          data: {
+            members: {
+              connect: {
+                email: data.email,
               },
             },
-          });
-          rep.send(true);
-        } else {
-          rep.code(500);
-          rep.send("NO USER FOUND");
-        }
+          },
+        });
+
+        rep.send(true);
       } catch (error) {
         rep.code(500);
         console.log(error);
@@ -132,11 +119,15 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
           },
         });
         if (member) {
-          await prisma.members.delete({
+          await prisma.projects.update({
             where: {
-              project_id_user_id: {
-                project_id: data.project_id,
-                user_id: member.id,
+              id: data.project_id,
+            },
+            data: {
+              members: {
+                disconnect: {
+                  email: data.email,
+                },
               },
             },
           });

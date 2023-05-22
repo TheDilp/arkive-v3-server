@@ -24,9 +24,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             {
               members: {
                 some: {
-                  member: {
-                    auth_id: user_id,
-                  },
+                  auth_id: user_id,
                 },
               },
             },
@@ -37,15 +35,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           title: true,
           image: true,
           ownerId: true,
-          permissions: {
-            include: {
-              member: {
-                select: {
-                  user_id: true,
-                },
-              },
-            },
-          },
         },
         orderBy: {
           title: "asc",
@@ -87,14 +76,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             },
             members: {
               select: {
-                user_id: true,
-                member: {
-                  select: {
-                    auth_id: true,
-                    nickname: true,
-                    image: true,
-                  },
-                },
+                id: true,
+                nickname: true,
+                image: true,
               },
             },
             _count: {
@@ -216,19 +200,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           include: {
             members: {
               select: {
-                permissions: {
-                  where: {
-                    project_id: data.id,
-                  },
-                },
-                member: {
-                  select: {
-                    id: true,
-                    nickname: true,
-                    image: true,
-                  },
-                },
-                user_id: true,
+                id: true,
+                nickname: true,
+                image: true,
               },
             },
             swatches: {
