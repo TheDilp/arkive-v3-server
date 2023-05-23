@@ -24,15 +24,23 @@ model User {
 }
 
 model roles {
-  id          String        @id @default(uuid()) @db.Uuid
+  id          String  @id @default(uuid()) @db.Uuid
   title       String
   description String?
+
+  project    projects @relation(fields: [project_id], references: [id])
+  project_id String   @db.Uuid
+
   users       User[]
   permissions permissions[] @relation("role_permissions")
 }
 
 model permissions {
-  id            String  @id @default(uuid()) @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
+
+  project    projects @relation(fields: [project_id], references: [id])
+  project_id String   @db.Uuid
+
   resource_type String
   resource_id   String? @db.Uuid
   permission    String
@@ -52,7 +60,9 @@ model projects {
   ownerId String
   owner   User   @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
 
-  members User[] @relation("project_members")
+  members     User[]        @relation("project_members")
+  roles       roles[]
+  permissions permissions[]
 
   documents     documents[]
   maps          maps[]
