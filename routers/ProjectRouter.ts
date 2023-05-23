@@ -289,6 +289,8 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           },
           select: {
+            id: true,
+            nickname: true,
             roles: {
               where: {
                 project_id: data.project_id,

@@ -44,9 +44,7 @@ export const authRouter = (server: FastifyInstance, _: any, done: any) => {
                 image: data.data.profile_image_url,
                 nickname:
                   data.data?.username ||
-                  `${data.data?.first_name || ""} ${
-                    data.data?.last_name || ""
-                  }`,
+                  data.data.email_addresses[0].email_address,
               },
             });
           }
