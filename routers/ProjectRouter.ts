@@ -23,13 +23,13 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             OR: [
               {
                 owner: {
-                  auth_id: data.user_id,
+                  id: data.user_id,
                 },
               },
               {
                 members: {
                   some: {
-                    auth_id: data.user_id,
+                    id: data.user_id,
                   },
                 },
               },
