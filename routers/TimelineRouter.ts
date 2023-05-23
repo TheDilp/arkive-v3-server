@@ -31,7 +31,7 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(timelines);
       } catch (error) {
         rep.status(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -92,7 +92,7 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(timeline);
       } catch (error) {
         rep.status(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -121,7 +121,7 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(newTimeline);
       } catch (error) {
         rep.status(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -152,7 +152,7 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(updatedTimeline);
       } catch (error) {
         rep.status(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -173,7 +173,7 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.status(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }

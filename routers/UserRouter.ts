@@ -27,7 +27,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(user);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -61,7 +61,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -95,7 +95,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(500);
       }
     }
@@ -138,7 +138,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         }
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(500);
       }
     }
@@ -168,7 +168,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -199,7 +199,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -231,7 +231,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -263,7 +263,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }

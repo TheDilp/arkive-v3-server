@@ -46,7 +46,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(data);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -78,7 +78,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(map);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -108,7 +108,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(newMap);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -129,7 +129,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(newMapPin);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -149,7 +149,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(newMapLayer);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -178,7 +178,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error: any) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -200,7 +200,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error: any) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -222,7 +222,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error: any) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -250,7 +250,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -272,7 +272,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -295,7 +295,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -318,7 +318,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }

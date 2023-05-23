@@ -26,7 +26,7 @@ export const randomTableRouter = (
         rep.send(allTables);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -48,7 +48,7 @@ export const randomTableRouter = (
         rep.send(doc);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -70,7 +70,7 @@ export const randomTableRouter = (
         rep.send(newTable);
       } catch (error) {
         rep.status(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -95,7 +95,7 @@ export const randomTableRouter = (
         rep.send(true);
       } catch (error) {
         rep.status(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -124,7 +124,7 @@ export const randomTableRouter = (
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -148,7 +148,7 @@ export const randomTableRouter = (
         rep.send(newOption);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -173,7 +173,7 @@ export const randomTableRouter = (
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -197,7 +197,7 @@ export const randomTableRouter = (
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -223,7 +223,7 @@ export const randomTableRouter = (
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }

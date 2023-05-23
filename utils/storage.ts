@@ -29,12 +29,12 @@ export async function emptyS3Directory(dir: string) {
     try {
       await s3Client.deleteObjects(deleteParams);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return;
     }
 
     if (listedObjects.IsTruncated) await emptyS3Directory(dir);
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }

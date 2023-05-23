@@ -28,7 +28,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -53,7 +53,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -89,7 +89,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -127,7 +127,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
             await s3Client.send(new PutObjectCommand(params));
             return true;
           } catch (error) {
-            console.log(error);
+            console.error(error);
             return false;
           }
         });
@@ -135,7 +135,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -167,7 +167,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }

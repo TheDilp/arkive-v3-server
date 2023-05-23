@@ -55,7 +55,7 @@ export const authRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(false);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }

@@ -44,7 +44,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       return;
     } catch (error) {
       rep.code(500);
-      console.log(error);
+      console.error(error);
       rep.send(false);
       return;
     }
@@ -179,7 +179,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -218,7 +218,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -239,7 +239,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       return;
     } catch (error) {
       rep.code(500);
-      console.log(error);
+      console.error(error);
       rep.send(false);
       return;
     }
@@ -266,9 +266,47 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(updatedProject);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
+      }
+    }
+  );
+  server.post(
+    "/getprojectmembers",
+    async (
+      req: FastifyRequest<{ Body: { project_id: string } }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const data = req.body;
+        const members = await prisma.user.findUnique({
+          where: {
+            id: data.project_id,
+            projects: {
+              some: {
+                id: data.project_id,
+              },
+            },
+          },
+          select: {
+            roles: {
+              where: {
+                project_id: data.project_id,
+              },
+            },
+            permissions: {
+              where: {
+                project_id: data.project_id,
+              },
+            },
+          },
+        });
+        rep.send(members);
+      } catch (error) {
+        rep.code(500);
+        console.error(error);
+        rep.send(false);
       }
     }
   );
@@ -336,7 +374,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -364,7 +402,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -533,7 +571,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -566,7 +604,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -599,7 +637,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -629,7 +667,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }

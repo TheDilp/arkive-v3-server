@@ -22,7 +22,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(screens);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -66,7 +66,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           rep.send(screens);
         } catch (error) {
           rep.code(500);
-          console.log(error);
+          console.error(error);
           rep.send(false);
         }
       }
@@ -96,7 +96,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           rep.send(newScreen);
         } catch (error) {
           rep.code(500);
-          console.log(error);
+          console.error(error);
           rep.send(false);
         }
       }
@@ -126,7 +126,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           rep.send(true);
         } catch (error) {
           rep.code(500);
-          console.log(error);
+          console.error(error);
           rep.send(false);
         }
       }
@@ -158,7 +158,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(newSection);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -186,7 +186,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           rep.send(true);
         } catch (error) {
           rep.code(500);
-          console.log(error);
+          console.error(error);
           rep.send(false);
         }
       }
@@ -213,7 +213,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -238,7 +238,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           rep.send(newCards);
         } catch (error) {
           rep.code(500);
-          console.log(error);
+          console.error(error);
           rep.send(false);
         }
       }
@@ -268,7 +268,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           rep.send(true);
         } catch (error) {
           rep.code(500);
-          console.log(error);
+          console.error(error);
           rep.send(false);
         }
       }
@@ -298,7 +298,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -329,7 +329,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -350,7 +350,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -370,7 +370,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -391,7 +391,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }

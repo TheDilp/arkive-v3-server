@@ -22,7 +22,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(calendars);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -47,7 +47,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(calendars);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -98,7 +98,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         });
         return calendar;
       } catch (error) {
-        console.log(error);
+        console.error(error);
         rep.status(500);
         return false;
       }
@@ -128,7 +128,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(newCalendar);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -160,7 +160,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(updatedCalendar);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -191,7 +191,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -213,7 +213,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -238,7 +238,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -260,7 +260,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(newMonth);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -285,7 +285,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -315,7 +315,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
 
         return true;
       } catch (error) {
-        console.log(error);
+        console.error(error);
         return false;
       }
     }
@@ -351,7 +351,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(newEvent);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -383,7 +383,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -405,7 +405,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -426,7 +426,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -447,7 +447,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -468,7 +468,7 @@ export const calendarRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }

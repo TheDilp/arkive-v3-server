@@ -26,7 +26,7 @@ export const dictionaryRouter = (
         rep.send(data);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -60,7 +60,7 @@ export const dictionaryRouter = (
         rep.send(dictionary);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -89,7 +89,7 @@ export const dictionaryRouter = (
         rep.send(newDictionary);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -114,7 +114,7 @@ export const dictionaryRouter = (
         rep.send(newDictionary);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(error);
       }
     }
@@ -142,7 +142,7 @@ export const dictionaryRouter = (
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -163,7 +163,7 @@ export const dictionaryRouter = (
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -188,7 +188,7 @@ export const dictionaryRouter = (
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -214,7 +214,7 @@ export const dictionaryRouter = (
         rep.send(word);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -239,7 +239,7 @@ export const dictionaryRouter = (
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -262,7 +262,7 @@ export const dictionaryRouter = (
         rep.send(true);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }

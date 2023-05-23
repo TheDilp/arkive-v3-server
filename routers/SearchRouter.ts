@@ -876,7 +876,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         return false;
       }
     }

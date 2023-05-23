@@ -48,7 +48,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -86,7 +86,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -113,7 +113,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -152,7 +152,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -194,7 +194,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -231,7 +231,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -263,7 +263,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -294,7 +294,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }
@@ -322,7 +322,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         return;
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
         return;
       }

@@ -24,7 +24,7 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(doc);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -61,7 +61,7 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(map);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -90,7 +90,7 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(board);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -128,7 +128,7 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(word);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -178,7 +178,7 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(timeline);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -204,7 +204,7 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(word);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
@@ -228,7 +228,7 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
         rep.send(user);
       } catch (error) {
         rep.code(500);
-        console.log(error);
+        console.error(error);
         rep.send(false);
       }
     }
