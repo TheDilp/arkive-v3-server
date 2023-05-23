@@ -280,7 +280,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = req.body;
-        const members = await prisma.user.findUnique({
+        const members = await prisma.user.findMany({
           where: {
             id: data.project_id,
             projects: {
