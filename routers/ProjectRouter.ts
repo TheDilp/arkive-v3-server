@@ -422,7 +422,48 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
-
+  server.post(
+    "/getuserrolespermissions",
+    async (
+      req: FastifyRequest<{ Body: { user_id: string } }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const roles = await prisma.roles.findMany({
+          where: {
+            users: {
+              some: {
+                id: req.body.user_id,
+              },
+            },
+          },
+        });
+        const permissions = await prisma.permissions.findMany({
+          where: {
+            user_id: req.body.user_id,
+          },
+        });
+      } catch (error) {}
+    }
+  );
+  server.post(
+    "/getprojectroles",
+    async (
+      req: FastifyRequest<{ Body: { project_id: string } }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const roles = await prisma.roles.findMany({
+          where: { project_id: req.body.project_id },
+        });
+        rep.send(roles);
+      } catch (error) {
+        rep.code(500);
+        console.error(error);
+        rep.send(false);
+      }
+    }
+  );
   // SEND TO DISCORD
   server.post(
     "/sendpublicitem",
