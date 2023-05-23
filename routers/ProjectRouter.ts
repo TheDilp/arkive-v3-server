@@ -282,7 +282,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         const data = req.body;
         const members = await prisma.user.findMany({
           where: {
-            id: data.project_id,
             projects: {
               some: {
                 id: data.project_id,
