@@ -39,7 +39,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             id: true,
             title: true,
             image: true,
-            ownerId: true,
+            owner_id: true,
           },
           orderBy: {
             title: "asc",
@@ -244,7 +244,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       if (user) {
         const newProject = await prisma.projects.create({
           data: {
-            ownerId: user.id,
+            owner_id: user.id,
           },
         });
         rep.send(newProject);
@@ -272,7 +272,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         const updatedProject = await prisma.projects.update({
           where: {
             id: data.id,
-            ownerId: data.user_id,
+            owner_id: data.user_id,
           },
           data,
         });
@@ -409,7 +409,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         await prisma.projects.delete({
           where: {
             id: data.id,
-            ownerId: data.user_id,
+            owner_id: data.user_id,
           },
         });
         rep.send(true);
@@ -673,7 +673,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           where: {
             id: data.id,
             project: {
-              ownerId: data.user_id,
+              owner_id: data.user_id,
             },
           },
         });
