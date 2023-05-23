@@ -58,7 +58,7 @@ model projects {
   image     String?
 
   ownerId String
-  owner   User   @relation("project_owner", fields: [ownerId], references: [auth_id], onDelete: Cascade)
+  owner   User   @relation("project_owner", fields: [ownerId], references: [id], onDelete: Cascade)
 
   members     User[]        @relation("project_members")
   roles       roles[]
