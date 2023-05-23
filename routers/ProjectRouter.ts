@@ -464,6 +464,33 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+  server.post(
+    "/createrole",
+    async (
+      req: FastifyRequest<{
+        Body: {
+          project_id: string;
+          title: string;
+          description?: string;
+          permissionIds: string[];
+        };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const newRole = await prisma.roles.create({
+          data: {
+            title: req.body.title,
+            description: req.body.description,
+            project_id: req.body.project_id,
+            permissions: {
+              connect: req.body.permissionIds.map((id) => ({ id })),
+            },
+          },
+        });
+      } catch (error) {}
+    }
+  );
   // SEND TO DISCORD
   server.post(
     "/sendpublicitem",
