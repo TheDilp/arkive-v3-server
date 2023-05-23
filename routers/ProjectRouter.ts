@@ -8,47 +8,53 @@ import { emptyS3Directory } from "../utils/storage";
 import { extractDocumentText, formatImage } from "../utils/transform";
 
 export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
-  server.get("/getallprojects", async (req, rep: FastifyReply) => {
-    try {
-      const user_id = checkIfLocal(req, rep);
-      console.log(user_id);
-      if (user_id === null) return;
-      const data = await prisma.projects.findMany({
-        where: {
-          OR: [
-            {
-              owner: {
-                auth_id: user_id,
-              },
-            },
-            {
-              members: {
-                some: {
-                  auth_id: user_id,
+  server.post(
+    "/getallprojects",
+    async (
+      req: FastifyRequest<{ Body: { user_id: string } }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        const auth_id = checkIfLocal(req, rep);
+        if (auth_id === null) return;
+        const data = req.body;
+        const projects = await prisma.projects.findMany({
+          where: {
+            OR: [
+              {
+                owner: {
+                  auth_id: data.user_id,
                 },
               },
-            },
-          ],
-        },
-        select: {
-          id: true,
-          title: true,
-          image: true,
-          ownerId: true,
-        },
-        orderBy: {
-          title: "asc",
-        },
-      });
-      rep.send(data);
-      return;
-    } catch (error) {
-      rep.code(500);
-      console.error(error);
-      rep.send(false);
-      return;
+              {
+                members: {
+                  some: {
+                    auth_id: data.user_id,
+                  },
+                },
+              },
+            ],
+          },
+          select: {
+            id: true,
+            title: true,
+            image: true,
+            ownerId: true,
+          },
+          orderBy: {
+            title: "asc",
+          },
+        });
+        rep.send(projects);
+        return;
+      } catch (error) {
+        rep.code(500);
+        console.error(error);
+        rep.send(false);
+        return;
+      }
     }
-  });
+  );
   server.post(
     "/getprojectdetails",
     async (
@@ -230,12 +236,19 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
 
       if (user_id === null) return;
 
-      const newProject = await prisma.projects.create({
-        data: {
-          ownerId: user_id,
+      const user = await prisma.user.findUnique({
+        where: {
+          auth_id: user_id,
         },
       });
-      rep.send(newProject);
+      if (user) {
+        const newProject = await prisma.projects.create({
+          data: {
+            ownerId: user.id,
+          },
+        });
+        rep.send(newProject);
+      }
       return;
     } catch (error) {
       rep.code(500);
@@ -247,7 +260,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   server.post(
     "/updateproject",
     async (
-      req: FastifyRequest<{ Body: { id: string } }>,
+      req: FastifyRequest<{ Body: { id: string; user_id: string } }>,
       rep: FastifyReply
     ) => {
       try {
@@ -259,7 +272,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         const updatedProject = await prisma.projects.update({
           where: {
             id: data.id,
-            ownerId: user_id,
+            ownerId: data.user_id,
           },
           data,
         });
@@ -384,7 +397,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   server.delete(
     "/deleteproject",
     async (
-      req: FastifyRequest<{ Body: { id: string } }>,
+      req: FastifyRequest<{ Body: { id: string; user_id: string } }>,
       rep: FastifyReply
     ) => {
       try {
@@ -396,7 +409,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         await prisma.projects.delete({
           where: {
             id: data.id,
-            ownerId: user_id,
+            ownerId: data.user_id,
           },
         });
         rep.send(true);
@@ -647,7 +660,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   server.delete(
     "/deleteswatch",
     async (
-      req: FastifyRequest<{ Body: { id: string } }>,
+      req: FastifyRequest<{ Body: { id: string; user_id: string } }>,
       rep: FastifyReply
     ) => {
       try {
@@ -660,7 +673,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           where: {
             id: data.id,
             project: {
-              ownerId: user_id,
+              ownerId: data.user_id,
             },
           },
         });
