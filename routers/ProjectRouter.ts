@@ -489,6 +489,34 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+  server.post(
+    "/updaterole",
+    async (
+      req: FastifyRequest<{
+        Body: {
+          id: string;
+          title?: string;
+          description?: string;
+          [key: string]: string | undefined | boolean;
+        };
+      }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        await prisma.roles.update({
+          where: {
+            id: req.body.id,
+          },
+          data: req.body,
+        });
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.error(error);
+        rep.send(false);
+      }
+    }
+  );
   // SEND TO DISCORD
   server.post(
     "/sendpublicitem",
