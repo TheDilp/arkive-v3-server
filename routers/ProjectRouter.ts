@@ -472,23 +472,14 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           project_id: string;
           title: string;
           description?: string;
-          permissions: { name: RolePermissionsType; value: boolean }[];
+          [key: string]: string | undefined | boolean;
         };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const permissions = req.body.permissions.reduce(
-          (obj, item) => Object.assign(obj, { [item.name]: item.value }),
-          {}
-        ) as { [key: string]: boolean };
         const newRole = await prisma.roles.create({
-          data: {
-            title: req.body.title,
-            description: req.body.description,
-            project_id: req.body.project_id,
-            ...permissions,
-          },
+          data: req.body,
         });
         rep.send(newRole);
       } catch (error) {
