@@ -31,8 +31,26 @@ model roles {
   project    projects @relation(fields: [project_id], references: [id])
   project_id String   @db.Uuid
 
-  users       User[]
-  permissions permissions[] @relation("role_permissions")
+  users User[]
+
+  view_documents     Boolean @default(false)
+  edit_documents     Boolean @default(false)
+  view_maps          Boolean @default(false)
+  edit_maps          Boolean @default(false)
+  view_boards        Boolean @default(false)
+  edit_boards        Boolean @default(false)
+  view_calendars     Boolean @default(false)
+  edit_calendars     Boolean @default(false)
+  view_timelines     Boolean @default(false)
+  edit_timelines     Boolean @default(false)
+  view_screens       Boolean @default(false)
+  edit_screens       Boolean @default(false)
+  view_dictionaries  Boolean @default(false)
+  edit_dictionaries  Boolean @default(false)
+  view_random_tables Boolean @default(false)
+  edit_random_tables Boolean @default(false)
+  edit_tags          Boolean @default(false)
+  edit_alter_names   Boolean @default(false)
 }
 
 model permissions {
@@ -47,8 +65,6 @@ model permissions {
 
   user    User?   @relation(fields: [user_id], references: [id])
   user_id String? @db.Uuid
-  role    roles?  @relation("role_permissions", fields: [role_id], references: [id])
-  role_id String? @db.Uuid
 }
 
 model projects {

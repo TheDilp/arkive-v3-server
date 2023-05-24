@@ -80,3 +80,23 @@ export type EntityFieldType = {
   dictionary_id?: string;
   word_id?: string;
 };
+
+export type RolePermissionsType =
+  | "view_documents"
+  | "edit_documents"
+  | "view_maps"
+  | "edit_maps"
+  | "view_boards"
+  | "edit_boards"
+  | "view_screens"
+  | "edit_screens"
+  | "view_calendars"
+  | "edit_calendars"
+  | "view_timelines"
+  | "edit_timelines"
+  | "view_dictionaries"
+  | "edit_dictionaries"
+  | "view_random_tables"
+  | "edit_random_tables"
+  | "edit_tags"
+  | "edit_alter_names";

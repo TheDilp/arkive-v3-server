@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import prisma from "../client";
-import { AvailableDiscordTypes } from "../types/dataTypes";
+import { AvailableDiscordTypes, RolePermissionsType } from "../types/dataTypes";
 import { checkIfLocal } from "../utils/auth";
 import { getRandomIntInclusive, sendPublicItem } from "../utils/discord";
 import { emptyS3Directory } from "../utils/storage";
@@ -472,23 +472,30 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           project_id: string;
           title: string;
           description?: string;
-          permissionIds: string[];
+          permissions: { name: RolePermissionsType; value: boolean }[];
         };
       }>,
       rep: FastifyReply
     ) => {
       try {
+        const permissions = req.body.permissions.reduce(
+          (obj, item) => Object.assign(obj, { [item.name]: item.value }),
+          {}
+        ) as { [key: string]: boolean };
         const newRole = await prisma.roles.create({
           data: {
             title: req.body.title,
             description: req.body.description,
             project_id: req.body.project_id,
-            permissions: {
-              connect: req.body.permissionIds.map((id) => ({ id })),
-            },
+            ...permissions,
           },
         });
-      } catch (error) {}
+        rep.send(newRole);
+      } catch (error) {
+        rep.code(500);
+        console.error(error);
+        rep.send(false);
+      }
     }
   );
   // SEND TO DISCORD
