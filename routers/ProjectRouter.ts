@@ -40,6 +40,15 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             title: true,
             image: true,
             owner_id: true,
+            roles: {
+              where: {
+                users: {
+                  some: {
+                    id: data.user_id,
+                  },
+                },
+              },
+            },
           },
           orderBy: {
             title: "asc",
@@ -517,7 +526,8 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
-  // SEND TO DISCORD
+
+  // #region discord
   server.post(
     "/sendpublicitem",
     async (
@@ -684,8 +694,10 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+  // #endregion discord
 
   // SWATCHES
+  // #region swatches
   server.post(
     "/createswatch",
     async (
@@ -781,6 +793,8 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+
+  // #endregion swatches
 
   done();
 };
