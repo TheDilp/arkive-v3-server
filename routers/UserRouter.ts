@@ -176,6 +176,60 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
   );
 
   server.post(
+    "/assignrole",
+    async (
+      req: FastifyRequest<{ Body: { user_id: string; role_id: string } }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        await prisma.roles.update({
+          where: {
+            id: req.body.role_id,
+          },
+          data: {
+            users: {
+              connect: {
+                id: req.body.user_id,
+              },
+            },
+          },
+        });
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.error(error);
+        rep.send(false);
+      }
+    }
+  );
+  server.post(
+    "/revokerole",
+    async (
+      req: FastifyRequest<{ Body: { user_id: string; role_id: string } }>,
+      rep: FastifyReply
+    ) => {
+      try {
+        await prisma.roles.update({
+          where: {
+            id: req.body.role_id,
+          },
+          data: {
+            users: {
+              disconnect: {
+                id: req.body.user_id,
+              },
+            },
+          },
+        });
+        rep.send(true);
+      } catch (error) {
+        rep.code(500);
+        console.error(error);
+        rep.send(false);
+      }
+    }
+  );
+  server.post(
     "/updatepermission",
     async (
       req: FastifyRequest<{
