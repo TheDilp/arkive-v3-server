@@ -270,7 +270,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   server.post(
     "/updateproject",
     async (
-      req: FastifyRequest<{ Body: { id: string; user_id: string } }>,
+      req: FastifyRequest<{
+        Body: { id: string; user_id: string; [key: string]: string };
+      }>,
       rep: FastifyReply
     ) => {
       try {
@@ -278,11 +280,11 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
 
         if (user_id === null) return;
 
-        const data = req.body;
+        const { id, user_id: owner_id, ...data } = req.body;
         const updatedProject = await prisma.projects.update({
           where: {
-            id: data.id,
-            owner_id: data.user_id,
+            id,
+            owner_id: owner_id,
           },
           data,
         });

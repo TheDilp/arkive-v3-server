@@ -51,6 +51,8 @@ model roles {
   edit_random_tables Boolean @default(false)
   edit_tags          Boolean @default(false)
   edit_alter_names   Boolean @default(false)
+  upload_assets      Boolean @default(false)
+  delete_assets      Boolean @default(false)
 
   @@unique([title, project_id])
 }
