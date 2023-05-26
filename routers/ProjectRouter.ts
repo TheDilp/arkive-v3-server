@@ -218,6 +218,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 id: true,
                 nickname: true,
                 image: true,
+                roles: true,
               },
             },
             swatches: {
