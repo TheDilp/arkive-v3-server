@@ -38,12 +38,23 @@ const mainIncrementItems = [
   "screens",
   "randomtables",
 ];
+
 const subIncrementItems = [
   "sections",
   "cards",
   "events",
   "months",
   "random_table_options",
+];
+const updatedAtItems = [
+  "documents",
+  "maps",
+  "boards",
+  "calendars",
+  "timelines",
+  "dictionaries",
+  "screens",
+  "randomtables",
 ];
 
 const server = fastify();
@@ -54,7 +65,7 @@ server.register(cors, {
       cb(null, true);
       return;
     }
-    const hostname = new URL(origin).hostname;
+    const hostname = new URL(origin as string).hostname;
     if (hostname === process.env.ALLOWED_URL) {
       //  Request from localhost will pass
       cb(null, true);
@@ -133,6 +144,33 @@ prisma.$use(async (params, next) => {
       return result;
     }
   }
+  const result = await next(params);
+  // See results here
+  return result;
+});
+prisma.$use(async (params, next) => {
+  try {
+    if (params.action === "update" && params?.model) {
+      if (updatedAtItems.includes(params.model)) {
+        const tempParams = { ...params };
+
+        set(tempParams, "args.data.updatedAt", new Date());
+        const parentId = params.args.data.parentId;
+
+        const result = await next(params);
+        // See results here
+        return result;
+      }
+      const result = await next(params);
+      // See results here
+      return result;
+    }
+  } catch (error) {
+    const result = await next(params);
+    // See results here
+    return result;
+  }
+
   const result = await next(params);
   // See results here
   return result;
