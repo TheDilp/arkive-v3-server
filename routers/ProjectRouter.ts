@@ -112,6 +112,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
               where: {
                 folder: false,
               },
+              orderBy: {
+                updatedAt: "desc",
+              },
               select: {
                 id: true,
                 title: true,
@@ -121,6 +124,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             maps: {
               where: {
                 folder: false,
+              },
+              orderBy: {
+                updatedAt: "desc",
               },
               select: {
                 id: true,
@@ -132,6 +138,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
               where: {
                 folder: false,
               },
+              orderBy: {
+                updatedAt: "desc",
+              },
               select: {
                 id: true,
                 title: true,
@@ -141,6 +150,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             calendars: {
               where: {
                 folder: false,
+              },
+              orderBy: {
+                updatedAt: "desc",
               },
               select: {
                 id: true,
@@ -152,6 +164,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
               where: {
                 folder: false,
               },
+              orderBy: {
+                updatedAt: "desc",
+              },
               select: {
                 id: true,
                 title: true,
@@ -161,6 +176,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             screens: {
               where: {
                 folder: false,
+              },
+              orderBy: {
+                updatedAt: "desc",
               },
               select: {
                 id: true,
@@ -172,6 +190,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
               where: {
                 folder: false,
               },
+              orderBy: {
+                updatedAt: "desc",
+              },
               select: {
                 id: true,
                 title: true,
@@ -181,6 +202,9 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
             random_tables: {
               where: {
                 folder: false,
+              },
+              orderBy: {
+                updatedAt: "desc",
               },
               select: {
                 id: true,
