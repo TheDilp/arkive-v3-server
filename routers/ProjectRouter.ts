@@ -113,7 +113,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 folder: false,
               },
               orderBy: {
-                updatedAt: "desc",
+                updatedAt: "asc",
               },
               select: {
                 id: true,
@@ -126,7 +126,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 folder: false,
               },
               orderBy: {
-                updatedAt: "desc",
+                updatedAt: "asc",
               },
               select: {
                 id: true,
@@ -139,7 +139,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 folder: false,
               },
               orderBy: {
-                updatedAt: "desc",
+                updatedAt: "asc",
               },
               select: {
                 id: true,
@@ -152,7 +152,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 folder: false,
               },
               orderBy: {
-                updatedAt: "desc",
+                updatedAt: "asc",
               },
               select: {
                 id: true,
@@ -165,7 +165,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 folder: false,
               },
               orderBy: {
-                updatedAt: "desc",
+                updatedAt: "asc",
               },
               select: {
                 id: true,
@@ -178,7 +178,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 folder: false,
               },
               orderBy: {
-                updatedAt: "desc",
+                updatedAt: "asc",
               },
               select: {
                 id: true,
@@ -191,7 +191,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 folder: false,
               },
               orderBy: {
-                updatedAt: "desc",
+                updatedAt: "asc",
               },
               select: {
                 id: true,
@@ -204,7 +204,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
                 folder: false,
               },
               orderBy: {
-                updatedAt: "desc",
+                updatedAt: "asc",
               },
               select: {
                 id: true,
