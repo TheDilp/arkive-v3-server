@@ -1,54 +1,55 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
+import { and, eq } from "drizzle-orm";
 import prisma from "../client";
+import {
+  alterNames,
+  documents,
+  documentsTotags,
+  images,
+  tags,
+} from "../drizzle/schema";
+import { ResponseEnum } from "../enums/ResponseEnums";
+import { db, insertDocumentSchema, updateDocumentSchema } from "../utils";
 import { removeNull } from "../utils/transform";
 
 export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
-    "/getalldocuments/:project_id",
+    "/:projectId/:parentId",
     async (
-      req: FastifyRequest<{ Params: { project_id: string } }>,
-      rep: FastifyReply
+      req: FastifyRequest<{ Params: { projectId: string; parentId: string } }>,
+      rep
     ) => {
-      try {
-        const data = await prisma.documents.findMany({
-          where: {
-            project_id: req.params.project_id,
-          },
-          select: {
-            id: true,
-            title: true,
-            icon: true,
-            parent_id: true,
-            parent: {
-              select: {
-                id: true,
-                title: true,
-              },
-            },
-            isTemplate: true,
-            isFolder: true,
+      const tagsQuery = db
+        .select()
+        .from(documentsTotags)
+        .leftJoin(documents, eq(documents.id, documentsTotags.a))
+        .leftJoin(tags, eq(tags.id, documentsTotags.b))
+        .where(eq(documents.parentId, req.params.parentId))
+        .as("tagsQuery");
+      const data = await db
+        .select({
+          id: documents.id,
+          title: documents.title,
+          icon: documents.icon,
+          parentId: documents.parentId,
+          isTemplate: documents.isTemplate,
+          isFolder: documents.isFolder,
+          isPublic: documents.isPublic,
+          projectId: documents.projectId,
+        })
+        .from(documents)
+        .where(
+          and(
+            eq(documents.projectId, req.params.projectId),
+            eq(documents.parentId, req.params.parentId)
+          )
+        )
+        .leftJoin(alterNames, eq(alterNames.parentId, documents.id))
+        .leftJoin(images, eq(images.id, documents.imageId))
+        .leftJoin(tagsQuery, eq(documents.id, tagsQuery.documents.id));
 
-            isPublic: true,
-            project_id: true,
-            alter_names: true,
-            image: true,
-            tags: {
-              select: {
-                id: true,
-                title: true,
-              },
-            },
-          },
-        });
-        rep.send(data);
-        return;
-      } catch (error) {
-        rep.code(500);
-        console.error(error);
-        rep.send(false);
-        return;
-      }
+      rep.send({ data, message: ResponseEnum.generic(), ok: true });
     }
   );
   server.post(
@@ -117,158 +118,50 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/createdocument",
-    async (
-      req: FastifyRequest<{
-        Body: JSON;
-      }>,
-      rep: FastifyReply
-    ) => {
-      try {
-        const data = removeNull(req.body) as any;
-        const { tags, alter_names, ...rest } = data;
-        const newDocument = await prisma.documents.create({
-          data: {
-            alter_names: {
-              create: alter_names,
-            },
-            tags: {
-              connect: data?.tags?.map((tag: { id: string }) => ({
-                id: tag.id,
-              })),
-            },
-            ...rest,
-          },
-          include: {
-            alter_names: true,
-            tags: true,
-          },
-        });
-
-        rep.send(newDocument);
-        return;
-      } catch (error) {
-        rep.code(500);
-        console.error(error);
-        rep.send(false);
-        return;
-      }
-    }
-  );
-  server.post(
-    "/createfromisTemplate",
+    "/create",
     async (
       req: FastifyRequest<{
         Body: {
-          title: string;
-          isTemplate_id: string;
-          project_id: string;
+          data: typeof insertDocumentSchema;
         };
       }>,
       rep: FastifyReply
     ) => {
-      try {
-        const data = req.body;
-        const isTemplateContent = await prisma.documents.findUnique({
-          where: { id: data.isTemplate_id },
-          select: {
-            content: true,
-          },
+      const data = insertDocumentSchema.parse(req.body.data);
+      if (data) {
+        const [document] = await db.insert(documents).values(data).returning();
+        rep.send({
+          data: document,
+          message: ResponseEnum.created("Document"),
+          ok: true,
         });
-        if (isTemplateContent) {
-          const newDocument = await prisma.documents.create({
-            data: {
-              title: data.title,
-              content: isTemplateContent.content as any,
-              project_id: data.project_id,
-            },
-          });
-          rep.send(newDocument);
-          return;
-        }
-        rep.code(500);
-        rep.send(false);
-        return;
-      } catch (error) {
-        rep.code(500);
-        console.error(error);
-        rep.send(false);
-        return;
-      }
-    }
-  );
-  server.post(
-    "/updatedocument",
-    async (
-      req: FastifyRequest<{
-        Body: { [key: string]: any };
-      }>,
-      rep: FastifyReply
-    ) => {
-      try {
-        const data = req.body;
-        await prisma.documents.update({
-          data: {
-            ...data,
-            tags: {
-              set: data?.tags?.map((tag: { id: string }) => ({
-                id: tag.id,
-              })),
-            },
-            alter_names: {
-              set: data?.alter_names?.map((tag: { id: string }) => ({
-                id: tag.id,
-              })),
-            },
-          },
-          where: { id: data.id },
-        });
-        rep.code(200);
-        rep.send(true);
-        return;
-      } catch (error) {
-        rep.code(500);
-        console.error(error);
-        rep.send(false);
-        return;
-      }
-    }
-  );
-  server.post(
-    "/sortdocuments",
-    async (
-      req: FastifyRequest<{
-        Body: { id: string; parent: string; sort: number }[];
-      }>,
-      rep: FastifyReply
-    ) => {
-      try {
-        const indexes = req.body;
-        const updates = indexes.map((idx) =>
-          prisma.documents.update({
-            data: {
-              parent_id: idx.parent,
-            },
-            where: { id: idx.id },
-          })
-        );
-        await prisma.$transaction(async () => {
-          Promise.all(updates);
-        });
-        rep.send(true);
-        return;
-      } catch (error) {
-        rep.code(500);
-        console.error(error);
-        rep.send(false);
-        return;
       }
     }
   );
 
   server.post(
-    "/autolink",
-    async (req: FastifyRequest, rep: FastifyReply) => {}
+    "/update/:id",
+    async (
+      req: FastifyRequest<{
+        Params: {
+          id: string;
+        };
+        Body: {
+          data: typeof updateDocumentSchema;
+        };
+      }>,
+      rep: FastifyReply
+    ) => {
+      const data = updateDocumentSchema.parse(req.body.data);
+      if (data) {
+        await db
+          .update(documents)
+          .set(data)
+          .where(eq(documents.id, req.params.id));
+
+        rep.send({ message: ResponseEnum.updated("Document"), ok: true });
+      }
+    }
   );
 
   server.delete(
@@ -296,34 +189,34 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
-  server.delete(
-    "/deletemanydocuments",
-    async (
-      req: FastifyRequest<{
-        Body: string[];
-      }>,
-      rep: FastifyReply
-    ) => {
-      try {
-        const ids = req.body;
-        if (ids)
-          await prisma.documents.deleteMany({
-            where: {
-              id: {
-                in: ids,
-              },
-            },
-          });
-        rep.send(true);
-        return;
-      } catch (error) {
-        rep.code(500);
-        console.error(error);
-        rep.send(false);
-        return;
-      }
-    }
-  );
+  // server.delete(
+  //   "/deletemanydocuments",
+  //   async (
+  //     req: FastifyRequest<{
+  //       Body: string[];
+  //     }>,
+  //     rep: FastifyReply
+  //   ) => {
+  //     try {
+  //       const ids = req.body;
+  //       if (ids)
+  //         await prisma.documents.deleteMany({
+  //           where: {
+  //             id: {
+  //               in: ids,
+  //             },
+  //           },
+  //         });
+  //       rep.send(true);
+  //       return;
+  //     } catch (error) {
+  //       rep.code(500);
+  //       console.error(error);
+  //       rep.send(false);
+  //       return;
+  //     }
+  //   }
+  // );
 
   done();
 };

@@ -458,7 +458,6 @@ export const documents = pgTable(
     isFolder: boolean("isFolder"),
     isPublic: boolean("isPublic"),
     isTemplate: boolean("isTemplate"),
-    properties: jsonb("properties"),
     projectId: uuid("project_id")
       .notNull()
       .references(() => projects.id, {
