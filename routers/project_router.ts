@@ -28,7 +28,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
     "/",
     async (
       req: FastifyRequest<{ Body: { data: { userId: string } } }>,
-      rep: FastifyReply
+      rep
     ) => {
       const data = await db
         .select({
@@ -75,12 +75,13 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
         .leftJoin(images, eq(projects.id, images.projectImageId))
         .leftJoin(swatches, eq(swatches.projectId, projects.id));
 
-      rep.send({ data, message: ResponseEnum.generic(), ok: true });
+      rep.send({ data: data[0], message: ResponseEnum.generic(), ok: true });
     }
   );
 
   // #endregion read_routes
 
+  // #region update_routes
   server.post(
     "/update/:id",
     async (
@@ -97,6 +98,7 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       }
     }
   );
+  // #endregion update_routes
 
   // server.get(
   //   "/exportproject/:id",
@@ -191,180 +193,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   // #endregion delete_routes
-
-  // #region discord
-  // server.post(
-  //   "/sendpublicitem",
-  //   async (
-  //     req: FastifyRequest<{
-  //       Body: {
-  //         id: string;
-  //         item_type: AvailableDiscordTypes;
-  //         project_id: string;
-  //         webhook_url: string;
-  //         image?: string;
-  //       };
-  //     }>,
-  //     rep
-  //   ) => {
-  //     try {
-  //       const data = req.body;
-  //       if (data.item_type === "documents") {
-  //         const doc = await prisma.documents.findUnique({
-  //           where: { id: data.id },
-  //           select: {
-  //             isPublic: true,
-  //             title: true,
-  //             image: true,
-  //             content: true,
-  //           },
-  //         });
-  //         if (doc && doc.isPublic) {
-  //           const messageText = extractDocumentText(doc.content);
-  //           sendPublicItem(
-  //             data.id,
-  //             doc.title,
-  //             "documents",
-  //             data.webhook_url,
-  //             rep,
-  //             doc?.image,
-  //             messageText || ""
-  //           );
-  //           rep.send(true);
-  //           return;
-  //         } else {
-  //           rep.code(500);
-  //           rep.send(false);
-  //         }
-  //       } else if (data.item_type === "maps") {
-  //         const publicMap = await prisma.maps.findUnique({
-  //           where: { id: data.id },
-  //           select: {
-  //             title: true,
-  //             isPublic: true,
-  //             image: true,
-  //           },
-  //         });
-  //         if (publicMap && publicMap.isPublic) {
-  //           sendPublicItem(
-  //             data.id,
-  //             publicMap.title,
-  //             "maps",
-  //             data.webhook_url,
-  //             rep,
-  //             publicMap?.image
-  //           );
-  //           rep.send(true);
-  //         } else rep.send(false);
-  //       } else if (data.item_type === "boards") {
-  //         const publicBoard = await prisma.boards.findUnique({
-  //           where: { id: data.id },
-  //           select: {
-  //             title: true,
-  //             isPublic: true,
-  //           },
-  //         });
-  //         if (publicBoard && publicBoard.isPublic) {
-  //           sendPublicItem(
-  //             data.id,
-  //             publicBoard.title,
-  //             "boards",
-  //             data.webhook_url,
-  //             rep
-  //           );
-  //           rep.send(true);
-  //         }
-  //       } else if (data.item_type === "random_tables") {
-  //         const publicTable = await prisma.random_tables.findUnique({
-  //           where: { id: data.id },
-  //           select: {
-  //             random_table_options: {
-  //               select: {
-  //                 title: true,
-  //                 description: true,
-  //               },
-  //             },
-  //             title: true,
-  //             isPublic: true,
-  //           },
-  //         });
-  //         if (publicTable) {
-  //           const selectedOptionIdx = getRandomIntInclusive(
-  //             1,
-  //             publicTable.random_table_options.length || 1
-  //           );
-  //           const selectedOption =
-  //             publicTable.random_table_options[selectedOptionIdx - 1];
-  //           sendPublicItem(
-  //             data.id,
-  //             selectedOption.title,
-  //             "random_tables",
-  //             data.webhook_url,
-  //             rep,
-  //             null,
-  //             selectedOption.description || ""
-  //           );
-  //           rep.send(true);
-  //         }
-  //       } else if (data.item_type === "random_table_options") {
-  //         const tableOption = await prisma.random_table_options.findUnique({
-  //           where: { id: data.id },
-  //           select: {
-  //             title: true,
-  //             description: true,
-  //           },
-  //         });
-  //         if (tableOption) {
-  //           sendPublicItem(
-  //             data.id,
-  //             tableOption.title,
-  //             "random_table_options",
-  //             data.webhook_url,
-  //             rep,
-  //             null,
-  //             tableOption.description || ""
-  //           );
-  //           rep.send(true);
-  //         }
-  //       } else if (data.item_type === "images") {
-  //         if (data?.image) {
-  //           const imageName = data.image.split("/").pop();
-  //           if (imageName)
-  //             sendPublicItem(
-  //               data.id,
-  //               imageName,
-  //               "images",
-  //               data.webhook_url,
-  //               rep,
-  //               formatImage(data.image),
-  //               ""
-  //             );
-
-  //           rep.send(true);
-  //         } else {
-  //           rep.code(500);
-  //           rep.send(false);
-  //           return false;
-  //         }
-  //       } else {
-  //         rep.code(500);
-  //         rep.send(false);
-  //         return;
-  //       }
-  //       return;
-  //     } catch (error) {
-  //       rep.code(500);
-  //       console.error(error);
-  //       rep.send(false);
-  //     }
-  //   }
-  // );
-  // #endregion discord
-
-  // SWATCHES
-  // #region swatches
-
-  // #endregion swatches
 
   done();
 };

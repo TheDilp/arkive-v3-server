@@ -7,6 +7,7 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import fileUpload from "fastify-file-upload";
 import {
   assetRouter,
+  documentRouter,
   otherRouter,
   projectRouter,
   publicRouter,
@@ -43,7 +44,7 @@ server.register(
     instance.register(assetRouter, { prefix: "/assets" });
     instance.register(projectRouter, { prefix: "/projects" });
     instance.register(swatchesRouter, { prefix: "/swatches" });
-    // instance.register(documentRouter);
+    instance.register(documentRouter);
     // instance.register(mapRouter);
     // instance.register(boardRouter);
     // instance.register(calendarRouter);

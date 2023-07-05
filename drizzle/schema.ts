@@ -94,7 +94,7 @@ export const maps = pgTable(
         onUpdate: "cascade",
       }),
     parentId: uuid("parent_id"),
-    imagesId: uuid("images_id").references(() => images.id, {
+    imageId: uuid("imageId").references(() => images.id, {
       onDelete: "set null",
       onUpdate: "cascade",
     }),
@@ -139,8 +139,8 @@ export const alterNames = pgTable(
   }
 );
 
-export const boards = pgTable(
-  "boards",
+export const graphs = pgTable(
+  "graphs",
   {
     id: uuid("id").primaryKey().notNull().defaultRandom(),
     createdAt: timestamp("created_at", { precision: 3, mode: "string" })
@@ -149,7 +149,7 @@ export const boards = pgTable(
     updatedAt: timestamp("updated_at", { precision: 3, mode: "string" })
       .defaultNow()
       .notNull(),
-    title: text("title").default("New Board").notNull(),
+    title: text("title").default("New Graph").notNull(),
     isFolder: boolean("isFolder"),
     isPublic: boolean("isPublic"),
     sort: integer("sort").notNull(),
@@ -167,7 +167,7 @@ export const boards = pgTable(
   },
   (table) => {
     return {
-      boardsParentIdFkey: foreignKey({
+      graphsParentIdFkey: foreignKey({
         columns: [table.parentId],
         foreignColumns: [table.id],
       })
@@ -224,7 +224,7 @@ export const characters = pgTable("characters", {
   lastName: text("lastName"),
   nickname: text("nickname"),
   age: integer("age"),
-  imagesId: uuid("images_id").references(() => images.id, {
+  imageId: uuid("imageId").references(() => images.id, {
     onDelete: "set null",
     onUpdate: "cascade",
   }),
@@ -276,7 +276,7 @@ export const edges = pgTable(
       .references(() => nodes.id, { onDelete: "cascade", onUpdate: "cascade" }),
     parentId: uuid("parent_id")
       .notNull()
-      .references(() => boards.id, {
+      .references(() => graphs.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
@@ -377,7 +377,7 @@ export const events = pgTable("events", {
   monthsId: uuid("monthsId")
     .notNull()
     .references(() => months.id, { onDelete: "cascade", onUpdate: "cascade" }),
-  imagesId: uuid("images_id").references(() => images.id, {
+  imageId: uuid("imageId").references(() => images.id, {
     onDelete: "set null",
     onUpdate: "cascade",
   }),
@@ -400,7 +400,7 @@ export const mapPins = pgTable("map_pins", {
   isPublic: boolean("isPublic"),
   mapLink: uuid("map_link"),
   docId: uuid("doc_id"),
-  imagesId: uuid("images_id").references(() => images.id, {
+  imageId: uuid("imageId").references(() => images.id, {
     onDelete: "set null",
     onUpdate: "cascade",
   }),
@@ -466,7 +466,7 @@ export const documents = pgTable(
         onUpdate: "cascade",
       }),
     parentId: uuid("parent_id"),
-    imagesId: uuid("images_id").references(() => images.id, {
+    imageId: uuid("imageId").references(() => images.id, {
       onDelete: "set null",
       onUpdate: "cascade",
     }),
@@ -506,8 +506,8 @@ export const roles = pgTable(
     editDocuments: boolean("edit_documents").notNull(),
     viewMaps: boolean("view_maps").notNull(),
     editMaps: boolean("edit_maps").notNull(),
-    viewBoards: boolean("view_boards").notNull(),
-    editBoards: boolean("edit_boards").notNull(),
+    viewGraphs: boolean("view_graphs").notNull(),
+    editGraphs: boolean("edit_graphs").notNull(),
     viewCalendars: boolean("view_calendars").notNull(),
     editCalendars: boolean("edit_calendars").notNull(),
     viewTimelines: boolean("view_timelines").notNull(),
@@ -874,8 +874,8 @@ export const nodes = pgTable("nodes", {
   }),
   parentId: uuid("parent_id")
     .notNull()
-    .references(() => boards.id, { onDelete: "cascade", onUpdate: "cascade" }),
-  imagesId: uuid("images_id").references(() => images.id, {
+    .references(() => graphs.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  imageId: uuid("imageId").references(() => images.id, {
     onDelete: "set null",
     onUpdate: "cascade",
   }),
@@ -934,12 +934,12 @@ export const nodesTotags = pgTable(
   }
 );
 
-export const boardsTotags = pgTable(
-  "_boardsTotags",
+export const graphsTotags = pgTable(
+  "_graphsTotags",
   {
     a: uuid("A")
       .notNull()
-      .references(() => boards.id, {
+      .references(() => graphs.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
@@ -949,7 +949,7 @@ export const boardsTotags = pgTable(
   },
   (table) => {
     return {
-      abUnique: uniqueIndex("_boardsTotags_AB_unique").on(table.a, table.b),
+      abUnique: uniqueIndex("_graphsTotags_AB_unique").on(table.a, table.b),
       bIdx: index().on(table.b),
     };
   }
