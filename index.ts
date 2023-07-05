@@ -2,16 +2,18 @@ import cors from "@fastify/cors";
 
 import fastify, { errorCodes } from "fastify";
 
+import { drizzle } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
 import fileUpload from "fastify-file-upload";
 import {
+  assetRouter,
   otherRouter,
   projectRouter,
   publicRouter,
   userRouter,
 } from "./routers";
-import { migrate } from "drizzle-orm/postgres-js/migrator";
-import { db, migrationClient } from "./utils";
-import { drizzle } from "drizzle-orm/postgres-js";
+import { swatchesRouter } from "./routers/swatches_router";
+import { migrationClient } from "./utils";
 
 const server = fastify();
 
@@ -38,8 +40,9 @@ server.register(
   async (instance, _, done) => {
     // INSERT AUTH HERE
     instance.register(userRouter, { prefix: "/users" });
-    // instance.register(assetRouter, { prefix: "/assets" });
+    instance.register(assetRouter, { prefix: "/assets" });
     instance.register(projectRouter, { prefix: "/projects" });
+    instance.register(swatchesRouter, { prefix: "/swatches" });
     // instance.register(documentRouter);
     // instance.register(mapRouter);
     // instance.register(boardRouter);

@@ -38,7 +38,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           image: {
             id: images.id,
             title: images.title,
-            link: images.link,
           },
         })
         .from(projects)
@@ -64,7 +63,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
           image: {
             id: images.id,
             title: images.title,
-            link: images.link,
           },
           swatches: {
             id: swatches.id,

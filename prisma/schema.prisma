@@ -114,7 +114,7 @@ model images {
   events     events[]
 
   project_image  projects? @relation("project_image", fields: [projectImageId], references: [id])
-  projectImageId String    @unique @db.Uuid
+  projectImageId String?   @unique @db.Uuid
 
   project_images projects @relation(fields: [projectsId], references: [id])
 

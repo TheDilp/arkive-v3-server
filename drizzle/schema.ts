@@ -1,22 +1,17 @@
 import {
-  pgTable,
-  pgEnum,
-  pgSchema,
-  AnyPgColumn,
-  uniqueIndex,
-  index,
-  foreignKey,
-  uuid,
-  text,
   boolean,
-  timestamp,
-  integer,
   doublePrecision,
-  varchar,
+  foreignKey,
+  index,
+  integer,
   jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+  varchar,
 } from "drizzle-orm/pg-core";
-
-import { sql } from "drizzle-orm";
 
 export const characterFieldsTocharacterFieldsTemplates = pgTable(
   "_character_fieldsTocharacter_fields_templates",
@@ -577,13 +572,10 @@ export const images = pgTable(
   {
     id: uuid("id").primaryKey().notNull().defaultRandom(),
     title: text("title").default("New image").notNull(),
-    link: text("link").notNull(),
-    projectImageId: uuid("projectImageId")
-      .notNull()
-      .references(() => projects.id, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
+    projectImageId: uuid("projectImageId").references(() => projects.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
     projectsId: uuid("projectsId")
       .notNull()
       .references(() => projects.id, {
