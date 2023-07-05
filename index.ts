@@ -1,61 +1,17 @@
 import cors from "@fastify/cors";
 
-import fastify from "fastify";
+import fastify, { errorCodes } from "fastify";
 
-import { clerkPlugin, getAuth } from "@clerk/fastify";
 import fileUpload from "fastify-file-upload";
-import set from "lodash.set";
-import prisma from "./client";
-import { authRouter } from "./routers/AuthRouter";
-import { boardRouter } from "./routers/BoardRouter";
-import { calendarRouter } from "./routers/CalendarRouter";
-import { dictionaryRouter } from "./routers/DictionaryRouter";
-import { documentRouter } from "./routers/DocumentRouter";
-import { imageRouter } from "./routers/ImageRouter";
-import { mapRouter } from "./routers/MapRouter";
-import { otherRouter } from "./routers/OtherRouter";
-import { projectRouter } from "./routers/ProjectRouter";
-import { publicRouter } from "./routers/PublicRouter";
-import { randomTableRouter } from "./routers/RandomTableRouter";
-import { screenRouter } from "./routers/ScreenRouter";
-import { searchRouter } from "./routers/SearchRouter";
-import { tagRouter } from "./routers/TagRouter";
-import { timelineRouter } from "./routers/TimelineRouter";
-import { userRouter } from "./routers/UserRouter";
-
-// declare module "fastify" {
-//   interface FastifyRequest {
-//     isLocal: boolean;
-//   }
-// }
-
-const mainIncrementItems = [
-  "documents",
-  "maps",
-  "boards",
-  "calendars",
-  "dictionaries",
-  "screens",
-  "randomtables",
-];
-
-const subIncrementItems = [
-  "sections",
-  "cards",
-  "events",
-  "months",
-  "random_table_options",
-];
-const updatedAtItems = [
-  "documents",
-  "maps",
-  "boards",
-  "calendars",
-  "timelines",
-  "dictionaries",
-  "screens",
-  "randomtables",
-];
+import {
+  otherRouter,
+  projectRouter,
+  publicRouter,
+  userRouter,
+} from "./routers";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+import { db, migrationClient } from "./utils";
+import { drizzle } from "drizzle-orm/postgres-js";
 
 const server = fastify();
 
@@ -76,152 +32,62 @@ server.register(cors, {
   },
 });
 
-server.register(clerkPlugin);
-
-prisma.$use(async (params, next) => {
-  try {
-    if (params.action === "create" && params?.model) {
-      if (subIncrementItems.includes(params.model)) {
-        const parentId = params.args.data.parentId;
-        if (parentId) {
-          let count = 0;
-
-          // @ts-ignore
-          count = await prisma[params.model].count({
-            where: {
-              parentId,
-            },
-          });
-          const newSort = count + 1;
-          const tempParams = { ...params };
-
-          set(tempParams, "args.data.sort", newSort);
-          const result = await next(tempParams);
-          // See results here
-          return result;
-        }
-        const result = await next(params);
-        // See results here
-        return result;
-      }
-      const result = await next(params);
-      // See results here
-      return result;
-    }
-  } catch (error) {
-    const result = await next(params);
-    // See results here
-    return result;
-  }
-
-  const result = await next(params);
-  // See results here
-  return result;
-});
-prisma.$use(async (params, next) => {
-  if (
-    params.action === "create" &&
-    params?.model &&
-    mainIncrementItems.includes(params.model)
-  ) {
-    try {
-      // @ts-ignore
-      const count = await prisma[params.model].count({
-        where: {
-          project_id: params.args.data.project_id,
-        },
-      });
-      const newSort = count + 1;
-      const tempParams = { ...params };
-
-      set(tempParams, "args.data.sort", newSort);
-      const result = await next(tempParams);
-      // See results here
-      return result;
-    } catch (error) {
-      const result = await next(params);
-      // See results here
-      return result;
-    }
-  }
-  const result = await next(params);
-  // See results here
-  return result;
-});
-prisma.$use(async (params, next) => {
-  try {
-    if (params.action === "update" && params?.model) {
-      if (updatedAtItems.includes(params.model)) {
-        const tempParams = { ...params };
-
-        set(tempParams, "args.data.updatedAt", new Date());
-        const parentId = params.args.data.parentId;
-
-        const result = await next(params);
-        // See results here
-        return result;
-      }
-      const result = await next(params);
-      // See results here
-      return result;
-    }
-  } catch (error) {
-    const result = await next(params);
-    // See results here
-    return result;
-  }
-
-  const result = await next(params);
-  // See results here
-  return result;
-});
-
 server.register(fileUpload);
 server.register(otherRouter);
-server.register(authRouter);
-server.register(async (instance, _, done) => {
-  instance.addHook("preHandler", async (request, reply) => {
-    const { userId, sessionId } = getAuth(request);
-    if (!sessionId) {
-      reply.status(401);
-      reply.send({ error: "User could not be verified" });
-    }
-    if (!userId) {
-      reply.code(403);
-      throw new Error("NOT AUTHORIZED");
-    }
-  });
-  instance.register(userRouter);
-  instance.register(projectRouter);
-  instance.register(searchRouter);
-  instance.register(tagRouter);
-  instance.register(documentRouter);
-  instance.register(mapRouter);
-  instance.register(boardRouter);
-  instance.register(calendarRouter);
-  instance.register(timelineRouter);
-  instance.register(screenRouter);
-  instance.register(dictionaryRouter);
-  instance.register(randomTableRouter);
-  instance.register(imageRouter);
+server.register(
+  async (instance, _, done) => {
+    // INSERT AUTH HERE
+    instance.register(userRouter, { prefix: "/users" });
+    // instance.register(assetRouter, { prefix: "/assets" });
+    instance.register(projectRouter, { prefix: "/projects" });
+    // instance.register(documentRouter);
+    // instance.register(mapRouter);
+    // instance.register(boardRouter);
+    // instance.register(calendarRouter);
+    // instance.register(timelineRouter);
+    // instance.register(screenRouter);
+    // instance.register(dictionaryRouter);
+    // instance.register(randomTableRouter);
+    // instance.register(tagRouter);
+    // instance.register(searchRouter);
 
-  done();
+    done();
+  },
+  {
+    prefix: "api/v1",
+  }
+);
+
+server.setErrorHandler(function (error, request, reply) {
+  if (error instanceof errorCodes.FST_ERR_BAD_STATUS_CODE) {
+    // Log error
+    this.log.error(error);
+    // Send error response
+    reply.status(500).send({ ok: false });
+  } else {
+    console.log(error);
+
+    // fastify will use parent error handler to handle this
+    reply.send(error);
+  }
 });
 
 server.register(publicRouter);
-if (process.env.VITE_BE_PORT) {
+if (process.env.SERVER_PORT) {
   server.listen(
-    { port: parseInt(process.env.VITE_BE_PORT, 10) as number, host: "0.0.0.0" },
+    { port: parseInt(process.env.SERVER_PORT, 10) as number, host: "0.0.0.0" },
     async (err, address) => {
+      await migrate(drizzle(migrationClient), {
+        migrationsFolder: "./drizzle",
+      });
       if (err) {
         console.error(err);
         process.exit(1);
       }
 
       console.log(`Server listening at ${address}`);
-      console.log("==============================");
     }
   );
 } else {
-  console.log("NO VITE_BE_PORT");
+  console.error("NO SERVER_PORT");
 }

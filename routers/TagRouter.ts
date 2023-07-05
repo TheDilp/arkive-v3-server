@@ -141,7 +141,7 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
                 id: true,
                 title: true,
                 icon: true,
-                folder: true,
+                isFolder: true,
               },
             },
             maps: {
@@ -149,7 +149,7 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
                 id: true,
                 title: true,
                 icon: true,
-                folder: true,
+                isFolder: true,
               },
             },
             map_pins: {
@@ -164,21 +164,21 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
                 id: true,
                 title: true,
                 icon: true,
-                folder: true,
+                isFolder: true,
               },
             },
             nodes: {
               select: {
                 id: true,
                 label: true,
-                parentId: true,
+                parent_id: true,
               },
             },
             edges: {
               select: {
                 id: true,
                 label: true,
-                parentId: true,
+                parent_id: true,
                 source: {
                   select: {
                     label: true,
@@ -196,7 +196,7 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
                 id: true,
                 title: true,
                 icon: true,
-                folder: true,
+                isFolder: true,
               },
             },
             events: {
@@ -210,7 +210,7 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
               select: {
                 id: true,
                 title: true,
-                folder: true,
+                isFolder: true,
                 icon: true,
               },
             },
@@ -228,7 +228,7 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
               select: {
                 id: true,
                 title: true,
-                folder: true,
+                isFolder: true,
                 icon: true,
               },
             },
@@ -252,19 +252,19 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
           id: string;
           title: string;
           project_id: string;
-          parentId: string;
+          parent_id: string;
         };
       }>,
       rep: FastifyReply
     ) => {
       try {
-        const { id, title, project_id, parentId } = req.body;
+        const { id, title, project_id, parent_id } = req.body;
         await prisma.alter_names.create({
           data: {
             id,
             title,
             project_id,
-            parentId,
+            parent_id,
           },
         });
         rep.send(true);
@@ -346,7 +346,7 @@ export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
                 id: true,
                 title: true,
                 icon: true,
-                folder: true,
+                isFolder: true,
               },
             },
           },

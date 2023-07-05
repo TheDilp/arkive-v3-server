@@ -23,10 +23,6 @@ export const timelineRouter = (server: FastifyInstance, _: any, done: any) => {
               },
             },
           },
-
-          orderBy: {
-            sort: "asc",
-          },
         });
         rep.send(timelines);
       } catch (error) {

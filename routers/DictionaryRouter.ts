@@ -19,9 +19,6 @@ export const dictionaryRouter = (
           where: {
             project_id: req.params.project_id,
           },
-          orderBy: {
-            sort: "asc",
-          },
         });
         rep.send(data);
       } catch (error) {
@@ -132,8 +129,7 @@ export const dictionaryRouter = (
         const updates = indexes.map((idx) =>
           prisma.dictionaries.update({
             data: {
-              parentId: idx.parent,
-              sort: idx.sort,
+              parent_id: idx.parent,
             },
             where: { id: idx.id },
           })

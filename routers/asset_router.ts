@@ -1,14 +1,8 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import {
-  DeleteObjectCommand,
-  PutObjectCommand,
-  ListObjectsCommand,
-} from "@aws-sdk/client-s3";
 
 import sharp from "sharp";
-import { s3Client } from "../client";
 
-export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
+export const assetRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
     "/getallimages/:project_id",
     async (
@@ -17,14 +11,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const key = `assets/${req.params.project_id}/images/`;
-        const data = await s3Client.send(
-          new ListObjectsCommand({
-            Bucket: process.env.DO_SPACES_NAME,
-            Delimiter: "/",
-            Prefix: key,
-          })
-        );
-        rep.send(data?.Contents || []);
+
         return;
       } catch (error) {
         rep.code(500);
@@ -42,14 +29,7 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const key = `assets/${req.params.project_id}/maps/`;
-        const data = await s3Client.send(
-          new ListObjectsCommand({
-            Bucket: process.env.DO_SPACES_NAME,
-            Delimiter: "/",
-            Prefix: key,
-          })
-        );
-        rep.send(data?.Contents || []);
+
         return;
       } catch (error) {
         rep.code(500);
@@ -70,22 +50,6 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
         const imagesKey = `assets/${req.params.project_id}/images/`;
         const mapsKey = `assets/${req.params.project_id}/maps/`;
 
-        const images = await s3Client.send(
-          new ListObjectsCommand({
-            Bucket: process.env.DO_SPACES_NAME,
-            Delimiter: "/",
-            Prefix: imagesKey,
-          })
-        );
-        const maps = await s3Client.send(
-          new ListObjectsCommand({
-            Bucket: process.env.DO_SPACES_NAME,
-            Delimiter: "/",
-            Prefix: mapsKey,
-          })
-        );
-        const data = [...(images?.Contents || []), ...(maps?.Contents || [])];
-        rep.send(data || []);
         return;
       } catch (error) {
         rep.code(500);
@@ -115,16 +79,6 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
               .toFormat("webp")
               .toBuffer();
 
-            const params = {
-              Bucket: process.env.DO_SPACES_NAME as string,
-              Key: filePath.substring(0, filePath.lastIndexOf(".")) + ".webp",
-
-              Body: webpImage,
-              ACL: "public-read",
-              ContentType: "image/webp",
-            };
-
-            await s3Client.send(new PutObjectCommand(params));
             return true;
           } catch (error) {
             console.error(error);
@@ -157,12 +111,6 @@ export const imageRouter = (server: FastifyInstance, _: any, done: any) => {
       try {
         const data = req.body;
 
-        await s3Client.send(
-          new DeleteObjectCommand({
-            Bucket: process.env.DO_SPACES_NAME,
-            Key: `assets/${data.project_id}/${data.type}/${data.image}`,
-          })
-        );
         rep.send(true);
         return;
       } catch (error) {

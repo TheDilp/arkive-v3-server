@@ -19,16 +19,16 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
             id: true,
             title: true,
             icon: true,
-            parentId: true,
+            parent_id: true,
             parent: {
               select: {
                 id: true,
                 title: true,
               },
             },
-            template: true,
-            folder: true,
-            sort: true,
+            isTemplate: true,
+            isFolder: true,
+
             isPublic: true,
             project_id: true,
             alter_names: true,
@@ -39,9 +39,6 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
                 title: true,
               },
             },
-          },
-          orderBy: {
-            sort: "asc",
           },
         });
         rep.send(data);
@@ -159,12 +156,12 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.post(
-    "/createfromtemplate",
+    "/createfromisTemplate",
     async (
       req: FastifyRequest<{
         Body: {
           title: string;
-          template_id: string;
+          isTemplate_id: string;
           project_id: string;
         };
       }>,
@@ -172,17 +169,17 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = req.body;
-        const templateContent = await prisma.documents.findUnique({
-          where: { id: data.template_id },
+        const isTemplateContent = await prisma.documents.findUnique({
+          where: { id: data.isTemplate_id },
           select: {
             content: true,
           },
         });
-        if (templateContent) {
+        if (isTemplateContent) {
           const newDocument = await prisma.documents.create({
             data: {
               title: data.title,
-              content: templateContent.content as any,
+              content: isTemplateContent.content as any,
               project_id: data.project_id,
             },
           });
@@ -250,8 +247,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
         const updates = indexes.map((idx) =>
           prisma.documents.update({
             data: {
-              parentId: idx.parent,
-              sort: idx.sort,
+              parent_id: idx.parent,
             },
             where: { id: idx.id },
           })

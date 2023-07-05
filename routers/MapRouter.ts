@@ -19,8 +19,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
             clusterPins: true,
             icon: true,
             image: true,
-            sort: true,
-            folder: true,
+            isFolder: true,
             isPublic: true,
             tags: {
               select: {
@@ -34,11 +33,9 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
                 title: true,
               },
             },
-            parentId: true,
+            parent_id: true,
           },
-          orderBy: {
-            sort: "asc",
-          },
+
           where: {
             project_id: req.params.project_id,
           },
@@ -240,8 +237,7 @@ export const mapRouter = (server: FastifyInstance, _: any, done: any) => {
         const updates = indexes.map((idx) =>
           prisma.maps.update({
             data: {
-              parentId: idx.parent,
-              sort: idx.sort,
+              parent_id: idx.parent,
             },
             where: { id: idx.id },
           })

@@ -8,7 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model users {
   id       String     @id @default(uuid()) @db.Uuid
   auth_id  String     @unique
   nickname String
@@ -16,7 +16,7 @@ model User {
   image    String?
   webhooks webhooks[]
 
-  createrOf projects[] @relation("project_owner")
+  creator_of projects[] @relation("project_owner")
 
   projects    projects[]    @relation("project_members")
   roles       roles[]
@@ -31,7 +31,7 @@ model roles {
   project    projects @relation(fields: [project_id], references: [id])
   project_id String   @db.Uuid
 
-  users User[]
+  users users[]
 
   view_documents     Boolean @default(false)
   edit_documents     Boolean @default(false)
@@ -67,22 +67,26 @@ model permissions {
   resource_id   String? @db.Uuid
   permission    String
 
-  user    User?   @relation(fields: [user_id], references: [id])
+  user    users?  @relation(fields: [user_id], references: [id])
   user_id String? @db.Uuid
 }
 
 model projects {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  title     String   @default("New Project")
-  image     String?
+  id         String   @id @default(uuid()) @db.Uuid
+  created_at DateTime @default(now())
+  title      String   @default("New Project")
 
   owner_id String @db.Uuid
-  owner    User   @relation("project_owner", fields: [owner_id], references: [id], onDelete: Cascade)
+  owner    users  @relation("project_owner", fields: [owner_id], references: [id], onDelete: Cascade)
 
-  members     User[]        @relation("project_members")
+  image images? @relation("project_image")
+
+  members     users[]       @relation("project_members")
   roles       roles[]
   permissions permissions[]
+
+  images     images[]
+  characters characters[]
 
   documents     documents[]
   maps          maps[]
@@ -97,29 +101,96 @@ model projects {
   alter_names   alter_names[]
 }
 
-model documents {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+model images {
+  id    String @id @default(uuid()) @db.Uuid
+  title String @default("New image")
+  link  String
 
-  title      String  @default("New Document")
-  content    Json?   @db.JsonB
-  icon       String? @default("ph:files-thin")
-  folder     Boolean @default(false)
-  isPublic   Boolean @default(false)
-  sort       Int     @default(0)
-  template   Boolean @default(false)
+  characters characters[]
+  documents  documents[]
+  maps       maps[]
+  map_pins   map_pins[]
+  nodes      nodes[]
+  events     events[]
+
+  project_image  projects? @relation("project_image", fields: [projectImageId], references: [id])
+  projectImageId String    @unique @db.Uuid
+
+  project_images projects @relation(fields: [projectsId], references: [id])
+
+  projectsId String @db.Uuid
+}
+
+model characters {
+  id         String   @id @default(uuid()) @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  firstName String
+  lastName  String?
+  nickname  String?
+  age       Int?
+  image     images? @relation(fields: [images_id], references: [id])
+  images_id String? @db.Uuid
+
+  character_fields_templates character_fields_templates[]
+
+  project                      projects                       @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  project_id                   String                         @db.Uuid
+  character_to_character_field character_to_character_field[]
+}
+
+model character_fields {
+  id                           String                         @id @default(uuid()) @db.Uuid
+  title                        String
+  field_type                   String
+  options                      String[]
+  character_fields_templates   character_fields_templates[]
+  character_to_character_field character_to_character_field[]
+}
+
+model character_fields_templates {
+  id               String             @id @default(uuid()) @db.Uuid
+  title            String
+  character_fields character_fields[]
+  characters       characters[]
+  value            String
+}
+
+model character_to_character_field {
+  id String @id @default(uuid()) @db.Uuid
+
+  characters    characters @relation(fields: [characters_id], references: [id])
+  characters_id String     @db.Uuid
+
+  character_fields    character_fields @relation(fields: [character_fields_id], references: [id])
+  character_fields_id String           @db.Uuid
+}
+
+model documents {
+  id         String   @id @default(uuid()) @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  title    String   @default("New Document")
+  content  Json?    @db.JsonB
+  icon     String?
+  isFolder Boolean?
+  isPublic Boolean?
+
+  isTemplate Boolean?
   properties Json?
-  image      String?
+  image      images?  @relation(fields: [images_id], references: [id])
+  images_id  String?  @db.Uuid
 
   // Relations
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
   nodes      nodes[]
 
-  parentId String?     @db.Uuid
-  parent   documents?  @relation("parentChildDocuments", fields: [parentId], references: [id], onDelete: Cascade)
-  children documents[] @relation("parentChildDocuments")
+  parent_id String?     @db.Uuid
+  parent    documents?  @relation("parentChildDocuments", fields: [parent_id], references: [id], onDelete: Cascade)
+  children  documents[] @relation("parentChildDocuments")
 
   tags        tags[]
   alter_names alter_names[]
@@ -135,25 +206,25 @@ model alter_names {
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
-  document documents @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  parentId String    @db.Uuid
+  document  documents @relation(fields: [parent_id], references: [id], onDelete: Cascade)
+  parent_id String    @db.Uuid
 
-  @@unique([title, parentId])
+  @@unique([title, parent_id])
 }
 
 model maps {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id         String   @id @default(uuid()) @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 
   title       String  @default("New Map")
-  folder      Boolean @default(false)
+  isFolder    Boolean @default(false)
   isPublic    Boolean @default(false)
-  sort        Int     @default(0)
   clusterPins Boolean @default(false)
 
-  image String?
-  icon  String? @default("ph:map-trifold")
+  image     images? @relation(fields: [images_id], references: [id])
+  images_id String? @db.Uuid
+  icon      String?
 
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
@@ -161,27 +232,28 @@ model maps {
   map_pins   map_pins[]
   map_layers map_layers[]
 
-  parentId String? @db.Uuid
-  parent   maps?   @relation("parentChildMaps", fields: [parentId], references: [id], onDelete: Cascade)
-  children maps[]  @relation("parentChildMaps")
-  tags     tags[]
+  parent_id String? @db.Uuid
+  parent    maps?   @relation("parentChildMaps", fields: [parent_id], references: [id], onDelete: Cascade)
+  children  maps[]  @relation("parentChildMaps")
+  tags      tags[]
 }
 
 model map_pins {
-  id              String  @id @default(uuid()) @db.Uuid
+  id              String   @id @default(uuid()) @db.Uuid
   text            String?
-  parent          maps?   @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  parentId        String  @db.Uuid
+  parent          maps?    @relation(fields: [parent_id], references: [id], onDelete: Cascade)
+  parent_id       String   @db.Uuid
   lat             Float
   lng             Float
-  color           String  @default("#ffffff")
-  borderColor     String  @default("#ffffff")
-  backgroundColor String  @default("#000000")
+  color           String   @default("#ffffff")
+  borderColor     String   @default("#ffffff")
+  backgroundColor String   @default("#000000")
   icon            String?
-  image           String?
-  showBackground  Boolean @default(true)
-  showBorder      Boolean @default(true)
-  isPublic        Boolean @default(false)
+  image           images?  @relation(fields: [images_id], references: [id])
+  images_id       String?  @db.Uuid
+  showBackground  Boolean  @default(true)
+  showBorder      Boolean  @default(true)
+  isPublic        Boolean?
   tags            tags[]
 
   map_link String? @db.Uuid
@@ -189,25 +261,25 @@ model map_pins {
 }
 
 model map_layers {
-  id       String  @id @default(uuid()) @db.Uuid
-  title    String  @default("New Layer")
-  image    String?
-  parentId String  @db.Uuid
-  isPublic Boolean @default(false)
-  maps     maps?   @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  id        String   @id @default(uuid()) @db.Uuid
+  title     String   @default("New Layer")
+  image     String?
+  parent_id String   @db.Uuid
+  isPublic  Boolean?
+  maps      maps?    @relation(fields: [parent_id], references: [id], onDelete: Cascade)
 }
 
 model boards {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id         String   @id @default(uuid()) @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 
-  title    String  @default("New Board")
-  folder   Boolean @default(false)
-  isPublic Boolean @default(false)
-  sort     Int     @default(0)
+  title    String   @default("New Board")
+  isFolder Boolean?
+  isPublic Boolean?
+  sort     Int      @default(0)
 
-  icon String? @default("ph:graph-light")
+  icon String?
 
   defaultNodeShape String @default("rectangle")
   defaultNodeColor String @default("#595959")
@@ -215,8 +287,8 @@ model boards {
 
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
-  parentId   String?  @db.Uuid
-  parent     boards?  @relation("parentChildBoards", fields: [parentId], references: [id], onDelete: Cascade)
+  parent_id  String?  @db.Uuid
+  parent     boards?  @relation("parentChildBoards", fields: [parent_id], references: [id], onDelete: Cascade)
   children   boards[] @relation("parentChildBoards")
   nodes      nodes[]
   edges      edges[]
@@ -242,15 +314,16 @@ model nodes {
   backgroundColor   String?
   backgroundOpacity Float?
 
-  locked   Boolean?
-  template Boolean?
-  zIndex   Int?
+  locked     Boolean?
+  isTemplate Boolean?
+  zIndex     Int?
 
-  board        boards     @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  board        boards     @relation(fields: [parent_id], references: [id], onDelete: Cascade)
   document     documents? @relation(fields: [doc_id], references: [id])
   doc_id       String?    @db.Uuid
-  image        String?
-  parentId     String     @db.Uuid
+  image        images?    @relation(fields: [images_id], references: [id])
+  images_id    String?    @db.Uuid
+  parent_id    String     @db.Uuid
   edges_source edges[]    @relation("edges_source")
   edges_target edges[]    @relation("edges_target")
   tags         tags[]
@@ -297,34 +370,33 @@ model edges {
 
   zIndex Int?
 
-  board     boards @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  board     boards @relation(fields: [parent_id], references: [id], onDelete: Cascade)
   source    nodes  @relation("edges_source", fields: [source_id], references: [id], onDelete: Cascade)
   target    nodes  @relation("edges_target", fields: [target_id], references: [id], onDelete: Cascade)
   source_id String @db.Uuid
   target_id String @db.Uuid
-  parentId  String @db.Uuid
+  parent_id String @db.Uuid
   tags      tags[]
 
   @@unique([source_id, target_id])
 }
 
 model screens {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id         String   @id @default(uuid()) @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 
   title      String   @default("New Screen")
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
-  parentId String?   @db.Uuid
-  parent   screens?  @relation("parentChildScreens", fields: [parentId], references: [id], onDelete: Cascade)
-  children screens[] @relation("parentChildScreens")
+  parent_id String?   @db.Uuid
+  parent    screens?  @relation("parentChildScreens", fields: [parent_id], references: [id], onDelete: Cascade)
+  children  screens[] @relation("parentChildScreens")
 
-  icon     String  @default("fluent:board-24-regular")
-  folder   Boolean @default(false)
-  isPublic Boolean @default(false)
-  sort     Int     @default(0)
+  icon     String?
+  isFolder Boolean?
+  isPublic Boolean?
 
   sectionSize String     @default("md")
   sections    sections[]
@@ -337,8 +409,8 @@ model sections {
   sort     Int    @default(0)
   cardSize String @default("md")
 
-  screens  screens? @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  parentId String?  @db.Uuid
+  screens   screens? @relation(fields: [parent_id], references: [id], onDelete: Cascade)
+  parent_id String?  @db.Uuid
 
   cards cards[]
 }
@@ -350,32 +422,31 @@ model cards {
   document    documents @relation(fields: [documentsId], references: [id], onDelete: Cascade)
   documentsId String    @db.Uuid
 
-  sections sections? @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  parentId String?   @db.Uuid
+  sections  sections? @relation(fields: [parent_id], references: [id], onDelete: Cascade)
+  parent_id String?   @db.Uuid
 
   tags tags[]
 
-  @@unique([parentId, documentsId])
+  @@unique([parent_id, documentsId])
 }
 
 model dictionaries {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id         String   @id @default(uuid()) @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 
   title String
 
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
-  icon     String  @default("ph:book-bookmark-light")
-  sort     Int     @default(0)
-  folder   Boolean @default(false)
-  isPublic Boolean @default(false)
+  icon     String?
+  isFolder Boolean?
+  isPublic Boolean?
 
-  parentId String?        @db.Uuid
-  parent   dictionaries?  @relation("parentChildDictionaries", fields: [parentId], references: [id], onDelete: Cascade)
-  children dictionaries[] @relation("parentChildDictionaries")
+  parent_id String?        @db.Uuid
+  parent    dictionaries?  @relation("parentChildDictionaries", fields: [parent_id], references: [id], onDelete: Cascade)
+  children  dictionaries[] @relation("parentChildDictionaries")
 
   tags  tags[]
   words words[]
@@ -390,36 +461,34 @@ model words {
 
   translation String
 
-  dictionary dictionaries @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  parentId   String       @db.Uuid
+  dictionary dictionaries @relation(fields: [parent_id], references: [id], onDelete: Cascade)
+  parent_id  String       @db.Uuid
 
-  @@unique([title, translation, parentId])
+  @@unique([title, translation, parent_id])
 }
 
 model calendars {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id         String   @id @default(uuid()) @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 
   title String
 
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
-  parentId String?     @db.Uuid
-  parent   calendars?  @relation("parentChildCalendar", fields: [parentId], references: [id], onDelete: Cascade)
-  children calendars[] @relation("parentChildCalendar")
+  parent_id String?     @db.Uuid
+  parent    calendars?  @relation("parentChildCalendar", fields: [parent_id], references: [id], onDelete: Cascade)
+  children  calendars[] @relation("parentChildCalendar")
 
-  icon     String  @default("ph:calendar-blank-light")
-  sort     Int     @default(0)
-  folder   Boolean @default(false)
-  isPublic Boolean @default(false)
+  icon     String?
+  isFolder Boolean?
+  isPublic Boolean?
 
   offset  Int  @default(0)
   hours   Int?
   minutes Int?
 
-  eras   eras[]
   months months[]
   days   String[]
   events events[]
@@ -428,36 +497,27 @@ model calendars {
   timelines timelines[]
 }
 
-model eras {
-  id         String @id @default(uuid()) @db.Uuid
-  title      String
-  start_year Int
-  end_year   Int
-
-  calendar calendars @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  parentId String    @db.Uuid
-}
-
 model months {
   id    String @id @default(uuid()) @db.Uuid
   title String
   days  Int
 
-  calendar calendars @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  sort     Int       @default(0)
-  parentId String    @db.Uuid
-  events   events[]
+  calendar  calendars @relation(fields: [parent_id], references: [id], onDelete: Cascade)
+  sort      Int       @default(0)
+  parent_id String    @db.Uuid
+  events    events[]
 }
 
 model events {
-  id              String  @id @default(uuid()) @db.Uuid
-  title           String
-  description     String?
-  backgroundImage String?
+  id          String  @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
 
   isPublic Boolean @default(false)
 
-  document documents? @relation(fields: [documentsId], references: [id])
+  document  documents? @relation(fields: [documentsId], references: [id])
+  image     images?    @relation(fields: [images_id], references: [id])
+  images_id String?    @db.Uuid
 
   backgroundColor String?
   textColor       String?
@@ -477,31 +537,30 @@ model events {
 }
 
 model timelines {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id         String   @id @default(uuid()) @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 
   title String
 
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
-  parentId String?     @db.Uuid
-  parent   timelines?  @relation("parentChildTimeline", fields: [parentId], references: [id], onDelete: Cascade)
-  children timelines[] @relation("parentChildTimeline")
+  parent_id String?     @db.Uuid
+  parent    timelines?  @relation("parentChildTimeline", fields: [parent_id], references: [id], onDelete: Cascade)
+  children  timelines[] @relation("parentChildTimeline")
 
-  icon     String  @default("mdi:timeline-clock-outline")
-  sort     Int     @default(0)
-  folder   Boolean @default(false)
-  isPublic Boolean @default(false)
+  icon     String?
+  isFolder Boolean?
+  isPublic Boolean?
 
   calendars calendars[]
 }
 
 model random_tables {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id         String   @id @default(uuid()) @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 
   title       String
   description String?
@@ -509,16 +568,15 @@ model random_tables {
   project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String   @db.Uuid
 
-  parent   random_tables?  @relation("parentChildRandomTables", fields: [parentId], references: [id], onDelete: Cascade)
-  children random_tables[] @relation("parentChildRandomTables")
-  parentId String?         @db.Uuid
+  parent    random_tables?  @relation("parentChildRandomTables", fields: [parent_id], references: [id], onDelete: Cascade)
+  children  random_tables[] @relation("parentChildRandomTables")
+  parent_id String?         @db.Uuid
 
   isShared Boolean @default(false)
 
-  icon                 String                 @default("game-icons:perspective-dice-six-faces-random")
-  folder               Boolean                @default(false)
-  isPublic             Boolean                @default(false)
-  sort                 Int                    @default(0)
+  icon                 String?
+  isFolder             Boolean?
+  isPublic             Boolean?
   random_table_options random_table_options[]
 }
 
@@ -526,9 +584,8 @@ model random_table_options {
   id           String        @id @default(uuid()) @db.Uuid
   title        String
   description  String?
-  sort         Int           @default(0)
-  random_table random_tables @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  parentId     String        @db.Uuid
+  random_table random_tables @relation(fields: [parent_id], references: [id], onDelete: Cascade)
+  parent_id    String        @db.Uuid
   icon         String?
   iconColor    String?
 }
@@ -570,7 +627,7 @@ model webhooks {
   id    String @id @default(uuid()) @db.Uuid
   title String
   url   String
-  user  User   @relation(fields: [user_id], references: [id])
+  user  users  @relation(fields: [user_id], references: [id])
 
   user_id String @db.Uuid
 

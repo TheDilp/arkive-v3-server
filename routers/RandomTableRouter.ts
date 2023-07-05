@@ -19,9 +19,6 @@ export const randomTableRouter = (
           where: {
             project_id: req.params.project_id,
           },
-          orderBy: {
-            sort: "asc",
-          },
         });
         rep.send(allTables);
       } catch (error) {
@@ -113,8 +110,7 @@ export const randomTableRouter = (
         const updates = indexes.map((idx) =>
           prisma.random_tables.update({
             data: {
-              parentId: idx.parent,
-              sort: idx.sort,
+              parent_id: idx.parent,
             },
             where: { id: idx.id },
           })

@@ -1,0 +1,20 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1688549272882,
+      "tag": "0000_yielding_gamma_corps",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1688558976566,
+      "tag": "0001_icy_talkback",
+      "breakpoints": true
+    }
+  ]
+}

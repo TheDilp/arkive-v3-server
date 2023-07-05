@@ -1,35 +1,46 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import prisma from "../client";
-import { checkIfLocal } from "../utils/auth";
+import { db, insertUserSchema } from "../utils";
+import { users, webhooks } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
+import { ResponseEnum } from "../enums/ResponseEnums";
 
 export const userRouter = (server: FastifyInstance, _: any, done: any) => {
+  // #region create_routes
+  server.post(
+    "/create",
+    async (
+      req: FastifyRequest<{ Body: { data: typeof insertUserSchema } }>,
+      rep
+    ) => {
+      const user = insertUserSchema.parse(req.body.data);
+      if (user) {
+        const data = await db.insert(users).values(user);
+        rep.send({ data, message: ResponseEnum.created("User"), ok: true });
+      }
+    }
+  );
+  // #endregion create_routes
+  // #region read_routes
+  // #endregion read_routes
+  // #region update_routes
+  // #endregion update_routes
+  // #region delete_routes
+  // #endregion delete_routes
   server.get(
     "/user/:user_id",
     async (
       req: FastifyRequest<{ Params: { user_id: string } }>,
       rep: FastifyReply
     ) => {
-      try {
-        const user = await prisma.user.findUnique({
-          where: {
-            auth_id: req.params.user_id,
-          },
-          include: {
-            webhooks: {
-              select: {
-                id: true,
-                title: true,
-                url: true,
-              },
-            },
-          },
-        });
-        rep.send(user);
-      } catch (error) {
-        rep.code(500);
-        console.error(error);
-        rep.send(false);
-      }
+      const data = await db
+        .select()
+        .from(users)
+        .where(eq(users.authId, req.params.user_id))
+        .leftJoin(webhooks, eq(users.id, webhooks.userId));
+
+      if (data)
+        rep.send({ data, message: ResponseEnum.created("User"), ok: true });
     }
   );
 
@@ -44,27 +55,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         };
       }>,
       rep: FastifyReply
-    ) => {
-      try {
-        const data = req.body;
-        const user_id = checkIfLocal(req, rep);
-
-        if (user_id === null) return;
-
-        await prisma.user.update({
-          where: {
-            id: data.id,
-            auth_id: user_id,
-          },
-          data,
-        });
-        rep.send(true);
-      } catch (error) {
-        rep.code(500);
-        console.error(error);
-        rep.send(false);
-      }
-    }
+    ) => {}
   );
   server.post(
     "/addtoproject",
@@ -110,38 +101,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         };
       }>,
       rep: FastifyReply
-    ) => {
-      try {
-        const data = req.body;
-        const member = await prisma.user.findUnique({
-          where: {
-            email: data.email,
-          },
-        });
-        if (member) {
-          await prisma.projects.update({
-            where: {
-              id: data.project_id,
-            },
-            data: {
-              members: {
-                disconnect: {
-                  email: data.email,
-                },
-              },
-            },
-          });
-          rep.send(true);
-        } else {
-          rep.code(500);
-          rep.send("NO USER FOUND");
-        }
-      } catch (error) {
-        rep.code(500);
-        console.error(error);
-        rep.send(500);
-      }
-    }
+    ) => {}
   );
   server.post(
     "/createwebhook",
@@ -268,27 +228,7 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
         };
       }>,
       rep: FastifyReply
-    ) => {
-      try {
-        const user_id = checkIfLocal(req, rep);
-
-        if (user_id === null) return;
-
-        const data = req.body;
-        if (data.id === user_id)
-          await prisma.user.delete({
-            where: {
-              id: data.id,
-              auth_id: user_id,
-            },
-          });
-        rep.send(true);
-      } catch (error) {
-        rep.code(500);
-        console.error(error);
-        rep.send(false);
-      }
-    }
+    ) => {}
   );
   server.delete(
     "/deletewebhook",
@@ -303,9 +243,6 @@ export const userRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       try {
         const data = req.body;
-        const u_id = checkIfLocal(req, rep);
-
-        if (u_id === null) return;
 
         const { id, user_id } = data;
         await prisma.webhooks.delete({

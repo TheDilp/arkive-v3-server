@@ -18,10 +18,10 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
           select: {
             id: true,
             title: true,
-            folder: true,
-            sort: true,
+            isFolder: true,
+
             icon: true,
-            parentId: true,
+            parent_id: true,
             isPublic: true,
             tags: true,
             defaultEdgeColor: true,
@@ -175,7 +175,7 @@ export const boardRouter = (server: FastifyInstance, _: any, done: any) => {
         const updates = indexes.map((idx) =>
           prisma.boards.update({
             data: {
-              parentId: idx.parent,
+              parent_id: idx.parent,
               sort: idx.sort,
             },
             where: { id: idx.id },

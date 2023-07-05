@@ -106,11 +106,6 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
         const word = await prisma.calendars.findUnique({
           where: { id: data.id },
           include: {
-            eras: {
-              orderBy: {
-                start_year: "asc",
-              },
-            },
             months: {
               include: {
                 events: {
@@ -216,7 +211,7 @@ export const publicRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       try {
-        const user = await prisma.user.findUnique({
+        const user = await prisma.users.findUnique({
           where: {
             id: req.params.user_id,
           },

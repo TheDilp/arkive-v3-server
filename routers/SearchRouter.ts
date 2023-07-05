@@ -25,7 +25,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
       if (type === "namecontent") {
         // lower(content->>'content'::text) like lower(${`%${query}%`}) or
         // prisma.$queryRaw`
-        // select id,title,icon from documents where (project_id::text = ${project_id} and ((lower(title) like lower(${`%${query}%`}) ) ) and folder = false)
+        // select id,title,icon from documents where (project_id::text = ${project_id} and ((lower(title) like lower(${`%${query}%`}) ) ) and isFolder = false)
         // ;`,
         const searches = [
           prisma.documents.findMany({
@@ -49,8 +49,8 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
                 },
               ],
               project_id,
-              folder: false,
-              template: false,
+              isFolder: false,
+              isTemplate: false,
             },
             take: 5,
             select: {
@@ -66,7 +66,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
                 mode: "insensitive",
               },
               project_id,
-              folder: false,
+              isFolder: false,
             },
             take: 5,
             select: {
@@ -89,7 +89,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             select: {
               id: true,
               text: true,
-              parentId: true,
+              parent_id: true,
               icon: true,
               parent: {
                 select: {
@@ -104,7 +104,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
                 contains: query as string,
                 mode: "insensitive",
               },
-              folder: false,
+              isFolder: false,
               project_id,
             },
             take: 5,
@@ -128,7 +128,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             select: {
               id: true,
               label: true,
-              parentId: true,
+              parent_id: true,
               board: {
                 select: {
                   title: true,
@@ -150,7 +150,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             select: {
               id: true,
               label: true,
-              parentId: true,
+              parent_id: true,
               board: {
                 select: {
                   title: true,
@@ -177,7 +177,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
                 contains: query as string,
                 mode: "insensitive",
               },
-              folder: false,
+              isFolder: false,
               project_id,
             },
             select: {
@@ -217,7 +217,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
               id: true,
               title: true,
               cards: true,
-              parentId: true,
+              parent_id: true,
             },
           }),
           prisma.calendars.findMany({
@@ -329,24 +329,24 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         };
         const searches = [
           prisma.documents.findMany({
-            where: { ...whereTagsClause, template: false, folder: false },
+            where: { ...whereTagsClause, isTemplate: false, isFolder: false },
             take: 5,
             select: {
               id: true,
               title: true,
               icon: true,
-              folder: true,
+              isFolder: true,
             },
           }),
           prisma.maps.findMany({
-            where: { ...whereTagsClause, folder: false },
+            where: { ...whereTagsClause, isFolder: false },
 
             take: 5,
             select: {
               id: true,
               title: true,
               icon: true,
-              folder: true,
+              isFolder: true,
             },
           }),
           prisma.map_pins.findMany({
@@ -365,13 +365,13 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           }),
           prisma.boards.findMany({
-            where: { ...whereTagsClause, folder: false },
+            where: { ...whereTagsClause, isFolder: false },
             take: 5,
             select: {
               id: true,
               title: true,
               icon: true,
-              folder: true,
+              isFolder: true,
             },
           }),
           prisma.nodes.findMany({
@@ -380,7 +380,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             select: {
               id: true,
               label: true,
-              parentId: true,
+              parent_id: true,
               board: {
                 select: {
                   id: true,
@@ -395,7 +395,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             select: {
               id: true,
               label: true,
-              parentId: true,
+              parent_id: true,
               board: {
                 select: {
                   id: true,
@@ -417,14 +417,14 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           }),
           prisma.screens.findMany({
-            where: { ...whereTagsClause, folder: false },
+            where: { ...whereTagsClause, isFolder: false },
             take: 5,
             select: {
               id: true,
               title: true,
-              parentId: true,
+              parent_id: true,
               icon: true,
-              folder: true,
+              isFolder: true,
             },
           }),
           prisma.cards.findMany({
@@ -432,7 +432,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             take: 5,
             select: {
               id: true,
-              parentId: true,
+              parent_id: true,
               sections: {
                 select: {
                   id: true,
@@ -448,19 +448,19 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
             },
           }),
           prisma.dictionaries.findMany({
-            where: { ...whereTagsClause, folder: false },
+            where: { ...whereTagsClause, isFolder: false },
             take: 5,
             select: {
               id: true,
-              parentId: true,
+              parent_id: true,
             },
           }),
           prisma.calendars.findMany({
-            where: { ...whereTagsClause, folder: false },
+            where: { ...whereTagsClause, isFolder: false },
             take: 5,
             select: {
               id: true,
-              parentId: true,
+              parent_id: true,
             },
           }),
           prisma.events.findMany({
@@ -537,8 +537,8 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
               take: data?.take,
               where: {
                 project_id: data.project_id,
-                folder: false,
-                template: false,
+                isFolder: false,
+                isTemplate: false,
                 title: {
                   contains: data.query,
                   mode: "insensitive",
@@ -566,7 +566,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
               select: {
                 id: true,
                 title: true,
-                parentId: true,
+                parent_id: true,
                 document: {
                   select: {
                     id: true,
@@ -587,7 +587,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           const items = await prisma.maps.findMany({
             take: data?.take,
             where: {
-              folder: false,
+              isFolder: false,
               project_id: data.project_id,
               title: {
                 contains: data.query,
@@ -617,7 +617,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
               select: {
                 id: true,
                 text: true,
-                parentId: true,
+                parent_id: true,
                 icon: true,
                 parent: {
                   select: {
@@ -633,7 +633,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           const items = await prisma.boards.findMany({
             take: data?.take,
             where: {
-              folder: false,
+              isFolder: false,
               project_id: data.project_id,
               title: {
                 contains: data.query,
@@ -663,7 +663,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
               select: {
                 id: true,
                 label: true,
-                parentId: true,
+                parent_id: true,
                 board: {
                   select: {
                     title: true,
@@ -690,7 +690,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
               select: {
                 id: true,
                 label: true,
-                parentId: true,
+                parent_id: true,
                 board: {
                   select: {
                     title: true,
@@ -723,7 +723,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
                   contains: data.query as string,
                   mode: "insensitive",
                 },
-                folder: false,
+                isFolder: false,
                 project_id: data.project_id,
               },
               select: {
@@ -768,7 +768,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
                 id: true,
                 title: true,
                 cards: true,
-                parentId: true,
+                parent_id: true,
               },
             })
           );

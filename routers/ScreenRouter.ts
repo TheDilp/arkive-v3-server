@@ -15,9 +15,6 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           where: {
             project_id: req.params.project_id,
           },
-          orderBy: {
-            sort: "asc",
-          },
         });
         rep.send(screens);
       } catch (error) {
@@ -77,7 +74,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         req: FastifyRequest<{
           Body: Pick<
             screens,
-            "title" | "sectionSize" | "project_id" | "folder"
+            "title" | "sectionSize" | "project_id" | "isFolder"
           >;
         }>,
         rep: FastifyReply
@@ -90,7 +87,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
               title: data.title,
               project_id: data.project_id,
               sectionSize: data.sectionSize,
-              folder: data.folder,
+              isFolder: data.isFolder,
             },
           });
           rep.send(newScreen);
@@ -105,7 +102,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       "/sortscreens",
       async (
         req: FastifyRequest<{
-          Body: { id: string; parentId: string; sort: number }[];
+          Body: { id: string; parent_id: string; sort: number }[];
         }>,
         rep: FastifyReply
       ) => {
@@ -114,8 +111,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           const updates = indexes.map((idx) =>
             prisma.screens.update({
               data: {
-                parentId: idx.parentId,
-                sort: idx.sort,
+                parent_id: idx.parent_id,
               },
               where: { id: idx.id },
             })
@@ -139,7 +135,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           id: string;
           title: string;
           section: string;
-          parentId: string;
+          parent_id: string;
           sort: number;
         };
       }>,
@@ -151,7 +147,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           data: {
             id: data.id,
             title: data.title,
-            parentId: data.parentId,
+            parent_id: data.parent_id,
             sort: data.sort,
           },
         });
@@ -224,7 +220,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         req: FastifyRequest<{
           Body: {
             id: string;
-            parentId: string;
+            parent_id: string;
             documentsId: string;
           }[];
         }>,
@@ -247,7 +243,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
       "/sortsections",
       async (
         req: FastifyRequest<{
-          Body: { id: string; parentId: string; sort: number }[];
+          Body: { id: string; parent_id: string; sort: number }[];
         }>,
         rep: FastifyReply
       ) => {
@@ -256,7 +252,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           const updates = indexes.map((idx) =>
             prisma.sections.update({
               data: {
-                parentId: idx.parentId,
+                parent_id: idx.parent_id,
                 sort: idx.sort,
               },
               where: { id: idx.id },
@@ -277,7 +273,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
     "/sortcards",
     async (
       req: FastifyRequest<{
-        Body: { id: string; parentId: string; sort: number }[];
+        Body: { id: string; parent_id: string; sort: number }[];
       }>,
       rep: FastifyReply
     ) => {
@@ -286,7 +282,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
         const updates = indexes.map((idx) =>
           prisma.cards.update({
             data: {
-              parentId: idx.parentId,
+              parent_id: idx.parent_id,
               sort: idx.sort,
             },
             where: { id: idx.id },
@@ -311,7 +307,7 @@ export const screenRouter = (server: FastifyInstance, _: any, done: any) => {
           id: string;
           title: string;
           icon: string;
-          folder: boolean;
+          isFolder: boolean;
           isPublic: boolean;
           sort: number;
         };
