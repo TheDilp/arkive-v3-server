@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { existsSync, mkdirSync, unlinkSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, unlinkSync } from "fs";
 import path from "path";
 
 import sharp from "sharp";
@@ -8,6 +8,7 @@ import { images } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 
 export const assetRouter = (server: FastifyInstance, _: any, done: any) => {
+  // #region read_router
   server.get(
     "/:projectId",
     async (
@@ -28,24 +29,48 @@ export const assetRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.get(
-    "/:type/:projectId",
+    "/:projectId/:type",
     async (
       req: FastifyRequest<{ Params: { type: string; projectId: string } }>,
       rep: FastifyReply
     ) => {
       const { projectId, type } = req.params;
-      try {
-        const key = `assets/${projectId}/${type}/`;
-
-        return;
-      } catch (error) {
-        rep.code(500);
-        console.error(error);
-        rep.send(false);
-        return;
+      const data = await db
+        .select({ id: images.id, title: images.title })
+        .from(images);
+      if (data) {
+        rep.send({ data, message: "Success", ok: true });
       }
     }
   );
+
+  server.get(
+    "/:projectId/:type/:title",
+    async (
+      req: FastifyRequest<{
+        Params: { projectId: string; type: "images" | "maps"; title: string };
+      }>,
+      rep
+    ) => {
+      const { projectId, type, title } = req.params;
+      const filePath = `./assets/${projectId}/${type}/${title}`;
+      if (!existsSync(filePath)) {
+        rep.code(404).send({
+          message:
+            "There are no assets of the requested type for this project.",
+          ok: false,
+        });
+      }
+      const image = readFileSync(filePath);
+      rep.type("image/webp");
+      rep.headers({
+        "Cache-Control": "max-age=3600",
+      });
+      rep.send(image);
+    }
+  );
+
+  // #endregion read_router
 
   server.post(
     "/upload/:projectId/:type",

@@ -1,7 +1,7 @@
 import cors from "@fastify/cors";
 
 import fastify, { errorCodes } from "fastify";
-
+import fastifyStatic from "@fastify/static";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import fileUpload from "fastify-file-upload";
@@ -15,6 +15,7 @@ import {
 } from "./routers";
 import { swatchesRouter } from "./routers/swatches_router";
 import { migrationClient } from "./utils";
+import path from "path";
 
 const server = fastify();
 
@@ -33,6 +34,10 @@ server.register(cors, {
     // Generate an error on other origins, disabling access
     cb(new Error("Not allowed"), false);
   },
+});
+
+server.register(fastifyStatic, {
+  root: path.join(__dirname, "assets"),
 });
 
 server.register(fileUpload);
