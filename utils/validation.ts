@@ -1,5 +1,11 @@
 import { createInsertSchema } from "drizzle-zod";
-import { documents, projects, swatches, users } from "../drizzle/schema";
+import {
+  characters,
+  documents,
+  projects,
+  swatches,
+  users,
+} from "../drizzle/schema";
 import { z } from "zod";
 
 const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
@@ -17,6 +23,10 @@ export const updateProjectSchema = z.object({
   image: z.string().optional(),
 });
 // #endregion projects
+
+// #region characters
+export const insertCharacterSchema = createInsertSchema(characters);
+// #endregion characters
 
 // #region documents
 export const insertDocumentSchema = createInsertSchema(documents);

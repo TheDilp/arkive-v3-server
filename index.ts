@@ -16,6 +16,7 @@ import {
 import { swatchesRouter } from "./routers/swatches_router";
 import { migrationClient } from "./utils";
 import path from "path";
+import { characterRouter } from "./routers/character_router";
 
 const server = fastify();
 
@@ -49,7 +50,8 @@ server.register(
     instance.register(assetRouter, { prefix: "/assets" });
     instance.register(projectRouter, { prefix: "/projects" });
     instance.register(swatchesRouter, { prefix: "/swatches" });
-    instance.register(documentRouter);
+    instance.register(characterRouter, { prefix: "/characters" });
+    instance.register(documentRouter, { prefix: "/documents" });
     // instance.register(mapRouter);
     // instance.register(boardRouter);
     // instance.register(calendarRouter);
