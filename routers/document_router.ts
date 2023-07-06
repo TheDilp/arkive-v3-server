@@ -11,21 +11,17 @@ import {
 } from "../drizzle/schema";
 import { ResponseEnum } from "../enums/ResponseEnums";
 import { db, insertDocumentSchema, updateDocumentSchema } from "../utils";
-import { removeNull } from "../utils/transform";
 
 export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
-  server.get(
-    "/:projectId/:parentId",
-    async (
-      req: FastifyRequest<{ Params: { projectId: string; parentId: string } }>,
-      rep
-    ) => {
+  server.post(
+    "/",
+    async (req: FastifyRequest<{ Body: { parentId: string } }>, rep) => {
       const tagsQuery = db
         .select()
         .from(documentsTotags)
         .leftJoin(documents, eq(documents.id, documentsTotags.a))
         .leftJoin(tags, eq(tags.id, documentsTotags.b))
-        .where(eq(documents.parentId, req.params.parentId))
+        .where(eq(documents.parentId, req.body.parentId))
         .as("tagsQuery");
       const data = await db
         .select({
@@ -39,12 +35,7 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
           projectId: documents.projectId,
         })
         .from(documents)
-        .where(
-          and(
-            eq(documents.projectId, req.params.projectId),
-            eq(documents.parentId, req.params.parentId)
-          )
-        )
+        .where(eq(documents.parentId, req.body.parentId))
         .leftJoin(alterNames, eq(alterNames.parentId, documents.id))
         .leftJoin(images, eq(images.id, documents.imageId))
         .leftJoin(tagsQuery, eq(documents.id, tagsQuery.documents.id));
@@ -52,41 +43,32 @@ export const documentRouter = (server: FastifyInstance, _: any, done: any) => {
       rep.send({ data, message: ResponseEnum.generic(), ok: true });
     }
   );
-  server.post(
-    "/getsingledocument",
+  server.get(
+    "/:id",
     async (
-      req: FastifyRequest<{ Body: { id: string } }>,
+      req: FastifyRequest<{ Params: { id: string } }>,
       rep: FastifyReply
     ) => {
-      try {
-        const data = req.body;
-        const doc = await prisma.documents.findUnique({
-          where: { id: data.id },
-          select: {
-            id: true,
-            title: true,
-            content: true,
-            tags: {
-              select: {
-                id: true,
-                title: true,
-              },
-            },
-            alter_names: {
-              select: {
-                id: true,
-                title: true,
-              },
-            },
-          },
-        });
-        rep.send(doc);
-        return;
-      } catch (error) {
-        rep.code(500);
-        console.error(error);
-        rep.send(false);
-        return;
+      const tagsQuery = db
+        .select()
+        .from(documentsTotags)
+        .leftJoin(documents, eq(documents.id, documentsTotags.a))
+        .leftJoin(tags, eq(tags.id, documentsTotags.b))
+        .where(eq(documents.id, req.params.id))
+        .as("tagsQuery");
+
+      const data = await db
+        .select({
+          id: documents.id,
+          title: documents.title,
+          content: documents.content,
+        })
+        .from(documents)
+        .leftJoin(alterNames, eq(documents.id, alterNames.parentId))
+        .leftJoin(tagsQuery, eq(documents.id, tagsQuery.documents.id));
+
+      if (data) {
+        rep.send({ data: data[0], message: "Success", ok: true });
       }
     }
   );

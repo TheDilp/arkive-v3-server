@@ -9,14 +9,14 @@ import { eq } from "drizzle-orm";
 
 export const assetRouter = (server: FastifyInstance, _: any, done: any) => {
   server.get(
-    "/:project_id",
+    "/:projectId",
     async (
-      req: FastifyRequest<{ Params: { project_id: string } }>,
+      req: FastifyRequest<{ Params: { projectId: string } }>,
       rep: FastifyReply
     ) => {
       try {
-        const imagesKey = `assets/${req.params.project_id}/images/`;
-        const mapsKey = `assets/${req.params.project_id}/maps/`;
+        const imagesKey = `assets/${req.params.projectId}/images/`;
+        const mapsKey = `assets/${req.params.projectId}/maps/`;
 
         return;
       } catch (error) {
@@ -28,13 +28,14 @@ export const assetRouter = (server: FastifyInstance, _: any, done: any) => {
     }
   );
   server.get(
-    "/:type/:project_id",
+    "/:type/:projectId",
     async (
-      req: FastifyRequest<{ Params: { project_id: string } }>,
+      req: FastifyRequest<{ Params: { type: string; projectId: string } }>,
       rep: FastifyReply
     ) => {
+      const { projectId, type } = req.params;
       try {
-        const key = `assets/${req.params.project_id}/images/`;
+        const key = `assets/${projectId}/${type}/`;
 
         return;
       } catch (error) {
@@ -47,7 +48,7 @@ export const assetRouter = (server: FastifyInstance, _: any, done: any) => {
   );
 
   server.post(
-    "/upload/:type/:projectId",
+    "/upload/:projectId/:type",
     async (
       req: FastifyRequest<{
         Params: { type: "images" | "maps"; projectId: string };
@@ -56,24 +57,27 @@ export const assetRouter = (server: FastifyInstance, _: any, done: any) => {
       rep: FastifyReply
     ) => {
       const files = req.body;
-      const { type, projectId: project_id } = req.params;
+      const { type, projectId: projectId } = req.params;
 
       const fileNames: string[] = [];
 
       Object.entries(files).forEach(async ([key, file]) => {
-        const filePath = `assets/${project_id}/${type}`;
+        const filePath = `assets/${projectId}/${type}`;
 
         if (!existsSync(filePath)) {
           mkdirSync(filePath, { recursive: true });
         }
         sharp(file.data)
           .toFormat("webp")
-          .toFile(`${filePath}/${path.parse(key).dir}.webp`, (err) => {
-            if (err) {
-              console.error(err);
-              rep.send({ message: "File not saved.", ok: false });
+          .toFile(
+            `${filePath}/${key.substring(0, key.lastIndexOf(".")) + ".webp"}`,
+            (err) => {
+              if (err) {
+                console.error(err);
+                rep.send({ message: "File not saved.", ok: false });
+              }
             }
-          });
+          );
         fileNames.push(key);
       });
       await db.transaction(async (tx) => {
