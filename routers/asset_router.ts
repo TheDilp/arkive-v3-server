@@ -67,19 +67,18 @@ export const assetRouter = (server: FastifyInstance, _: any, done: any) => {
         if (!existsSync(filePath)) {
           mkdirSync(filePath, { recursive: true });
         }
+        const newName = key.substring(0, key.lastIndexOf(".")) + ".webp";
         sharp(file.data)
           .toFormat("webp")
-          .toFile(
-            `${filePath}/${key.substring(0, key.lastIndexOf(".")) + ".webp"}`,
-            (err) => {
-              if (err) {
-                console.error(err);
-                rep.send({ message: "File not saved.", ok: false });
-              }
+          .toFile(`${filePath}/${newName}`, (err) => {
+            if (err) {
+              console.error(err);
+              rep.send({ message: "File not saved.", ok: false });
             }
-          );
-        fileNames.push(key);
+          });
+        if (!existsSync(`${filePath}/${newName}`)) fileNames.push(newName);
       });
+
       await db.transaction(async (tx) => {
         await Promise.all(
           fileNames.map((name) =>

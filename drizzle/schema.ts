@@ -585,6 +585,7 @@ export const images = pgTable(
   (table) => {
     return {
       projectImageIdKey: uniqueIndex("images_projectImageId_key").on(
+        table.title,
         table.projectImageId
       ),
     };
