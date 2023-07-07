@@ -1,10 +1,11 @@
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq, or } from "drizzle-orm";
 import { FastifyInstance, FastifyRequest } from "fastify";
 import { characters, images } from "../drizzle/schema";
 import { ResponseEnum } from "../enums/ResponseEnums";
 import { db, insertCharacterSchema } from "../utils";
 import { RequestBodyType } from "../types/CRUDTypes";
 import { getFilters } from "../utils/filterConstructor";
+import { getEntityOrderBy } from "../utils/orderByConstructor";
 
 export const characterRouter = (server: FastifyInstance, _: any, done: any) => {
   // #region create_routes
@@ -34,8 +35,12 @@ export const characterRouter = (server: FastifyInstance, _: any, done: any) => {
       rep
     ) => {
       let filters;
+      let orderBy;
       if (req.body.filters) {
         filters = getFilters(req.body.filters, characters);
+      }
+      if (req.body.orderBy) {
+        orderBy = getEntityOrderBy(req.body.orderBy, characters);
       }
       const data = await db
         .select({
@@ -57,6 +62,8 @@ export const characterRouter = (server: FastifyInstance, _: any, done: any) => {
             ...(filters || [])
           )
         )
+        // @ts-ignore
+        .orderBy(...(orderBy || [asc(characters.firstName)]))
         .leftJoin(images, eq(images.id, characters.imageId));
       rep.send({ data, message: ResponseEnum.generic, ok: true });
     }

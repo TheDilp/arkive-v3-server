@@ -20,7 +20,6 @@ import {
 } from "drizzle-orm";
 import { RequestFilterType, RequestFilterTypes } from "../types/CRUDTypes";
 import { characters, documents } from "../drizzle/schema";
-import { AvailableEntityType } from "../types/dataTypes";
 
 function getFilter(filterType: RequestFilterTypes) {
   switch (filterType) {
