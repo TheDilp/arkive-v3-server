@@ -4,10 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "prisma generate && node --max-old-space-size=200 ./dist/index.js",
+    "start:dev": "dotenv -e .env.dev -- nodemon index.ts",
     "build": "tsc",
-    "runlocal:dev": "dotenv -e .env.dev -- nodemon index.ts",
-    "runlocal:prod": "dotenv -e .env.prod -- nodemon index.ts",
     "generate": "dotenv -e .env.dev drizzle-kit generate:pg",
     "introspect": "dotenv -e .env.dev drizzle-kit introspect:pg --introspect-casing=preserve"
   },
