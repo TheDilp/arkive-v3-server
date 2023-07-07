@@ -1,8 +1,10 @@
-import { FastifyInstance, FastifyRegister, FastifyRequest } from "fastify";
-import { db, insertCharacterSchema } from "../utils";
-import { characters } from "../drizzle/schema";
+import { and, eq } from "drizzle-orm";
+import { FastifyInstance, FastifyRequest } from "fastify";
+import { characters, images } from "../drizzle/schema";
 import { ResponseEnum } from "../enums/ResponseEnums";
-import { eq } from "drizzle-orm";
+import { db, insertCharacterSchema } from "../utils";
+import { RequestBodyType } from "../types/CRUDTypes";
+import { getFilters } from "../utils/filterConstructor";
 
 export const characterRouter = (server: FastifyInstance, _: any, done: any) => {
   // #region create_routes
@@ -22,20 +24,40 @@ export const characterRouter = (server: FastifyInstance, _: any, done: any) => {
   // #endregion create_routes
 
   // #region read_routes
-  server.get(
+  server.post(
     "/:projectId",
-    async (req: FastifyRequest<{ Params: { projectId: string } }>, rep) => {
+    async (
+      req: FastifyRequest<{
+        Params: { projectId: string };
+        Body: RequestBodyType;
+      }>,
+      rep
+    ) => {
+      let filters;
+      if (req.body.filters) {
+        filters = getFilters(req.body.filters, characters);
+      }
       const data = await db
         .select({
           id: characters.id,
           firstName: characters.firstName,
           lastName: characters.lastName,
           nickname: characters.nickname,
+          projectId: characters.projectId,
           age: characters.age,
-          imageId: characters.imageId,
+          image: {
+            id: images.id,
+            title: images.title,
+          },
         })
         .from(characters)
-        .where(eq(characters.projectId, req.params.projectId));
+        .where(
+          and(
+            eq(characters.projectId, req.params.projectId),
+            ...(filters || [])
+          )
+        )
+        .leftJoin(images, eq(images.id, characters.imageId));
       rep.send({ data, message: ResponseEnum.generic, ok: true });
     }
   );

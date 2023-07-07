@@ -1,16 +1,31 @@
-export type AvailableTypes =
+export type AvailableEntityType =
+  | "project"
+  | "characters"
   | "documents"
   | "maps"
-  | "map_pins"
-  | "boards"
-  | "nodes"
-  | "edges"
+  | "graphs"
   | "screens"
-  | "sections"
+  | "dictionarys"
   | "calendars"
   | "timelines"
+  | "randomTables"
+  | "additionalFieldTemplates";
+export type AvailableSubEntityType =
+  | "alterNames"
+  | "mapPins"
+  | "mapLayers"
+  | "nodes"
+  | "edges"
+  | "sections"
+  | "cards"
+  | "words"
+  | "months"
   | "events"
-  | "words";
+  | "randomTableOptions"
+  | "additionalFields";
+
+export type AllAvailableEntities = AvailableEntityType | AvailableSubEntityType;
+
 export type AvailableDiscordTypes =
   | "documents"
   | "maps"
