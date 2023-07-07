@@ -1,11 +1,7 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
-import {
-  characterFields,
-  characterFieldsTocharacterFieldsTemplates,
-} from "../drizzle/schema";
-import { db } from "../utils";
-import { eq } from "drizzle-orm";
+import { characterFields } from "../drizzle/schema";
 import { ResponseEnum } from "../enums/ResponseEnums";
+import { db } from "../utils";
 
 export function characterFieldsRouter(
   server: FastifyInstance,
@@ -23,18 +19,9 @@ export function characterFieldsRouter(
       }>,
       rep
     ) => {
-      const fields = await db
-        .select()
-        .from(characterFieldsTocharacterFieldsTemplates)
-        .where(
-          eq(characterFieldsTocharacterFieldsTemplates.b, req.params.templateId)
-        )
-        .leftJoin(
-          characterFields,
-          eq(characterFields.id, characterFieldsTocharacterFieldsTemplates.a)
-        );
-      const data = fields.map((f) => f.character_fields);
-      rep.send({ data, message: ResponseEnum.generic, ok: true });
+      const fields = await db.select().from(characterFields);
+
+      rep.send({ data: fields, message: ResponseEnum.generic, ok: true });
     }
   );
 

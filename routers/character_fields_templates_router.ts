@@ -1,12 +1,10 @@
-import { eq } from "drizzle-orm";
+import { Subquery, and, eq, sql } from "drizzle-orm";
 import { FastifyInstance, FastifyRequest } from "fastify";
 import { db, insertFieldSchema, insertFieldTemplateSchema } from "../utils";
-import {
-  characterFields,
-  characterFieldsTemplates,
-  characterFieldsTocharacterFieldsTemplates,
-} from "../drizzle/schema";
+import { characterFields, characterFieldsTemplates } from "../drizzle/schema";
 import { ResponseEnum } from "../enums/ResponseEnums";
+import { RequestBodyType } from "../types/CRUDTypes";
+import groupBy from "lodash.groupby";
 
 export function characterFieldsTemplatesRouter(
   server: FastifyInstance,
@@ -44,7 +42,8 @@ export function characterFieldsTemplatesRouter(
           .insert(characterFields)
           .values(
             fields.map((f) => {
-              const fieldData = insertFieldSchema.parse(f);
+              const newField = { ...f, parentId: template.id };
+              const fieldData = insertFieldSchema.parse(newField);
               return fieldData;
             })
           )
@@ -53,12 +52,6 @@ export function characterFieldsTemplatesRouter(
           await tx.rollback();
           return;
         }
-        await tx.insert(characterFieldsTocharacterFieldsTemplates).values(
-          newFields.map((field) => ({
-            a: field.id,
-            b: template.id,
-          }))
-        );
       });
       rep.send({ message: ResponseEnum.created("Template"), ok: true });
     }
@@ -69,15 +62,40 @@ export function characterFieldsTemplatesRouter(
     async (
       req: FastifyRequest<{
         Params: { projectId: string };
+        Body: RequestBodyType;
       }>,
       rep
     ) => {
-      const templates = await db
-        .select()
+      const rows = await db
+        .select({
+          template: characterFieldsTemplates,
+          field: characterFields,
+        })
         .from(characterFieldsTemplates)
-        .where(eq(characterFieldsTemplates.projectId, req.params.projectId));
+        .leftJoin(
+          characterFields,
+          eq(characterFields.parentId, characterFieldsTemplates.id)
+        );
+      const result = rows.reduce<
+        Record<string, { template: { id: string }; fields: any[] }>
+      >((acc, row) => {
+        const { template, field } = row;
 
-      rep.send({ data: templates, message: ResponseEnum.generic, ok: true });
+        if (!acc[template.id]) {
+          acc[template.id] = { template, fields: [] };
+        }
+
+        if (field) {
+          acc[template.id].fields.push(field);
+        }
+
+        return acc;
+      }, {});
+      const data = Object.values(result).map((val) => ({
+        ...val.template,
+        fields: val.fields,
+      }));
+      rep.send({ data, message: ResponseEnum.generic, ok: true });
     }
   );
 

@@ -4,6 +4,7 @@ import {
   foreignKey,
   index,
   integer,
+  json,
   jsonb,
   pgTable,
   text,
@@ -12,32 +13,6 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-
-export const characterFieldsTocharacterFieldsTemplates = pgTable(
-  "_character_fieldsTocharacter_fields_templates",
-  {
-    a: uuid("A")
-      .notNull()
-      .references(() => characterFields.id, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
-    b: uuid("B")
-      .notNull()
-      .references(() => characterFieldsTemplates.id, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
-  },
-  (table) => {
-    return {
-      abUnique: uniqueIndex(
-        "_character_fieldsTocharacter_fields_templates_AB_unique"
-      ).on(table.a, table.b),
-      bIdx: index().on(table.b),
-    };
-  }
-);
 
 export const users = pgTable(
   "users",
@@ -349,6 +324,7 @@ export const characterFieldsTemplatesTocharacters = pgTable(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
+    values: json("values"),
   },
   (table) => {
     return {
@@ -492,6 +468,12 @@ export const characterFields = pgTable("character_fields", {
   title: text("title").notNull(),
   fieldType: text("field_type").notNull(),
   options: text("options").array(),
+  parentId: uuid("parentId")
+    .notNull()
+    .references(() => characterFieldsTemplates.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
 });
 
 export const roles = pgTable(
