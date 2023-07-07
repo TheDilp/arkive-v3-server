@@ -387,25 +387,6 @@ export const mapPins = pgTable("map_pins", {
   }),
 });
 
-export const characterToCharacterField = pgTable(
-  "character_to_character_field",
-  {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
-    charactersId: uuid("characters_id")
-      .notNull()
-      .references(() => characters.id, {
-        onDelete: "restrict",
-        onUpdate: "cascade",
-      }),
-    characterFieldsId: uuid("character_fields_id")
-      .notNull()
-      .references(() => characterFields.id, {
-        onDelete: "restrict",
-        onUpdate: "cascade",
-      }),
-  }
-);
-
 export const permissions = pgTable("permissions", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   projectId: uuid("project_id")

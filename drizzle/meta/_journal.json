@@ -71,6 +71,13 @@
       "when": 1688750586475,
       "tag": "0009_third_lady_vermin",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1688752576423,
+      "tag": "0010_flashy_sunspot",
+      "breakpoints": true
     }
   ]
 }
