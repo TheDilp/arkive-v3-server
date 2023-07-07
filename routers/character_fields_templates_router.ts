@@ -6,8 +6,13 @@ import {
   characterFieldsTemplates,
   characterFieldsTocharacterFieldsTemplates,
 } from "../drizzle/schema";
+import { ResponseEnum } from "../enums/ResponseEnums";
 
-export function fieldRouter(server: FastifyInstance, _: any, done: any) {
+export function characterFieldsTemplatesRouter(
+  server: FastifyInstance,
+  _: any,
+  done: any
+) {
   server.post(
     "/create",
     async (
@@ -55,7 +60,7 @@ export function fieldRouter(server: FastifyInstance, _: any, done: any) {
           }))
         );
       });
-      rep.send({ message: "Template created successfully.", ok: true });
+      rep.send({ message: ResponseEnum.created("Template"), ok: true });
     }
   );
 
@@ -72,7 +77,7 @@ export function fieldRouter(server: FastifyInstance, _: any, done: any) {
         .from(characterFieldsTemplates)
         .where(eq(characterFieldsTemplates.projectId, req.params.projectId));
 
-      rep.send({ data: templates });
+      rep.send({ data: templates, message: ResponseEnum.generic, ok: true });
     }
   );
 
