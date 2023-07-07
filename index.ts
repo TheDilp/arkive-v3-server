@@ -77,7 +77,7 @@ server.register(
   }
 );
 
-server.setErrorHandler(function (error, request, reply) {
+server.setErrorHandler(function (error, _, reply) {
   if (error instanceof errorCodes.FST_ERR_BAD_STATUS_CODE) {
     // Log error
     this.log.error(error);

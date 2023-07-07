@@ -13,10 +13,11 @@ export function characterFieldsRouter(
   done: any
 ) {
   server.get(
-    "/:templateId",
+    "/:projectId/:templateId",
     async (
       req: FastifyRequest<{
         Params: {
+          projectId: string;
           templateId: string;
         };
       }>,
@@ -32,8 +33,8 @@ export function characterFieldsRouter(
           characterFields,
           eq(characterFields.id, characterFieldsTocharacterFieldsTemplates.a)
         );
-
-      rep.send({ data: fields, message: ResponseEnum.generic, ok: true });
+      const data = fields.map((f) => f.character_fields);
+      rep.send({ data, message: ResponseEnum.generic, ok: true });
     }
   );
 
