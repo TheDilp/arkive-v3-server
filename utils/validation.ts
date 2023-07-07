@@ -1,5 +1,7 @@
 import { createInsertSchema } from "drizzle-zod";
 import {
+  characterFields,
+  characterFieldsTemplates,
   characters,
   documents,
   projects,
@@ -14,6 +16,7 @@ type Json = Literal | { [key: string]: Json } | Json[];
 
 // #region users
 export const insertUserSchema = createInsertSchema(users);
+
 // #endregion users
 
 // #region projects
@@ -26,6 +29,7 @@ export const updateProjectSchema = z.object({
 
 // #region characters
 export const insertCharacterSchema = createInsertSchema(characters);
+
 // #endregion characters
 
 // #region documents
@@ -40,6 +44,13 @@ export const updateDocumentSchema = z.object({
   imageId: z.string().optional(),
 });
 // #endregion documents
+
+// #region fields
+export const insertFieldTemplateSchema = createInsertSchema(
+  characterFieldsTemplates
+);
+export const insertFieldSchema = createInsertSchema(characterFields);
+// #endregion fields
 
 // #region swatches
 export const insertSwatchSchema = createInsertSchema(swatches);

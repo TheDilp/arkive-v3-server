@@ -59,7 +59,12 @@ export const users = pgTable(
 export const characterFieldsTemplates = pgTable("character_fields_templates", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   title: text("title").notNull(),
-  value: text("value").notNull(),
+  projectId: uuid("project_id")
+    .notNull()
+    .references(() => projects.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
 });
 
 export const mapLayers = pgTable("map_layers", {

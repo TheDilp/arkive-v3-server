@@ -179,5 +179,5 @@ export const assetRouter = (server: FastifyInstance, _: any, done: any) => {
       return;
     }
   );
-  // #endregion discord
+  done();
 };

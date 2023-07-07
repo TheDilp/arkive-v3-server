@@ -1,5 +1,6 @@
 # Logs
 assets
+drizzle
 logs
 *.log
 npm-debug.log*
