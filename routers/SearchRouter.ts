@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import prisma from "../client";
-import { AvailableTypes } from "../types/dataTypes";
+import { AllAvailableEntities, AvailableEntityType } from "../types/dataTypes";
 import { hasValueDeep } from "../utils/transform";
 
 export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
@@ -523,7 +523,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
         Body: {
           query: string;
           project_id: string;
-          type: AvailableTypes;
+          type: AllAvailableEntities;
           take?: number;
         };
       }>,
@@ -601,7 +601,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           });
           rep.send(items);
         }
-        if (data.type === "map_pins") {
+        if (data.type === "mapPins") {
           rep.send(
             prisma.map_pins.findMany({
               take: data?.take,
@@ -629,7 +629,7 @@ export const searchRouter = (server: FastifyInstance, _: any, done: any) => {
           );
           return;
         }
-        if (data.type === "boards") {
+        if (data.type === "graphs") {
           const items = await prisma.boards.findMany({
             take: data?.take,
             where: {
