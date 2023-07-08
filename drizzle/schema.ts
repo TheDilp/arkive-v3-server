@@ -578,6 +578,27 @@ export const rolesTousers = pgTable(
   }
 );
 
+export const charactersToTags = pgTable(
+  "_charactersTotags",
+  {
+    a: uuid("A")
+      .notNull()
+      .references(() => characters.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    b: uuid("B")
+      .notNull()
+      .references(() => tags.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  },
+  (table) => {
+    return {
+      abUnique: uniqueIndex("_charactersTotags_AB_unique").on(table.a, table.b),
+      bIdx: index().on(table.b),
+    };
+  }
+);
+
 export const documentsTotags = pgTable(
   "_documentsTotags",
   {
