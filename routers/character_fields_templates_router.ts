@@ -156,12 +156,18 @@ export function characterFieldsTemplatesRouter(
 
           if (req.body.relations?.fields?.length) {
             await Promise.all(
-              req.body.relations?.fields.map((field) => {
-                const parsedField = updateFieldSchema.parse(field);
-                if (parsedField)
-                  tx.update(characterFields)
-                    .set(parsedField)
-                    .where(eq(characterFields.id, parsedField.id));
+              req.body.relations?.fields.map((f) => {
+                const field = { ...f, parentId: req.params.id };
+                const parsedField = insertFieldSchema.parse(field);
+                if (parsedField) {
+                  return tx
+                    .insert(characterFields)
+                    .values(parsedField)
+                    .onConflictDoUpdate({
+                      target: characterFields.id,
+                      set: parsedField,
+                    });
+                }
               })
             );
           }
@@ -172,6 +178,19 @@ export function characterFieldsTemplatesRouter(
   );
 
   // #endregion update_routes
+
+  // #region delete_routes
+  server.delete(
+    "/:id",
+    async (req: FastifyRequest<{ Params: { id: string } }>, rep) => {
+      await db
+        .delete(characterFieldsTemplates)
+        .where(eq(characterFieldsTemplates.id, req.params.id));
+
+      rep.send({ message: ResponseEnum.deleted("Tempalte"), ok: true });
+    }
+  );
+  // #endregion delete_routes
 
   done();
 }
