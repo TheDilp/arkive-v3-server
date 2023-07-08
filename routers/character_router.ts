@@ -180,28 +180,73 @@ export const characterRouter = (server: FastifyInstance, _: any, done: any) => {
     ) => {
       const data = insertCharacterSchema.partial().parse(req.body.data);
       if (data) {
-        if (req.body?.relations) {
-          if (req.body.relations?.characterFieldTemplates) {
-            await db.transaction(async (tx) => {
-              await tx
-                .update(characters)
-                .set(data)
-                .where(eq(characters.id, req.params.id));
+        await db.transaction(async (tx) => {
+          await tx
+            .update(characters)
+            .set(data)
+            .where(eq(characters.id, req.params.id));
+
+          if (req.body?.relations) {
+            if (req.body.relations?.characterFieldTemplates) {
+              const existingTemplatesRelations = await tx
+                .select()
+                .from(characterFieldsTemplatesTocharacters)
+                .where(
+                  eq(characterFieldsTemplatesTocharacters.b, req.params.id)
+                );
+
+              const existingTemplateIds = existingTemplatesRelations.map(
+                (templateRelation) => templateRelation.a
+              );
+
+              const toUpdateTemplateIds = Object.keys(
+                req.body.relations.characterFieldTemplates
+              );
+
+              await Promise.all(
+                existingTemplateIds.map((templateId) => {
+                  if (!toUpdateTemplateIds.includes(templateId)) {
+                    return tx
+                      .delete(characterFieldsTemplatesTocharacters)
+                      .where(
+                        and(
+                          eq(
+                            characterFieldsTemplatesTocharacters.a,
+                            templateId
+                          ),
+                          eq(
+                            characterFieldsTemplatesTocharacters.b,
+                            req.params.id
+                          )
+                        )
+                      );
+                  }
+                })
+              );
 
               await Promise.all(
                 Object.entries(
                   req.body.relations.characterFieldTemplates || {}
-                ).map(([templateId, values]) =>
-                  tx.insert(characterFieldsTemplatesTocharacters).values({
-                    a: templateId,
-                    b: req.params.id,
-                    values,
-                  })
-                )
+                ).map(([templateId, values]) => {
+                  return tx
+                    .insert(characterFieldsTemplatesTocharacters)
+                    .values({
+                      a: templateId,
+                      b: req.params.id,
+                      values,
+                    })
+                    .onConflictDoUpdate({
+                      target: [
+                        characterFieldsTemplatesTocharacters.a,
+                        characterFieldsTemplatesTocharacters.b,
+                      ],
+                      set: { values },
+                    });
+                })
               );
-            });
+            }
           }
-        }
+        });
         rep.send({ message: ResponseEnum.updated("Character"), ok: true });
       }
     }
