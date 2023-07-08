@@ -17,6 +17,32 @@ export function removeNull(obj: JSON) {
   );
 }
 
+export function formatOneToManyResult(
+  data: { [key: string]: any }[],
+  key: string
+) {
+  const result = data.reduce<Record<string, { [key: string]: any }>>(
+    (acc, row) => {
+      const { [key]: field, ...rest } = row;
+      if (!acc[row.id]) {
+        acc[row.id] = { ...rest, [key]: [] };
+      }
+
+      if (field) {
+        acc[row.id][key].push(field);
+      }
+
+      return acc;
+    },
+    {}
+  );
+  const formattedResult = Object.values(result).map((val) => ({
+    ...val,
+    [key]: val[key],
+  }));
+  return formattedResult;
+}
+
 export function onlyUniqueStrings(
   value: string,
   index: number,

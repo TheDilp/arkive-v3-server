@@ -3,7 +3,12 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { and, asc, eq } from "drizzle-orm";
 import { images, projects, swatches } from "../drizzle/schema";
 import { ResponseEnum } from "../enums/ResponseEnums";
-import { db, insertProjectSchema, updateProjectSchema } from "../utils";
+import {
+  db,
+  formatOneToManyResult,
+  insertProjectSchema,
+  updateProjectSchema,
+} from "../utils";
 
 export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   // #region create_routes
@@ -13,7 +18,6 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
       req: FastifyRequest<{ Body: { data: typeof insertProjectSchema } }>,
       rep
     ) => {
-      console.log(req.body.data);
       const requestData = insertProjectSchema.parse(req.body.data);
       if (requestData) {
         const data = await db.insert(projects).values(requestData).returning();
@@ -27,23 +31,35 @@ export const projectRouter = (server: FastifyInstance, _: any, done: any) => {
   server.post(
     "/",
     async (
-      req: FastifyRequest<{ Body: { data: { userId: string } } }>,
+      req: FastifyRequest<{
+        Body: { data: { userId: string }; relations?: { images?: boolean } };
+      }>,
       rep
     ) => {
-      const data = await db
+      const result = db
         .select({
           id: projects.id,
           title: projects.title,
           owner_id: projects.ownerId,
-          image: {
-            id: images.id,
-            title: images.title,
-          },
+          ...(req.body?.relations?.images
+            ? {
+                image: {
+                  id: images.id,
+                  title: images.title,
+                },
+              }
+            : {}),
         })
         .from(projects)
         .where(eq(projects.ownerId, req.body.data.userId))
-        .orderBy(asc(projects.title))
-        .leftJoin(images, eq(projects.id, images.projectsId));
+        .orderBy(asc(projects.title));
+
+      if (req.body?.relations?.images) {
+        result.leftJoin(images, eq(projects.id, images.projectsId));
+      }
+
+      const data = formatOneToManyResult(await result, "image");
+
       if (data) {
         rep.send({ data, message: ResponseEnum.generic(), ok: true });
       }
