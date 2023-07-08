@@ -10,6 +10,6 @@ export * from "./PublicRouter";
 export * from "./RandomTableRouter";
 export * from "./ScreenRouter";
 export * from "./SearchRouter";
-export * from "./TagRouter";
+export * from "./tags_router";
 export * from "./TimelineRouter";
 export * from "./user_router";

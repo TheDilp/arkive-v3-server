@@ -1,32 +1,20 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import prisma from "../client";
+import { db } from "../utils";
+import { tags } from "../drizzle/schema";
+import { ResponseEnum } from "../enums/ResponseEnums";
 
-export const tagRouter = (server: FastifyInstance, _: any, done: any) => {
-  server.get(
-    "/alltags/:project_id",
+export const tagsRouter = (server: FastifyInstance, _: any, done: any) => {
+  server.post(
+    "/:project_id",
     async (
       req: FastifyRequest<{ Params: { project_id: string } }>,
       rep: FastifyReply
     ) => {
-      try {
-        const { project_id } = req.params;
-        const tags = await prisma.tags.findMany({
-          where: {
-            project_id,
-          },
-          select: {
-            id: true,
-            title: true,
-          },
-        });
-        rep.send(tags);
-        return;
-      } catch (error) {
-        rep.code(500);
-        console.error(error);
-        rep.send(false);
-        return;
+      const data = await db.select().from(tags);
+      if (data) {
+        rep.send({ data, message: ResponseEnum.generic, ok: true });
       }
     }
   );

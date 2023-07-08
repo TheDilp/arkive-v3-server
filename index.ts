@@ -11,6 +11,7 @@ import {
   otherRouter,
   projectRouter,
   publicRouter,
+  tagsRouter,
   userRouter,
 } from "./routers";
 import { swatchesRouter } from "./routers/swatches_router";
@@ -51,6 +52,7 @@ server.register(
     instance.register(userRouter, { prefix: "/users" });
     instance.register(assetRouter, { prefix: "/assets" });
     instance.register(projectRouter, { prefix: "/projects" });
+    instance.register(tagsRouter, { prefix: "/tags" });
     instance.register(swatchesRouter, { prefix: "/swatches" });
     instance.register(characterRouter, { prefix: "/characters" });
     instance.register(characterFieldsTemplatesRouter, {
