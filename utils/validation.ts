@@ -6,6 +6,7 @@ import {
   documents,
   projects,
   swatches,
+  tags,
   users,
 } from "../drizzle/schema";
 import { z } from "zod";
@@ -60,6 +61,10 @@ export const updateFieldSchema = z.object({
 });
 export const insertFieldSchema = createInsertSchema(characterFields);
 // #endregion fields
+
+// #region tags
+export const insertTagSchema = createInsertSchema(tags).array();
+// #endregion tags
 
 // #region swatches
 export const insertSwatchSchema = createInsertSchema(swatches);
