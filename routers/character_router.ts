@@ -152,7 +152,6 @@ export const characterRouter = (server: FastifyInstance, _: any, done: any) => {
 
         return acc;
       }, {});
-      console.log(Object.values(data)[0]);
       rep.send({
         data: Object.values(data)[0],
         message: ResponseEnum.generic,

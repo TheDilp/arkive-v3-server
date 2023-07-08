@@ -1,16 +1,24 @@
-import { Subquery, and, eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { FastifyInstance, FastifyRequest } from "fastify";
-import { db, insertFieldSchema, insertFieldTemplateSchema } from "../utils";
 import { characterFields, characterFieldsTemplates } from "../drizzle/schema";
 import { ResponseEnum } from "../enums/ResponseEnums";
 import { RequestBodyType } from "../types/CRUDTypes";
-import groupBy from "lodash.groupby";
+import {
+  db,
+  formatOneToManyResult,
+  insertFieldSchema,
+  insertFieldTemplateSchema,
+  updateFieldSchema,
+  updateFieldTemplateSchema,
+} from "../utils";
 
 export function characterFieldsTemplatesRouter(
   server: FastifyInstance,
   _: any,
   done: any
 ) {
+  // #region create_routes
+
   server.post(
     "/create",
     async (
@@ -56,6 +64,35 @@ export function characterFieldsTemplatesRouter(
       rep.send({ message: ResponseEnum.created("Template"), ok: true });
     }
   );
+  // #endregion create_routes
+
+  // #region read_routes
+
+  server.get(
+    "/:id",
+    async (
+      req: FastifyRequest<{
+        Params: { id: string };
+      }>,
+      rep
+    ) => {
+      const result = await db
+        .select({
+          id: characterFieldsTemplates.id,
+          title: characterFieldsTemplates.title,
+          projectId: characterFieldsTemplates.projectId,
+          fields: characterFields,
+        })
+        .from(characterFieldsTemplates)
+        .where(eq(characterFieldsTemplates.id, req.params.id))
+        .leftJoin(
+          characterFields,
+          eq(characterFields.parentId, characterFieldsTemplates.id)
+        );
+      const [data] = formatOneToManyResult(result, "fields");
+      rep.send({ data, message: ResponseEnum.generic, ok: true });
+    }
+  );
 
   server.post(
     "/:projectId",
@@ -66,38 +103,75 @@ export function characterFieldsTemplatesRouter(
       }>,
       rep
     ) => {
-      const rows = await db
+      const rows = db
         .select({
-          template: characterFieldsTemplates,
-          field: characterFields,
+          id: characterFieldsTemplates.id,
+          title: characterFieldsTemplates.title,
+          projectId: characterFieldsTemplates.projectId,
+          ...(req.body?.relations?.characterFields
+            ? { fields: characterFields }
+            : {}),
         })
-        .from(characterFieldsTemplates)
-        .leftJoin(
+        .from(characterFieldsTemplates);
+
+      if (req.body?.relations?.characterFields) {
+        rows.leftJoin(
           characterFields,
           eq(characterFields.parentId, characterFieldsTemplates.id)
         );
-      const result = rows.reduce<
-        Record<string, { template: { id: string }; fields: any[] }>
-      >((acc, row) => {
-        const { template, field } = row;
+      }
 
-        if (!acc[template.id]) {
-          acc[template.id] = { template, fields: [] };
-        }
+      const result = await rows;
 
-        if (field) {
-          acc[template.id].fields.push(field);
-        }
-
-        return acc;
-      }, {});
-      const data = Object.values(result).map((val) => ({
-        ...val.template,
-        fields: val.fields,
-      }));
+      const data = formatOneToManyResult(result, "fields");
       rep.send({ data, message: ResponseEnum.generic, ok: true });
     }
   );
+  // #endregion read_routes
+
+  // #region update_routes
+
+  server.post(
+    "/update/:id",
+    async (
+      req: FastifyRequest<{
+        Params: {
+          id: string;
+        };
+        Body: {
+          data: typeof insertFieldTemplateSchema;
+          relations?: { fields?: (typeof insertFieldSchema)[] };
+        };
+      }>,
+      rep
+    ) => {
+      const data = updateFieldTemplateSchema.parse(req.body.data);
+
+      if (data) {
+        await db.transaction(async (tx) => {
+          await tx
+            .update(characterFieldsTemplates)
+            .set(data)
+            .where(eq(characterFieldsTemplates.id, req.params.id));
+
+          if (req.body.relations?.fields?.length) {
+            await Promise.all(
+              req.body.relations?.fields.map((field) => {
+                const parsedField = updateFieldSchema.parse(field);
+                if (parsedField)
+                  tx.update(characterFields)
+                    .set(parsedField)
+                    .where(eq(characterFields.id, parsedField.id));
+              })
+            );
+          }
+        });
+        rep.send({ message: ResponseEnum.updated("Template"), ok: true });
+      }
+    }
+  );
+
+  // #endregion update_routes
 
   done();
 }

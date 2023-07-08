@@ -49,6 +49,15 @@ export const updateDocumentSchema = z.object({
 export const insertFieldTemplateSchema = createInsertSchema(
   characterFieldsTemplates
 );
+export const updateFieldTemplateSchema = z.object({
+  title: z.string().optional(),
+});
+export const updateFieldSchema = z.object({
+  id: z.string(),
+  title: z.string().optional(),
+  fieldType: z.string().optional(),
+  options: z.string().array().optional(),
+});
 export const insertFieldSchema = createInsertSchema(characterFields);
 // #endregion fields
 
